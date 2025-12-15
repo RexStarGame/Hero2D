@@ -7,19 +7,33 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D rb;
     private Animator animator;
     private Vector2 movement;
+    private SpriteRenderer sr;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        sr = GetComponent<SpriteRenderer>();
+
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
     }
+
 
     void Update()
     {
         // Læs input
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
+
+        // --- FLIP LOGIK (VENSTRE / HØJRE) ---
+        if (movement.x > 0.01f)
+        {
+            sr.flipX = false; // kigger mod højre
+        }
+        else if (movement.x < -0.01f)
+        {
+            sr.flipX = true; // kigger mod venstre
+        }
 
         if (movement.sqrMagnitude > 0)
         {
