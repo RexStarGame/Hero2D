@@ -3,74 +3,89 @@ using UnityEngine;
 public class EnemyAttack : MonoBehaviour
 {
     [Header("Indstillinger")]
-    [SerializeField] private GameObject fireballPrefab; // Hvad skal den skyde med?
-    [SerializeField] private Transform firePoint;       // Hvor skydes den fra? (F.eks. stavens spids)
+    [SerializeField] private GameObject fireballPrefab;
+    [SerializeField] private Transform firePoint;
 
     [Header("Kamp Stats")]
-    [SerializeField] private float attackRange = 5f;    // Hvor tæt skal spilleren være?
-    [SerializeField] private float attackCooldown = 2f; // Hvor mange sekunder mellem hvert skud?
+    [SerializeField] private float attackRange = 5f;
+    [SerializeField] private float attackCooldown = 2f;
 
-    private Transform player;       // Hvor er spilleren?
-    private float cooldownTimer;    // Tæller ned til næste skud
+    private Transform player;
+    private float cooldownTimer;
+    private Animator animator;
 
     void Start()
     {
-        // Vi finder spilleren automatisk via Tagget "Player"
-        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        animator = GetComponent<Animator>();
 
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
         {
             player = playerObj.transform;
         }
         else
         {
-            // Hvis vi glemte tagget, giver vi en advarsel i konsollen, men spillet crasher ikke
-            Debug.LogWarning("EnemyAttack kunne ikke finde en spiller med tagget 'Player'!");
+            Debug.LogWarning("Mangler Player tag!");
         }
 
-        // Hvis vi har glemt at sætte et firePoint, bruger vi bare fjendens egen position
-        if (firePoint == null)
-        {
-            firePoint = transform;
-        }
+        if (firePoint == null) firePoint = transform;
     }
 
     void Update()
     {
-        // Hvis spilleren er død (eller ikke fundet), gør ingenting
         if (player == null) return;
 
-        // 1. Mål afstanden til spilleren
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
 
-        // 2. Er vi tæt nok? OG er timeren klar?
         if (distanceToPlayer <= attackRange && cooldownTimer <= 0)
         {
             Shoot();
-            // Nulstil timeren
             cooldownTimer = attackCooldown;
         }
         else
         {
-            // Tæl timeren ned
             cooldownTimer -= Time.deltaTime;
         }
     }
 
     void Shoot()
     {
-        // Udregn retningen mod spilleren (Spillerens position minus start-positionen)
+        // 1. Find retningen til spilleren
         Vector2 direction = (player.position - firePoint.position).normalized;
 
-        // Udregn vinklen, så fireballen roterer rigtigt mod spilleren
+        if (animator != null)
+        {
+            // DEL 1: Er vi Oppe (Ryggen til) eller Nede (Ansigt frem)?
+            if (direction.y > 0)
+            {
+                animator.SetBool("IsFacingUp", true); // Vi ser RYGGEN
+            }
+            else
+            {
+                animator.SetBool("IsFacingUp", false); // Vi ser ANSIGTET
+            }
+
+            // DEL 2: Er vi til Højre eller Venstre?
+            if (direction.x > 0)
+            {
+                animator.SetBool("IsFacingRight", true);
+            }
+            else
+            {
+                animator.SetBool("IsFacingRight", false);
+            }
+
+            // 3. Aktivér angrebet
+            animator.SetTrigger("Attack");
+        }
+
+        // 4. Roter selve fireballen
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         Quaternion rotation = Quaternion.Euler(0, 0, angle);
 
-        // Skab fireballen
         Instantiate(fireballPrefab, firePoint.position, rotation);
     }
 
-    // En lille hjælper, så du kan se rækkevidden (den røde cirkel) i Editoren
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
