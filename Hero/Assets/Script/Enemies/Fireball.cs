@@ -25,8 +25,22 @@ public class Fireball : MonoBehaviour
     // Denne funktion kører, når fireballens Collider rammer en anden Collider
     void OnTriggerEnter2D(Collider2D other)
     {
-        // Vi tjekker ikke HVAD vi rammer. Rammer vi noget, så dør fireballen.
-        // (Her kan du senere tilføje skade til spilleren, før den dør)
+        // 1. Tjek om det vi ramte er en fjende
+        // Hvis vi rammer en fjende (os selv eller en ven), så gør ingenting!
+        if (other.CompareTag("Enemy"))
+        {
+            return; // Stop funktionen her, ikke gør mere.
+        }
+
+        // 2. Tjek om vi ramte patrulje-området (EnemyManagerens zone)
+        // Hvis din EnemyManager har et tag (f.eks. "GameController" eller "Zone"), kan du ignorere den
+        if (other.CompareTag("GameController"))
+        {
+            return;
+        }
+
+        // 3. Hvis vi når herned, har vi ramt spilleren eller en væg
+        // Her kan du senere tilføje: other.GetComponent<PlayerHealth>().TakeDamage(1);
 
         Destroy(gameObject);
     }
