@@ -6,6 +6,7 @@ public class EnemyHealth : MonoBehaviour
     [SerializeField] private int maxHealth = 3;
     private int currentHealth;
 
+    private ProgressBar progressBar;
     void Start()
     {
         // Sæt liv til max ved start
@@ -23,12 +24,11 @@ public class EnemyHealth : MonoBehaviour
             Die();
         }
     }
-
     void Die()
     {
         // Her kan du senere indsætte lydeffekter, partikler eller loot drops
         Debug.Log(gameObject.name + " er død!");
-
+        progressBar.EXPAmount(10f); // Tilføj XP til spilleren ved fjendens død
         // VIGTIGT: Dette fjerner objektet fra spillet.
         // Når dette sker, vil din EnemySpawn automatisk opdage, at der mangler en fjende.
         Destroy(gameObject);
