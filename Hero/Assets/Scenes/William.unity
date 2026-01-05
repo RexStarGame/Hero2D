@@ -1267,7 +1267,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &405388408
 Transform:
   m_ObjectHideFlags: 0
@@ -4761,7 +4761,7 @@ Transform:
   m_GameObject: {fileID: 1471776239}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.61968, y: -0.0046145, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 5.23239, y: 5.23239, z: 5.23239}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -5813,7 +5813,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: -2478889539282618257, guid: c38384ceaa42ce945bc60ab4026a0336, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -5881,7 +5881,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackCooldown: 0.5
+  hitboxStartDelay: 0.1
+  hitboxActiveTime: 0.2
+  hitboxDistance: 0.7
   attackHitbox: {fileID: 675056012}
+  animator: {fileID: 405388410}
 --- !u!95 &1716630635
 Animator:
   serializedVersion: 7
