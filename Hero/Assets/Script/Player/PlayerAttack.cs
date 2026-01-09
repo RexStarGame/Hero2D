@@ -13,22 +13,16 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField] private Collider2D attackHitbox;
     [SerializeField] private Animator animator;
 
-    // Name of the Trigger in the Animator
     private string animationTriggerName = "AttackTrigger";
+    private string animationBoolName = "IsAttackingBool";
 
     private bool canAttack = true;
     private Vector2 lastFacingDirection = Vector2.down;
-    private Rigidbody2D rb;
 
     void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
-
-        if (attackHitbox != null)
-            attackHitbox.enabled = false;
-
-        if (animator == null)
-            animator = GetComponentInChildren<Animator>();
+        if (attackHitbox != null) attackHitbox.enabled = false;
+        if (animator == null) animator = GetComponentInChildren<Animator>();
     }
 
     void Update()
@@ -48,14 +42,11 @@ public class PlayerAttack : MonoBehaviour
         Vector2 currentInput = new Vector2(moveX, moveY);
 
         if (currentInput.sqrMagnitude > 0.01f)
-        {
             lastFacingDirection = currentInput.normalized;
-        }
 
         if (attackHitbox != null)
         {
             attackHitbox.transform.localPosition = lastFacingDirection * hitboxDistance;
-
             float angle = Mathf.Atan2(lastFacingDirection.y, lastFacingDirection.x) * Mathf.Rad2Deg;
             attackHitbox.transform.localRotation = Quaternion.Euler(0, 0, angle);
         }
@@ -65,25 +56,23 @@ public class PlayerAttack : MonoBehaviour
     {
         canAttack = false;
 
-        // 1. Trigger the attack animation
+        // 1. Send signal til Animator
         if (animator != null)
+        {
+            animator.SetBool(animationBoolName, true);
             animator.SetTrigger(animationTriggerName);
+        }
 
-        // 2. Wait before activating hitbox
         yield return new WaitForSeconds(hitboxStartDelay);
+        if (attackHitbox != null) attackHitbox.enabled = true;
 
-        // 3. Activate hitbox
-        if (attackHitbox != null)
-            attackHitbox.enabled = true;
-
-        // 4. Keep hitbox active for a short duration
         yield return new WaitForSeconds(hitboxActiveTime);
+        if (attackHitbox != null) attackHitbox.enabled = false;
 
-        // 5. Deactivate hitbox
-        if (attackHitbox != null)
-            attackHitbox.enabled = false;
+        // 2. Fortæl Animator at vi er færdige
+        if (animator != null)
+            animator.SetBool(animationBoolName, false);
 
-        // 6. Wait for cooldown
         yield return new WaitForSeconds(attackCooldown);
         canAttack = true;
     }
