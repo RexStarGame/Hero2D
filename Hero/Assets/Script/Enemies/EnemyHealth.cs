@@ -11,6 +11,7 @@ public class EnemyHealth : MonoBehaviour
     {
         // Sæt liv til max ved start
         currentHealth = maxHealth;
+        progressBar = FindObjectOfType<ProgressBar>(); // Finds your ProgressBar in the scene
     }
 
     // Denne funktion kalder du fra din spillers våben/projektil script
@@ -26,11 +27,11 @@ public class EnemyHealth : MonoBehaviour
     }
     void Die()
     {
-        // Her kan du senere indsætte lydeffekter, partikler eller loot drops
         Debug.Log(gameObject.name + " er død!");
-        progressBar.EXPAmount(10f); // Tilføj XP til spilleren ved fjendens død
-        // VIGTIGT: Dette fjerner objektet fra spillet.
-        // Når dette sker, vil din EnemySpawn automatisk opdage, at der mangler en fjende.
+        if (progressBar != null)
+        {
+            progressBar.AddXP(10); // Add 10 XP per kill
+        }
         Destroy(gameObject);
     }
 

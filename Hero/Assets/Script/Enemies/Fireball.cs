@@ -9,6 +9,10 @@ public class Fireball : MonoBehaviour
     [Tooltip("Hvor mange sekunder går der før den forsvinder af sig selv?")]
     [SerializeField] private float lifeTime = 4f;
 
+    [SerializeField] private float Damage = 10f;
+
+    private PlayerHealth playerHealth;
+
     void Start()
     {
         // Denne linje fortæller Unity: "Slet mig om 'lifeTime' sekunder"
@@ -36,6 +40,12 @@ public class Fireball : MonoBehaviour
         // Hvis din EnemyManager har et tag (f.eks. "GameController" eller "Zone"), kan du ignorere den
         if (other.CompareTag("GameController"))
         {
+            return;
+        }
+
+        if (other.CompareTag("Player"))
+        {
+            playerHealth.TakeDamage(Damage);
             return;
         }
 
