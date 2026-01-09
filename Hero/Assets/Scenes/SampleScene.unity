@@ -1197,7 +1197,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1642540755}
   m_Father: {fileID: 2114726090}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &239307041
@@ -1237,7 +1238,7 @@ MonoBehaviour:
   attackCooldown: 1.5
   hitboxStartDelay: 0.1
   hitboxActiveTime: 0.1
-  hitboxDistance: 0.7
+  hitboxDistance: 0.1
   attackHitbox: {fileID: 1642540753}
   animator: {fileID: 239307041}
 --- !u!50 &239307043
@@ -10261,7 +10262,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2114726090}
+  m_Father: {fileID: 239307040}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1643881892
 GameObject:
@@ -12721,7 +12722,6 @@ Transform:
   m_LocalScale: {x: 5.23239, y: 5.23239, z: 5.23239}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1642540755}
   - {fileID: 239307040}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
