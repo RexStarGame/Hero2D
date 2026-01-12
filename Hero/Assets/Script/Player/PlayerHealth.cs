@@ -13,6 +13,10 @@ public class PlayerHealth : MonoBehaviour
     public float regenPerLevel = 0.5f;
     public int regenLevel = 0;
 
+    public int maxHealthLevel = 0;          // Current upgrade level
+    public int maxHealthUpgradeAmount = 50; // Health added per upgrade
+    public int maxHealthUpgradeMaxLevel = 10;
+
     void Start()
     {
         health = maxHealth ; healthSlider.value = health;
@@ -42,6 +46,24 @@ public class PlayerHealth : MonoBehaviour
             health = Mathf.Min( health + regenAmount, maxHealth);
         }
     }
+
+    public void UpgradeMaxHealth()
+    {
+        if (maxHealthLevel >= maxHealthUpgradeMaxLevel)
+        {
+            Debug.Log("Max Health is already maxed!");
+            return;
+        }
+
+        maxHealthLevel++;
+        maxHealth += maxHealthUpgradeAmount;
+
+        // Optional: Heal the player fully on upgrade
+        health = maxHealth;
+
+        Debug.Log("Max Health upgraded! New max: " + maxHealth);
+    }
+
 
     public void TakeDamage(float damage)
     {
