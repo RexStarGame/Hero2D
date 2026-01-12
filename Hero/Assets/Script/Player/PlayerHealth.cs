@@ -9,6 +9,10 @@ public class PlayerHealth : MonoBehaviour
     [Header("UI")]
     public Slider healthSlider; // Drag your UI Slider here in the Inspector
 
+    public float baseRegen = 0f;
+    public float regenPerLevel = 0.5f;
+    public int regenLevel = 0;
+
     void Start()
     {
         health = maxHealth ; healthSlider.value = health;
@@ -22,6 +26,20 @@ public class PlayerHealth : MonoBehaviour
             {
                 Debug.LogError("Kunne overhovedet ikke finde et GameOverMenu script i scenen!");
             }
+        }
+    }
+
+    void Update()
+    {
+        Regenerate();
+    }
+
+    void Regenerate()
+    {
+        if (health < maxHealth)
+        {
+            float regenAmount = (baseRegen + regenLevel * regenPerLevel) * Time.deltaTime;
+            health = Mathf.Min( health + regenAmount, maxHealth);
         }
     }
 
