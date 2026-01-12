@@ -987,6 +987,7 @@ GameObject:
   m_Component:
   - component: {fileID: 135784205}
   - component: {fileID: 135784206}
+  - component: {fileID: 135784207}
   m_Layer: 5
   m_Name: ExpSlider
   m_TagString: Untagged
@@ -1060,12 +1061,26 @@ MonoBehaviour:
   m_HandleRect: {fileID: 0}
   m_Direction: 0
   m_MinValue: 0
-  m_MaxValue: 100
+  m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 100
+  m_Value: 1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &135784207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 135784204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7b13a869afebee42b52618f0f9a8d12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slider: {fileID: 135784206}
+  player: {fileID: 1435283282}
 --- !u!1 &136047516
 GameObject:
   m_ObjectHideFlags: 0
@@ -6962,8 +6977,9 @@ GameObject:
   - component: {fileID: 987519589}
   - component: {fileID: 987519591}
   - component: {fileID: 987519590}
+  - component: {fileID: 987519592}
   m_Layer: 5
-  m_Name: XPAmount
+  m_Name: XPAmountText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7008,7 +7024,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Level 0
+  m_text: 'Level 1
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -7087,6 +7105,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 987519588}
   m_CullTransparentMesh: 1
+--- !u!114 &987519592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 987519588}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00783d0a37eee234789f90eda97392d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 1435283282}
+  levelText: {fileID: 987519590}
 --- !u!1 &998028449
 GameObject:
   m_ObjectHideFlags: 0
@@ -9549,6 +9581,7 @@ GameObject:
   - component: {fileID: 1435283278}
   - component: {fileID: 1435283277}
   - component: {fileID: 1435283276}
+  - component: {fileID: 1435283282}
   - component: {fileID: 1435283275}
   m_Layer: 0
   m_Name: Player
@@ -9587,6 +9620,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 100
   health: 0
+  gameOverManager: {fileID: 0}
   healthSlider: {fileID: 2131080625}
 --- !u!95 &1435283276
 Animator:
@@ -9796,6 +9830,21 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1435283282
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1435283273}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e571abc1eef54d43ba9f35cd7d8821c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  level: 1
+  xp: 0
+  xpToNextLevel: 100
 --- !u!1 &1436096527
 GameObject:
   m_ObjectHideFlags: 0
