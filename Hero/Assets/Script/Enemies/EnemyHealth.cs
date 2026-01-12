@@ -6,12 +6,14 @@ public class EnemyHealth : MonoBehaviour
     [SerializeField] private int maxHealth = 3;
     private int currentHealth;
 
-    private ProgressBar progressBar;
+    public int xpReward = 25;
+
+    PlayerXP player;
     void Start()
     {
         // Sæt liv til max ved start
         currentHealth = maxHealth;
-        progressBar = FindObjectOfType<ProgressBar>(); // Finds your ProgressBar in the scene
+        player = FindObjectOfType<PlayerXP>();
     }
 
     // Denne funktion kalder du fra din spillers våben/projektil script
@@ -28,9 +30,9 @@ public class EnemyHealth : MonoBehaviour
     void Die()
     {
         Debug.Log(gameObject.name + " er død!");
-        if (progressBar != null)
+        if (player != null)
         {
-            progressBar.AddXP(10); // Add 10 XP per kill
+            player.AddXP(xpReward);
         }
         Destroy(gameObject);
     }
