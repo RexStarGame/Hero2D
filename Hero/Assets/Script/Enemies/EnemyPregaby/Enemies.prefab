@@ -47,6 +47,7 @@ GameObject:
   - component: {fileID: 1378482468039930319}
   - component: {fileID: 7752190014984649726}
   - component: {fileID: 3745639338394277203}
+  - component: {fileID: -3651679510663702152}
   m_Layer: 3
   m_Name: Enemies
   m_TagString: Enemy
@@ -247,6 +248,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 20
+  xpReward: 25
 --- !u!114 &3745639338394277203
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -263,3 +265,17 @@ MonoBehaviour:
   firePoint: {fileID: 5287324975665498792}
   attackRange: 5
   attackCooldown: 2
+--- !u!114 &-3651679510663702152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8233854846743954295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5e3741ffa8b64b4a9c07edb8ab8d0be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.1

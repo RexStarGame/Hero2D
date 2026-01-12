@@ -1572,8 +1572,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2fac69efb373fb4bb6efff7588cbe95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 5
-  health: 0
+  maxHealth: 5000
+  health: 5000
   gameOverManager: {fileID: 1702388449}
   healthSlider: {fileID: 710254126}
 --- !u!1 &258284932
