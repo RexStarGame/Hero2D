@@ -2,15 +2,26 @@ using UnityEngine;
 
 public class PlayerXP : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public int level = 1;
+    public int xp = 0;
+    public int xpToNextLevel = 100;
+
+    public void AddXP(int amount)
     {
-        
+        xp += amount;
+
+        while (xp >= xpToNextLevel)
+        {
+            xp -= xpToNextLevel;
+            LevelUp();
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    void LevelUp()
     {
-        
+        level++;
+        xpToNextLevel += 50;
+        Debug.Log("Leveled up! Now level " + level);
     }
+
 }
