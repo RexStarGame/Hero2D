@@ -1329,6 +1329,8 @@ GameObject:
   - component: {fileID: 239307042}
   - component: {fileID: 239307041}
   - component: {fileID: 239307047}
+  - component: {fileID: 239307048}
+  - component: {fileID: 239307049}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1572,10 +1574,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2fac69efb373fb4bb6efff7588cbe95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 5000
-  health: 5000
+  maxHealth: 300
+  health: 300
   gameOverManager: {fileID: 1702388449}
   healthSlider: {fileID: 710254126}
+--- !u!114 &239307048
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 239307039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45ff44667e1383d4a93a2fd9106aded0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dashPower: 10
+  dashDuration: 0.5
+  dashCooldown: 1
+--- !u!114 &239307049
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 239307039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2e4f9d374ad1594598c31b241f12a1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  walkArea: {fileID: 884967502159381072}
 --- !u!1 &258284932
 GameObject:
   m_ObjectHideFlags: 0
@@ -3784,7 +3814,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.628554, y: -0.0033099998, z: -10}
+  m_LocalPosition: {x: 3.6046932, y: -0.0033099998, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
