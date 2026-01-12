@@ -5,6 +5,8 @@ public class PlayerXP : MonoBehaviour
     public int level = 1;
     public int xp = 0;
     public int xpToNextLevel = 100;
+    public int abilityPoints = 0;
+
 
     public void AddXP(int amount)
     {
@@ -20,8 +22,12 @@ public class PlayerXP : MonoBehaviour
     void LevelUp()
     {
         level++;
+        abilityPoints++;          // <-- give 1 point
         xpToNextLevel += 50;
-        Debug.Log("Leveled up! Now level " + level);
+
+        Debug.Log("Leveled up! Level " + level +
+                  " | Ability Points: " + abilityPoints);
     }
+
 
 }

@@ -11,6 +11,8 @@ public class PlayerHealth : MonoBehaviour
 
     void Start()
     {
+        health = maxHealth ; healthSlider.value = health;
+
         // Hvis referencen er tom, så led efter den i hele scenen
         if (gameOverManager == null)
         {
