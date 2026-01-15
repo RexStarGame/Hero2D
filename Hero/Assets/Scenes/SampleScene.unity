@@ -1680,7 +1680,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 661886739}
         m_TargetAssemblyTypeName: GameOverMenu, Assembly-CSharp
         m_MethodName: RestartGame
         m_Mode: 1
@@ -1806,7 +1806,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be673688339bf384795c88ece26407dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackCooldown: 1.5
+  attackCooldown: 0.9
   hitboxStartDelay: 0.1
   hitboxActiveTime: 0.1
   hitboxDistance: 0.1
@@ -1997,7 +1997,7 @@ MonoBehaviour:
   gameOverManager: {fileID: 1702388449}
   healthSlider: {fileID: 507525551}
   baseRegen: 0
-  regenPerLevel: 0.5
+  regenPerLevel: 1.5
   regenLevel: 0
   maxHealthLevel: 0
   maxHealthUpgradeAmount: 50
@@ -5727,6 +5727,7 @@ GameObject:
   - component: {fileID: 661886735}
   - component: {fileID: 661886734}
   - component: {fileID: 661886738}
+  - component: {fileID: 661886739}
   m_Layer: 5
   m_Name: Canvas (1)
   m_TagString: Untagged
@@ -5840,6 +5841,20 @@ MonoBehaviour:
   pauseMenuUI: {fileID: 1623325929}
   volumeSlider: {fileID: 2009679966}
   musicSource: {fileID: 1778044296}
+--- !u!114 &661886739
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 661886733}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c715221739990d48b166c76174c85fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameOverPanel: {fileID: 1553508707}
+  deathParticlePrefab: {fileID: 0}
 --- !u!1 &678224716
 GameObject:
   m_ObjectHideFlags: 0
@@ -12293,6 +12308,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 8233854846743954295, guid: cc1175b0a56f8204d9a362b86c83c482, type: 3}
   enemyManager: {fileID: 1572118937}
+  playerXP: {fileID: 239307050}
+  enemyPool:
+  - prefab: {fileID: 8233854846743954295, guid: cc1175b0a56f8204d9a362b86c83c482, type: 3}
+    minLevel: 1
+  - prefab: {fileID: 8233854846743954295, guid: c431d5bfaee7cf242863ae6110025c32, type: 3}
+    minLevel: 5
+  - prefab: {fileID: 8233854846743954295, guid: 6242f085b186e894b83f42d36ba5f246, type: 3}
+    minLevel: 10
   spawnInterval: 3
   maxSpawn: 10
   minSpawn: 3
