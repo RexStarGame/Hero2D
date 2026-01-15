@@ -12318,6 +12318,8 @@ MonoBehaviour:
     minLevel: 5
   - prefab: {fileID: 8233854846743954295, guid: 6242f085b186e894b83f42d36ba5f246, type: 3}
     minLevel: 10
+  - prefab: {fileID: 8233854846743954295, guid: 5a7e9ed2e58b5f44798b11993a481c19, type: 3}
+    minLevel: 15
   spawnInterval: 3
   maxSpawn: 10
   minSpawn: 3
