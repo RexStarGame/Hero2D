@@ -1,3 +1,4 @@
+// DashDoge.cs
 using System.Collections;
 using UnityEngine;
 
@@ -8,20 +9,26 @@ public class DashDoge : MonoBehaviour
     [SerializeField] private float dashDuration = 0.2f;
     [SerializeField] private float dashCooldown = 0.8f;
 
+    [Header("Optional: Ignorï¿½r Enemy-collisions under dash")]
+    [Tooltip("Sï¿½t dine fjender pï¿½ en layer der hedder fx 'Enemy', ellers virker collision-ignore ikke.")]
+    [SerializeField] private string enemyLayerName = "Enemy";
+    [Tooltip("Hvilken layer spilleren skal vï¿½re pï¿½ under dash. (2 = Ignore Raycast).")]
+    [SerializeField] private int dashingLayer = 2;
+
     private Rigidbody2D rb;
     private TrailRenderer trail;
     private SpriteRenderer sprite;
     private Animator animator;
-
-    // NYT: Vi skal bruge en reference til dit movement script
     private PlayerMovement playerMovement;
 
     private bool canDash = true;
     private bool isDashing = false;
-    private int originalLayer;
 
-    // Vi gemmer den sidste retning, vi gik i
-    private Vector2 lastMoveDirection;
+    private int originalLayer;
+    private Vector2 lastMoveDirection = Vector2.right;
+
+    private int enemyLayer = -1;
+    private bool collisionIgnored = false;
 
     void Start()
     {
@@ -29,38 +36,29 @@ public class DashDoge : MonoBehaviour
         trail = GetComponent<TrailRenderer>();
         sprite = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
-
-        // NYT: Find movement scriptet på samme spiller
         playerMovement = GetComponent<PlayerMovement>();
 
         originalLayer = gameObject.layer;
 
-        // Sæt en standard retning
-        lastMoveDirection = Vector2.right;
+        enemyLayer = LayerMask.NameToLayer(enemyLayerName); // -1 hvis layer ikke findes
 
         if (trail != null) trail.emitting = false;
     }
 
     void Update()
     {
-        // 1. Opdater "Hukommelsen"
+        // Gem sidste bevï¿½gelsesretning (sï¿½ dash virker selv nï¿½r du slipper taster)
         float moveX = Input.GetAxisRaw("Horizontal");
         float moveY = Input.GetAxisRaw("Vertical");
         Vector2 inputDir = new Vector2(moveX, moveY);
 
-        // Hvis vi bevæger os, så gem retningen!
-        if (inputDir.magnitude > 0)
-        {
+        if (inputDir.sqrMagnitude > 0.0001f)
             lastMoveDirection = inputDir.normalized;
-        }
 
         if (isDashing) return;
 
-        // 2. Dash Trigger
         if (Input.GetKeyDown(KeyCode.LeftShift) && canDash)
-        {
             StartCoroutine(PerformRollDash(lastMoveDirection));
-        }
     }
 
     private IEnumerator PerformRollDash(Vector2 direction)
@@ -68,36 +66,51 @@ public class DashDoge : MonoBehaviour
         canDash = false;
         isDashing = true;
 
-        // Sikkerhedsnet
-        if (direction == Vector2.zero) direction = Vector2.right;
+        if (direction.sqrMagnitude < 0.0001f)
+            direction = Vector2.right;
 
-        // --- VIGTIGT FIX ---
-        // Sluk for PlayerMovement så den ikke bremser os!
+        // Sluk movement sï¿½ det ikke bremser dash
         if (playerMovement != null) playerMovement.enabled = false;
 
-        // 1. Visuel start
+        // Visuel start
         if (sprite != null) sprite.color = new Color(1f, 1f, 1f, 0.6f);
         if (trail != null) trail.emitting = true;
         if (animator != null) animator.SetTrigger("Roll");
 
-        // 2. Skift lag
-        gameObject.layer = 2; // "Ignore Raycast"
+        // Skift layer under dash (valgfrit)
+        gameObject.layer = dashingLayer;
 
-        // 3. FYSISK KRAFT
-        rb.linearVelocity = Vector2.zero; // Nulstil nuværende fart
-        rb.AddForce(direction * dashPower, ForceMode2D.Impulse); // Eksplosion fremad!
+        // Optional: Ignorï¿½r collisions med Enemy-layer under dash
+        if (enemyLayer != -1)
+        {
+            Physics2D.IgnoreLayerCollision(dashingLayer, enemyLayer, true);
+            collisionIgnored = true;
+        }
+
+        // Dash kraft
+        rb.linearVelocity = Vector2.zero;
+        rb.AddForce(direction * dashPower, ForceMode2D.Impulse);
 
         yield return new WaitForSeconds(dashDuration);
 
-        // 4. Afslutning
-        rb.linearVelocity = rb.linearVelocity * 0.1f; // Brems ned
+        // Slut: brems lidt ned
+        rb.linearVelocity *= 0.1f;
 
+        // Gendan visuals
         if (sprite != null) sprite.color = Color.white;
         if (trail != null) trail.emitting = false;
+
+        // Gendan collisions
+        if (collisionIgnored)
+        {
+            Physics2D.IgnoreLayerCollision(dashingLayer, enemyLayer, false);
+            collisionIgnored = false;
+        }
+
+        // Gendan layer
         gameObject.layer = originalLayer;
 
-        // --- VIGTIGT FIX ---
-        // Tænd for styringen igen, så du kan gå normalt
+        // Tï¿½nd movement igen
         if (playerMovement != null) playerMovement.enabled = true;
 
         isDashing = false;
@@ -106,6 +119,7 @@ public class DashDoge : MonoBehaviour
         canDash = true;
     }
 
+    // PlayerHealth bruger denne
     public bool IsInvulnerable()
     {
         return isDashing;

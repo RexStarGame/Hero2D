@@ -1994,8 +1994,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 300
   health: 300
-  gameOverManager: {fileID: 1702388449}
   healthSlider: {fileID: 507525551}
+  gameOverManager: {fileID: 1702388449}
   baseRegen: 0
   regenPerLevel: 1.5
   regenLevel: 0
@@ -2014,9 +2014,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45ff44667e1383d4a93a2fd9106aded0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dashPower: 10
-  dashDuration: 0.5
-  dashCooldown: 1
+  dashPower: 16
+  dashDuration: 0.4
+  dashCooldown: 1.5
+  enemyLayerName: Enemy
+  dashingLayer: 2
 --- !u!114 &239307049
 MonoBehaviour:
   m_ObjectHideFlags: 0
