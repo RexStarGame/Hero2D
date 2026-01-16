@@ -4,7 +4,7 @@ using System.Collections;
 public class PlayerAttack : MonoBehaviour
 {
     [Header("Attack Settings")]
-    [SerializeField] private float attackCooldown = 0.5f;
+    [SerializeField] private float attackCooldown = 0.5f;      // Attack speed (lavere = hurtigere)
     [SerializeField] private float hitboxStartDelay = 0.1f;
     [SerializeField] private float hitboxActiveTime = 0.2f;
     [SerializeField] private float hitboxDistance = 0.7f;
@@ -12,6 +12,17 @@ public class PlayerAttack : MonoBehaviour
     [Header("References")]
     [SerializeField] private Collider2D attackHitbox;
     [SerializeField] private Animator animator;
+
+    [Header("Health (for Life Steal)")]
+    [SerializeField] private PlayerHealth playerHealth;
+
+    [Header("Attack Upgrades")]
+    public int attackSpeedLevel = 0;
+
+    [Header("Life Steal")]
+    public int lifeStealLevel = 0;
+    [Tooltip("0 = 0%. 0.0002 = 0.02%")]
+    [SerializeField] private float lifeStealPercent = 0f;
 
     private string animationTriggerName = "AttackTrigger";
     private string animationBoolName = "IsAttackingBool";
@@ -23,6 +34,9 @@ public class PlayerAttack : MonoBehaviour
     {
         if (attackHitbox != null) attackHitbox.enabled = false;
         if (animator == null) animator = GetComponentInChildren<Animator>();
+
+        if (playerHealth == null)
+            playerHealth = GetComponent<PlayerHealth>();
     }
 
     void Update()
@@ -56,7 +70,7 @@ public class PlayerAttack : MonoBehaviour
     {
         canAttack = false;
 
-        // 1. Send signal til Animator
+        // 1) Animator
         if (animator != null)
         {
             animator.SetBool(animationBoolName, true);
@@ -69,11 +83,40 @@ public class PlayerAttack : MonoBehaviour
         yield return new WaitForSeconds(hitboxActiveTime);
         if (attackHitbox != null) attackHitbox.enabled = false;
 
-        // 2. Fortæl Animator at vi er færdige
+        // 2) Animator færdig
         if (animator != null)
             animator.SetBool(animationBoolName, false);
 
         yield return new WaitForSeconds(attackCooldown);
         canAttack = true;
+    }
+
+    // ---------- Life Steal mechanics ----------
+    // Kaldes fra AttackHitbox når vi reelt rammer noget
+    public void OnSuccessfulHit(float damageDealt)
+    {
+        if (playerHealth == null) return;
+        if (lifeStealPercent <= 0f) return;
+        if (damageDealt <= 0f) return;
+
+        float healAmount = damageDealt * lifeStealPercent;
+        if (healAmount <= 0f) return;
+
+        playerHealth.Heal(healAmount);
+    }
+
+    public void UpgradeLifeSteal(float addPercent)
+    {
+        lifeStealLevel++;
+        lifeStealPercent += addPercent; // 0.0002 = 0.02%
+        // Debug.Log($"LifeSteal level {lifeStealLevel}, LifeSteal%={lifeStealPercent * 100f}%");
+    }
+
+    // ---------- Attack Speed upgrade support ----------
+    public void UpgradeAttackSpeed(float reductionPerLevel, float minCooldown)
+    {
+        attackSpeedLevel++;
+        attackCooldown = Mathf.Max(minCooldown, attackCooldown - reductionPerLevel);
+        // Debug.Log($"AttackSpeed level {attackSpeedLevel}, cooldown={attackCooldown}");
     }
 }

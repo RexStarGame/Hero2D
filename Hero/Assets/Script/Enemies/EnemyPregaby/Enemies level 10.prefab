@@ -49,7 +49,7 @@ GameObject:
   - component: {fileID: 3745639338394277203}
   - component: {fileID: -3651679510663702152}
   m_Layer: 3
-  m_Name: Enemies
+  m_Name: Enemies level 10
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -116,7 +116,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_Sprite: {fileID: -6146700129834819302, guid: a496653eab0d7494380ad36cea79cf8c, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 0.4630716, b: 0.48235294, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -247,8 +247,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12ad796373a86fb46af69ae35cfd02b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 20
-  xpReward: 25
+  maxHealth: 45
+  xpReward: 180
 --- !u!114 &3745639338394277203
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -261,7 +261,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d58054457ced4b4d8bb9496e5601418, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fireballPrefab: {fileID: 8772340623762868832, guid: 892a522abd485e94ea3a5e7b9dd182bc, type: 3}
+  fireballPrefab: {fileID: 8772340623762868832, guid: 342f0befb30bb8b4db2e9fb68b311285, type: 3}
   firePoint: {fileID: 5287324975665498792}
   attackRange: 5
   attackCooldown: 2

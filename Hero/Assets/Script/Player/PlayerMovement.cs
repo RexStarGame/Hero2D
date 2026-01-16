@@ -43,7 +43,7 @@ public class PlayerMovement : MonoBehaviour
         // --- ANIMATION LOGIK ---
 
         // 1. Fortæl om vi bevæger os (til at skifte fra Idle til Walk)
-        animator.SetFloat("Speed", movement.sqrMagnitude);
+        //animator.SetFloat("Speed", movement.sqrMagnitude);
 
         // 2. Bestem retning (Op eller Ned) med en BOOL
         if (movement.y > 0.01f) // Hvis vi går OP
