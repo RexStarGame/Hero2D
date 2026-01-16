@@ -6,14 +6,20 @@ public class AttackHitbox : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // Only damage objects tagged as "Enemy"
-        if (!collision.CompareTag("Enemy"))
+        // Boss
+        BossHealth boss = collision.GetComponentInParent<BossHealth>();
+        if (boss != null)
+        {
+            boss.TakeDamage(damage);
             return;
+        }
 
-        EnemyHealth enemy = collision.GetComponent<EnemyHealth>();
+        // Normal enemy
+        EnemyHealth enemy = collision.GetComponentInParent<EnemyHealth>();
         if (enemy != null)
         {
             enemy.TakeDamage(damage);
+            return;
         }
     }
 }
