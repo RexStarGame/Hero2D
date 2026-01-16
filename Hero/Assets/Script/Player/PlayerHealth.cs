@@ -1,4 +1,4 @@
-// PlayerHealth.cs
+﻿// PlayerHealth.cs
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -90,6 +90,8 @@ public class PlayerHealth : MonoBehaviour
         if (dashDoge != null && dashDoge.IsInvulnerable())
             return;
 
+        if (damage <= 0f) return;
+
         health -= damage;
         health = Mathf.Clamp(health, 0f, maxHealth);
 
@@ -99,6 +101,19 @@ public class PlayerHealth : MonoBehaviour
             Die();
     }
 
+    // ✅ ADD THIS: used by Life Steal / healing items / etc.
+    public void Heal(float amount)
+    {
+        if (amount <= 0f) return;
+        if (health <= 0f) return; // don't heal if dead
+
+        float oldHealth = health;
+        health = Mathf.Min(maxHealth, health + amount);
+
+        if (!Mathf.Approximately(oldHealth, health))
+            UpdateHealthUI(false);
+    }
+
     void Die()
     {
         Debug.Log("Player died!");
@@ -106,7 +121,7 @@ public class PlayerHealth : MonoBehaviour
         if (gameOverManager != null)
             gameOverManager.TriggerGameOver();
         else
-            Debug.LogError("GameOverManager mangler p� spilleren!");
+            Debug.LogError("GameOverManager mangler på spilleren!");
     }
 
     private void UpdateHealthUI(bool updateMaxValue)
