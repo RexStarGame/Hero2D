@@ -4,11 +4,14 @@ using System.Collections;
 public class PlayerAttack : MonoBehaviour
 {
     [Header("Attack Settings")]
-    [SerializeField] private float attackCooldown = 0.5f;      // Attack speed (lavere = hurtigere)
+    [SerializeField] private float attackCooldown = 0.5f;      // Attack speed (lower = faster)
     [SerializeField] private float hitboxStartDelay = 0.1f;
     [SerializeField] private float hitboxActiveTime = 0.2f;
     [SerializeField] private float hitboxDistance = 0.7f;
-
+    public float AttackCooldown => attackCooldown;      // attack speed value (seconds)
+    public float LifeStealPercent => lifeStealPercent;  // 0..1
+    public float CritChance => critChance;              // 0..1
+    public float CritMultiplier => critMultiplier;      // e.g. 2.0
     [Header("References")]
     [SerializeField] private Collider2D attackHitbox;
     [SerializeField] private Animator animator;
@@ -22,21 +25,31 @@ public class PlayerAttack : MonoBehaviour
     [Header("Life Steal")]
     public int lifeStealLevel = 0;
     [Tooltip("0 = 0%. 0.0002 = 0.02%")]
-    [SerializeField] private float lifeStealPercent = 0f;
+    [SerializeField] private float lifeStealPercent = 0f; // starts 0%
+
+    [Header("Critical Damage")]
+    public int critLevel = 0;
+    [Tooltip("0 = 0%. 0.01 = 1%")]
+    [SerializeField] private float critChance = 0f;      // starts 0%
+    [SerializeField] private float critMultiplier = 2f;  // double damage
 
     private string animationTriggerName = "AttackTrigger";
     private string animationBoolName = "IsAttackingBool";
 
     private bool canAttack = true;
     private Vector2 lastFacingDirection = Vector2.down;
-
-    void Awake()
+    [SerializeField] private DamageUpgrade damageUpgrade;
+    public DamageUpgrade DamageUpgrade => damageUpgrade;
+    private void Awake()
     {
         if (attackHitbox != null) attackHitbox.enabled = false;
         if (animator == null) animator = GetComponentInChildren<Animator>();
 
         if (playerHealth == null)
             playerHealth = GetComponent<PlayerHealth>();
+
+        if (damageUpgrade == null)
+            damageUpgrade = GetComponent<DamageUpgrade>();
     }
 
     void Update()
@@ -44,9 +57,7 @@ public class PlayerAttack : MonoBehaviour
         UpdateDirection();
 
         if (Input.GetKeyDown(KeyCode.Space) && canAttack)
-        {
             StartCoroutine(PerformAttack());
-        }
     }
 
     private void UpdateDirection()
@@ -70,7 +81,6 @@ public class PlayerAttack : MonoBehaviour
     {
         canAttack = false;
 
-        // 1) Animator
         if (animator != null)
         {
             animator.SetBool(animationBoolName, true);
@@ -83,7 +93,6 @@ public class PlayerAttack : MonoBehaviour
         yield return new WaitForSeconds(hitboxActiveTime);
         if (attackHitbox != null) attackHitbox.enabled = false;
 
-        // 2) Animator færdig
         if (animator != null)
             animator.SetBool(animationBoolName, false);
 
@@ -91,8 +100,19 @@ public class PlayerAttack : MonoBehaviour
         canAttack = true;
     }
 
-    // ---------- Life Steal mechanics ----------
-    // Kaldes fra AttackHitbox når vi reelt rammer noget
+    // ---------- Crit: compute damage for a hit ----------
+    public int GetDamageForHit(int baseDamage)
+    {
+        if (baseDamage <= 0) return 0;
+
+        bool isCrit = Random.value < Mathf.Clamp01(critChance);
+        if (!isCrit) return baseDamage;
+
+        int critDamage = Mathf.RoundToInt(baseDamage * critMultiplier);
+        return Mathf.Max(baseDamage, critDamage);
+    }
+
+    // ---------- Life Steal: heal on real hit ----------
     public void OnSuccessfulHit(float damageDealt)
     {
         if (playerHealth == null) return;
@@ -108,15 +128,20 @@ public class PlayerAttack : MonoBehaviour
     public void UpgradeLifeSteal(float addPercent)
     {
         lifeStealLevel++;
-        lifeStealPercent += addPercent; // 0.0002 = 0.02%
-        // Debug.Log($"LifeSteal level {lifeStealLevel}, LifeSteal%={lifeStealPercent * 100f}%");
+        lifeStealPercent += addPercent;
     }
 
-    // ---------- Attack Speed upgrade support ----------
+    // ---------- Attack speed upgrade ----------
     public void UpgradeAttackSpeed(float reductionPerLevel, float minCooldown)
     {
         attackSpeedLevel++;
         attackCooldown = Mathf.Max(minCooldown, attackCooldown - reductionPerLevel);
-        // Debug.Log($"AttackSpeed level {attackSpeedLevel}, cooldown={attackCooldown}");
+    }
+
+    // ---------- Crit upgrade ----------
+    public void UpgradeCritChance(float addChance)
+    {
+        critLevel++;
+        critChance = Mathf.Clamp01(critChance + addChance);
     }
 }

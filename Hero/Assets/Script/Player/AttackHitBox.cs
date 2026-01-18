@@ -1,32 +1,41 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class AttackHitbox : MonoBehaviour
 {
-    [Header("Owner (for lifesteal / on-hit effects)")]
+    [Header("Owner (for lifesteal / crit)")]
     [SerializeField] private PlayerAttack ownerAttack;
 
-    private DamageUpgrade damageUpgrade;
+    [Header("Damage Source")]
+    [Tooltip("Drag the player's DamageUpgrade here (recommended). If empty, we auto-find in parent.")]
+    [SerializeField] private DamageUpgrade damageUpgrade;
+
+    [Tooltip("Default damage if DamageUpgrade is missing (should match DamageUpgrade 'damage').")]
+    [SerializeField] private int damage = 10; // <-- keep this so you always have a default
 
     private void Awake()
     {
         if (ownerAttack == null)
             ownerAttack = GetComponentInParent<PlayerAttack>();
 
-        // THIS is the important change
-        damageUpgrade = GetComponentInParent<DamageUpgrade>();
+        if (damageUpgrade == null)
+            damageUpgrade = GetComponentInParent<DamageUpgrade>();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (damageUpgrade == null) return;
+        int baseDamage = (damageUpgrade != null) ? damageUpgrade.Damage : damage;
 
-        int damage = damageUpgrade.CurrentDamage;
+        // Crit
+        int finalDamage = baseDamage;
+        if (ownerAttack != null)
+            finalDamage = ownerAttack.GetDamageForHit(baseDamage);
+
         bool didHit = false;
 
         BossHealth boss = collision.GetComponentInParent<BossHealth>();
         if (boss != null)
         {
-            boss.TakeDamage(damage);
+            boss.TakeDamage(finalDamage);
             didHit = true;
         }
         else
@@ -34,14 +43,13 @@ public class AttackHitbox : MonoBehaviour
             EnemyHealth enemy = collision.GetComponentInParent<EnemyHealth>();
             if (enemy != null)
             {
-                enemy.TakeDamage(damage);
+                enemy.TakeDamage(finalDamage);
                 didHit = true;
             }
         }
 
+        // Lifesteal uses final damage (after crit)
         if (didHit && ownerAttack != null)
-        {
-            ownerAttack.OnSuccessfulHit(damage);
-        }
+            ownerAttack.OnSuccessfulHit(finalDamage);
     }
 }
