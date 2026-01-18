@@ -74,6 +74,6 @@ public class DamageUpgrade : MonoBehaviour
     private void UpdateLevelText()
     {
         if (levelText != null)
-            levelText.text = $"Damage {damageLevel}  (DMG: {Damage})"; // ✅ LIVE damage display
+            levelText.text = $"Damage {damageLevel}"; // ✅ LIVE damage display
     }
 }

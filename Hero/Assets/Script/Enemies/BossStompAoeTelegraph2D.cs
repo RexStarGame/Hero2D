@@ -8,7 +8,8 @@ public class BossStompAoeTelegraph2D : MonoBehaviour
     [SerializeField] private string playerTag = "Player";
     [SerializeField] private Transform player;
     [SerializeField] private LayerMask hitMask;
-
+    [Tooltip("Auto-destroy impact instance after this many seconds (0 disables).")]
+    [SerializeField] private float impactLifetime = 2.5f;
     [Header("Telegraph Prefabs")]
     [SerializeField] private GameObject telegraphPrimaryPrefab;
     [SerializeField] private GameObject telegraphNextPrefab;
@@ -360,8 +361,13 @@ public class BossStompAoeTelegraph2D : MonoBehaviour
         if (logDebug) Debug.Log($"[AOE] HIT at {center}");
 
         if (impactPrefab != null)
-            Instantiate(impactPrefab, new Vector3(center.x, center.y, 0f), Quaternion.identity);
-
+        {
+            GameObject impactInstance = Instantiate(impactPrefab, new Vector3(center.x, center.y, 0f), Quaternion.identity);
+            if (impactLifetime > 0f)
+            {
+                Destroy(impactInstance, impactLifetime); // auto-cleanup after time
+            }
+        }
         ContactFilter2D filter = new ContactFilter2D();
         filter.useLayerMask = true;
         filter.layerMask = hitMask;
