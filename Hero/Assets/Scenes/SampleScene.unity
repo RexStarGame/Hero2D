@@ -783,7 +783,7 @@ MonoBehaviour:
   playerXP: {fileID: 239307050}
   playerHealth: {fileID: 239307047}
   levelText: {fileID: 1792090564}
-  maxLevel: 15
+  maxLevel: 10
   cost: 1
 --- !u!114 &93892296
 MonoBehaviour:
@@ -2191,7 +2191,7 @@ MonoBehaviour:
   level: 1
   xp: 0
   xpToNextLevel: 100
-  abilityPoints: 100
+  abilityPoints: 1
 --- !u!1 &258284932
 GameObject:
   m_ObjectHideFlags: 0
@@ -4965,7 +4965,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: 3.6046932, y: -0.0033099998, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9230,7 +9230,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b46dada7d9bf64e8ba85d7e27d8ebd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 10
+  damage: 15
   damageLevel: 0
   maxDamageLevel: 15
   damagePerLevel: 5
@@ -10453,7 +10453,7 @@ MonoBehaviour:
   playerXP: {fileID: 239307050}
   bossPool:
   - prefab: {fileID: 8233854846743954295, guid: 5e2f1114b6b96c04aa40152f345bcca8, type: 3}
-    minLevel: 9
+    minLevel: 10
   bossTag: Boss
   requireNoActiveBoss: 1
   spawnZ: 0
@@ -11916,9 +11916,9 @@ MonoBehaviour:
   playerXP: {fileID: 239307050}
   playerAttack: {fileID: 239307042}
   levelText: {fileID: 1670826967}
-  maxLevel: 10
+  maxLevel: 15
   cost: 1
-  critChancePerLevel: 0.05
+  critChancePerLevel: 0.025
 --- !u!1 &1418739868
 GameObject:
   m_ObjectHideFlags: 0
@@ -13746,7 +13746,7 @@ MonoBehaviour:
   - prefab: {fileID: 8233854846743954295, guid: 5a7e9ed2e58b5f44798b11993a481c19, type: 3}
     minLevel: 15
   spawnInterval: 3
-  maxSpawn: 10
+  maxSpawn: 12
   minSpawn: 3
 --- !u!1 &1590943931
 GameObject:

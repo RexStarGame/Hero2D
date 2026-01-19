@@ -100,7 +100,7 @@ public class EnemySpawn : MonoBehaviour
         }
 
         Vector2 spawnPosition = enemyManager.GetRandomPointInZone();
-        Instantiate(prefabToSpawn, spawnPosition, Quaternion.identity);
+        Instantiate(prefabToSpawn, spawnPosition, Quaternion.identity); 
     }
 
     GameObject GetSpawnPrefab()
