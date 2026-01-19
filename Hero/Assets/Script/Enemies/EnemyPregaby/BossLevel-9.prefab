@@ -970,8 +970,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12ad796373a86fb46af69ae35cfd02b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 700
-  xpReward: 350
+  maxHealth: 1000
+  xpReward: 500
 --- !u!114 &-3651679510663702152
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1044,6 +1044,7 @@ MonoBehaviour:
   hitMask:
     serializedVersion: 2
     m_Bits: 63
+  impactLifetime: 2.5
   telegraphPrimaryPrefab: {fileID: 6389269228741101308, guid: 5b2ca5874ad14e146b5a68f4072031f9, type: 3}
   telegraphNextPrefab: {fileID: 6389269228741101308, guid: 5b2ca5874ad14e146b5a68f4072031f9, type: 3}
   impactPrefab: {fileID: 6389269228741101308, guid: 5b2ca5874ad14e146b5a68f4072031f9, type: 3}
