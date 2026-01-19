@@ -21,17 +21,18 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        // Read input
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
-        // --- FLIP LOGIK ---
+        // --- FLIP LOGIC (LEFT / RIGHT) ---
         if (movement.x > 0.01f)
         {
-            sr.flipX = false;
+            sr.flipX = false; // looking right
         }
         else if (movement.x < -0.01f)
         {
-            sr.flipX = true;
+            sr.flipX = true; // looking left
         }
 
         if (movement.sqrMagnitude > 0)
@@ -39,13 +40,21 @@ public class PlayerMovement : MonoBehaviour
             movement = movement.normalized;
         }
 
-        // --- ANIMATION LOGIK ---
-
-        // Walking / Idle
+        // --- WALK / IDLE ANIMATION ---
         bool isMoving = movement.sqrMagnitude > 0.01f;
-        animator.SetBool("IsMoving", isMoving);
 
-        // Facing up/down
+        // Don't allow walk animation while attacking
+        if (!animator.GetBool("IsAttackingBool"))
+        {
+            animator.SetBool("IsMoving", isMoving);
+        }
+        else
+        {
+            animator.SetBool("IsMoving", false);
+        }
+
+
+        // --- UP / DOWN DIRECTION ---
         if (movement.y > 0.01f)
         {
             animator.SetBool("IsFacingUp", true);
@@ -55,6 +64,7 @@ public class PlayerMovement : MonoBehaviour
             animator.SetBool("IsFacingUp", false);
         }
     }
+
 
     void FixedUpdate()
     {

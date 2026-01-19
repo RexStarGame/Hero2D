@@ -5,7 +5,7 @@ public class PlayerAttack : MonoBehaviour
 {
     [Header("Attack Settings")]
     [SerializeField] private float attackCooldown = 0.5f;      // Attack speed (lower = faster)
-    [SerializeField] private float hitboxStartDelay = 0.1f;
+    [SerializeField] private float hitboxStartDelay = 0.5f;
     [SerializeField] private float hitboxActiveTime = 0.2f;
     [SerializeField] private float hitboxDistance = 0.7f;
     public float AttackCooldown => attackCooldown;      // attack speed value (seconds)
@@ -99,6 +99,20 @@ public class PlayerAttack : MonoBehaviour
         yield return new WaitForSeconds(attackCooldown);
         canAttack = true;
     }
+    public void EnableHitbox()
+    {
+        Debug.Log("Hitbox enabled");
+        if (attackHitbox != null)
+            attackHitbox.enabled = true;
+    }
+
+    public void DisableHitbox()
+    {
+        Debug.Log("Hitbox disabled");
+        if (attackHitbox != null)
+            attackHitbox.enabled = false;
+    }
+
 
     // ---------- Crit: compute damage for a hit ----------
     public int GetDamageForHit(int baseDamage)
