@@ -8,10 +8,34 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField] private float hitboxStartDelay = 0.1f;
     [SerializeField] private float hitboxActiveTime = 0.2f;
     [SerializeField] private float hitboxDistance = 0.7f;
+
     public float AttackCooldown => attackCooldown;      // attack speed value (seconds)
     public float LifeStealPercent => lifeStealPercent;  // 0..1
     public float CritChance => critChance;              // 0..1
     public float CritMultiplier => critMultiplier;      // e.g. 2.0
+
+    // ---------- NEW: Cooldown/Ready info for UI ----------
+    public bool CanAttack => canAttack;
+
+    // Time.time when next attack becomes available
+    public float AttackReadyTime { get; private set; }
+
+    // Full cycle from pressing attack until you can attack again
+    public float AttackCycleDuration => hitboxStartDelay + hitboxActiveTime + attackCooldown;
+
+    public float CooldownRemaining => Mathf.Max(0f, AttackReadyTime - Time.time);
+
+    // 0..1 progress where 1 = ready
+    public float Cooldown01
+    {
+        get
+        {
+            float d = Mathf.Max(0.0001f, AttackCycleDuration);
+            return Mathf.Clamp01(1f - (CooldownRemaining / d));
+        }
+    }
+    // -----------------------------------------------
+
     [Header("References")]
     [SerializeField] private Collider2D attackHitbox;
     [SerializeField] private Animator animator;
@@ -38,8 +62,10 @@ public class PlayerAttack : MonoBehaviour
 
     private bool canAttack = true;
     private Vector2 lastFacingDirection = Vector2.down;
+
     [SerializeField] private DamageUpgrade damageUpgrade;
     public DamageUpgrade DamageUpgrade => damageUpgrade;
+
     private void Awake()
     {
         if (attackHitbox != null) attackHitbox.enabled = false;
@@ -50,6 +76,9 @@ public class PlayerAttack : MonoBehaviour
 
         if (damageUpgrade == null)
             damageUpgrade = GetComponent<DamageUpgrade>();
+
+        // Start as ready
+        AttackReadyTime = Time.time;
     }
 
     void Update()
@@ -80,6 +109,9 @@ public class PlayerAttack : MonoBehaviour
     IEnumerator PerformAttack()
     {
         canAttack = false;
+
+        // NEW: set when we will be ready again (includes delays + cooldown)
+        AttackReadyTime = Time.time + AttackCycleDuration;
 
         if (animator != null)
         {
@@ -136,6 +168,10 @@ public class PlayerAttack : MonoBehaviour
     {
         attackSpeedLevel++;
         attackCooldown = Mathf.Max(minCooldown, attackCooldown - reductionPerLevel);
+
+        // Keep ready time consistent if you change cooldown mid-game
+        if (!canAttack)
+            AttackReadyTime = Mathf.Max(AttackReadyTime, Time.time + CooldownRemaining);
     }
 
     // ---------- Crit upgrade ----------
