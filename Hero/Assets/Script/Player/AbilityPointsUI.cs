@@ -5,7 +5,6 @@ public class AbilityPointsUI : MonoBehaviour
 {
     public PlayerXP player;
     public TMP_Text pointsText;
-
     public TMP_Text pressPText;
 
     public float showDuration = 10f;     // hvor længe teksten vises
@@ -14,6 +13,8 @@ public class AbilityPointsUI : MonoBehaviour
     int lastLevel;
     float timer = 0f;
     float blinkTimer = 0f;
+
+    bool dismissed = false;              // <-- NY
 
     void Start()
     {
@@ -36,42 +37,53 @@ public class AbilityPointsUI : MonoBehaviour
         {
             lastLevel = player.level;
 
+            dismissed = false;           // <-- NY (reset ved level up)
             timer = showDuration;
             blinkTimer = 0f;
 
             if (pressPText != null)
             {
                 pressPText.text = "Tryk på P";
+                pressPText.enabled = true;       // <-- så den starter synlig
                 pressPText.gameObject.SetActive(true);
             }
         }
 
-        // håndtér visning + blink i 10 sekunder efter level up
-        if (pressPText != null)
+        if (pressPText == null) return;
+
+        // <-- NY: hvis man trykker P mens den vises, stop blink og skjul
+        if (!dismissed && timer > 0f && Input.GetKeyDown(KeyCode.P))
         {
-            if (timer > 0f)
-            {
-                timer -= Time.deltaTime;
+            dismissed = true;
+            timer = 0f;
+            pressPText.enabled = true;           // reset så den ikke ender usynlig
+            pressPText.gameObject.SetActive(false);
+            return;
+        }
 
-                blinkTimer += Time.deltaTime;
-                if (blinkTimer >= blinkInterval)
-                {
-                    blinkTimer = 0f;
-                    pressPText.enabled = !pressPText.enabled; // blink
-                }
+        // håndtér visning + blink i 10 sekunder efter level up (kun hvis ikke dismissed)
+        if (!dismissed && timer > 0f)
+        {
+            timer -= Time.deltaTime;
 
-                if (timer <= 0f)
-                {
-                    pressPText.enabled = true; // reset så den ikke ender “usynlig”
-                    pressPText.gameObject.SetActive(false);
-                }
-            }
-            else
+            blinkTimer += Time.deltaTime;
+            if (blinkTimer >= blinkInterval)
             {
-                // hvis ingen countdown er aktiv, så er den skjult
-                if (pressPText.gameObject.activeSelf)
-                    pressPText.gameObject.SetActive(false);
+                blinkTimer = 0f;
+                pressPText.enabled = !pressPText.enabled; // blink
             }
+
+            if (timer <= 0f)
+            {
+                pressPText.enabled = true; // reset så den ikke ender “usynlig”
+                pressPText.gameObject.SetActive(false);
+            }
+        }
+        else
+        {
+            // hvis ingen countdown er aktiv, så er den skjult
+            if (pressPText.gameObject.activeSelf)
+                pressPText.gameObject.SetActive(false);
         }
     }
 }
