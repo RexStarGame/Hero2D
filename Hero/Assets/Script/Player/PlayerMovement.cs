@@ -21,18 +21,17 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        // Læs input
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
-        // --- FLIP LOGIK (VENSTRE / HØJRE) ---
+        // --- FLIP LOGIK ---
         if (movement.x > 0.01f)
         {
-            sr.flipX = false; // kigger mod højre
+            sr.flipX = false;
         }
         else if (movement.x < -0.01f)
         {
-            sr.flipX = true; // kigger mod venstre
+            sr.flipX = true;
         }
 
         if (movement.sqrMagnitude > 0)
@@ -42,20 +41,19 @@ public class PlayerMovement : MonoBehaviour
 
         // --- ANIMATION LOGIK ---
 
-        // 1. Fortæl om vi bevæger os (til at skifte fra Idle til Walk)
-        //animator.SetFloat("Speed", movement.sqrMagnitude);
+        // Walking / Idle
+        bool isMoving = movement.sqrMagnitude > 0.01f;
+        animator.SetBool("IsMoving", isMoving);
 
-        // 2. Bestem retning (Op eller Ned) med en BOOL
-        if (movement.y > 0.01f) // Hvis vi går OP
+        // Facing up/down
+        if (movement.y > 0.01f)
         {
             animator.SetBool("IsFacingUp", true);
         }
-        else if (movement.y < -0.01f) // Hvis vi går NED
+        else if (movement.y < -0.01f)
         {
             animator.SetBool("IsFacingUp", false);
         }
-        // Bemærk: Hvis vi går til siden (y=0), ændrer vi IKKE bool'en. 
-        // Så husker den, om vi sidst kiggede op eller ned.
     }
 
     void FixedUpdate()
