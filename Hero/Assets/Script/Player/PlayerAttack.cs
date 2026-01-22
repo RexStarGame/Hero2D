@@ -85,9 +85,13 @@ public class PlayerAttack : MonoBehaviour
     {
         UpdateDirection();
 
+        // Only start attack if allowed
         if (Input.GetKeyDown(KeyCode.Space) && canAttack)
+        {
             StartCoroutine(PerformAttack());
+        }
     }
+
 
     private void UpdateDirection()
     {
