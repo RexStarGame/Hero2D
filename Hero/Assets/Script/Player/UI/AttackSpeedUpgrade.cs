@@ -53,7 +53,7 @@ public class AttackSpeedUpgrade : MonoBehaviour
     {
         if (levelText != null && playerAttack != null)
         {
-            levelText.text = "Atk Speed " + playerAttack.attackSpeedLevel;
+            levelText.text = "+";
         }
     }
 }

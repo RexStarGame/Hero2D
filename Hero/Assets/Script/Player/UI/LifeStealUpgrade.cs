@@ -51,6 +51,6 @@ public class LifeStealUpgrade : MonoBehaviour
     void UpdateText()
     {
         if (levelText != null && playerAttack != null)
-            levelText.text = "LifeSteal " + playerAttack.lifeStealLevel;
+            levelText.text = "+";
     }
 }

@@ -39,7 +39,7 @@ public class HealthUpgrade : MonoBehaviour
     {
         if (levelText != null)
         {
-            levelText.text = "Health " + playerHealth.maxHealthLevel;
+            levelText.text = "+";
         }
     }
 }

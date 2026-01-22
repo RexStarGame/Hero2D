@@ -43,7 +43,9 @@ public class PlayerStats : MonoBehaviour
 
     private void Update()
     {
-        timer += Time.deltaTime;
+        // VIGTIGT: unscaledDeltaTime fortsætter selv når Time.timeScale = 0 (pause)
+        timer += Time.unscaledDeltaTime;
+
         if (timer >= refreshInterval)
         {
             timer = 0f;
@@ -153,7 +155,6 @@ public class PlayerStats : MonoBehaviour
     }
 
     // ---------- Formatting helpers ----------
-
     private string Head(string t) => $"<b><color={headerColor}>{t}</color></b>";
     private string Soft(string t) => $"<color={mutedColor}>{t}</color>";
     private string Label(string t) => $"<color={labelColor}>{t}</color>";
@@ -161,7 +162,6 @@ public class PlayerStats : MonoBehaviour
 
     private string Row(string label, string value)
     {
-        // fixed width look with separator
         return $"{Label(label)}{Soft(": ")}{value}";
     }
 
