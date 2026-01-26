@@ -13,15 +13,29 @@ public class AbilityPointsUI : MonoBehaviour
     int lastLevel;
     float timer = 0f;
     float blinkTimer = 0f;
-
+    public bool showOnStart = true;
     bool dismissed = false;              // <-- NY
 
     void Start()
     {
+
         if (player != null) lastLevel = player.level;
 
         if (pressPText != null)
             pressPText.gameObject.SetActive(false);
+
+        if (pressPText != null)
+        {
+            pressPText.enabled = true;
+            pressPText.gameObject.SetActive(showOnStart);
+            
+            if (showOnStart)
+            {
+                dismissed = false;
+                timer = showDuration;
+                blinkTimer = 0f;
+            }
+        }
     }
 
     void Update()
