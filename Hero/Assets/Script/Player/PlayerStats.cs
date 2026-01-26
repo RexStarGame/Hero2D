@@ -25,7 +25,10 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private string warnColor = "#F59E0B";
     [SerializeField] private string badColor = "#EF4444";
     [SerializeField] private string blueColor = "#60A5FA";
-
+    [Header("Upgrade Menu")]
+    [SerializeField] private GameObject upgradeMenu;     // Drag dit UpgradeMenu panel her
+    [SerializeField] private bool pauseWhenOpen = true;  // Pause spil når menu er åben
+    private bool upgradeMenuOpen = false;
     private float timer;
     private readonly StringBuilder sb = new StringBuilder(768);
 
@@ -33,6 +36,8 @@ public class PlayerStats : MonoBehaviour
     {
         AutoFind();
         ForceUpdate();
+        if (upgradeMenu != null)
+            upgradeMenu.SetActive(false);
     }
 
     private void OnEnable()
@@ -44,6 +49,8 @@ public class PlayerStats : MonoBehaviour
     private void Update()
     {
         // VIGTIGT: unscaledDeltaTime fortsætter selv når Time.timeScale = 0 (pause)
+        if (Input.GetKeyDown(KeyCode.U))
+            ToggleUpgradeMenu();
         timer += Time.unscaledDeltaTime;
 
         if (timer >= refreshInterval)
@@ -52,6 +59,21 @@ public class PlayerStats : MonoBehaviour
             ForceUpdate();
         }
     }
+    private void ToggleUpgradeMenu()
+    {
+        if (upgradeMenu == null)
+        {
+           Debug.LogWarning("[PlayerStats] upgradeMenu reference mangler.");
+           return;
+        }
+
+        upgradeMenuOpen = !upgradeMenuOpen;
+        upgradeMenu.SetActive(upgradeMenuOpen);
+
+        if (pauseWhenOpen)
+    Time.timeScale = upgradeMenuOpen ? 0f : 1f;
+    }
+ 
 
     private void AutoFind()
     {
@@ -64,6 +86,11 @@ public class PlayerStats : MonoBehaviour
 
         if (damageUpgrade == null)
             damageUpgrade = FindAny<DamageUpgrade>();
+        if (upgradeMenu == null)
+        {
+            var go = GameObject.Find("UpgradeMenu");
+             if (go != null) upgradeMenu = go;
+        }
     }
 
     private void ForceUpdate()

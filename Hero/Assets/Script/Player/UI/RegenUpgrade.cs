@@ -7,7 +7,7 @@ public class RegenUpgrade : MonoBehaviour
     public PlayerHealth playerHealth;
 
     public TMP_Text levelText; // NEW
-    public TMP_Text Level;
+    //public TMP_Text Level;
     public int maxLevel = 10;
     public int cost = 1;
 
@@ -41,6 +41,6 @@ public class RegenUpgrade : MonoBehaviour
     void UpdateLevelText()
     {
         levelText.text = "+";
-        Level.text = playerHealth.regenLevel.ToString();
+        //Level.text = playerHealth.regenLevel.ToString();
     }
 }
