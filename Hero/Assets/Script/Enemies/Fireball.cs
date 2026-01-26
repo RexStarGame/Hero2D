@@ -20,6 +20,7 @@ public class Fireball : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
+        Debug.Log("Hit: " + other.name + " | Tag: " + other.tag);
         // Ignore enemies (including the shooter)
         if (other.CompareTag("Enemy")) return;
 
@@ -34,6 +35,12 @@ public class Fireball : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+        if (other.CompareTag("Environment"))
+        {
+            Destroy(gameObject);
+            return;
+        }
+
 
         // Anything else (walls, props, etc.)
         Destroy(gameObject);
