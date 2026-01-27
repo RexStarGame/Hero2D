@@ -16921,8 +16921,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6536c5df4767e614596aaff5bb4307c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pauseMenuUI: {fileID: 0}
-  volumeSlider: {fileID: 0}
+  pauseMenuUI: {fileID: 2009679964}
+  volumeSlider: {fileID: 2009679966}
   musicSource: {fileID: 1778044296}
 --- !u!1 &1792090562
 GameObject:

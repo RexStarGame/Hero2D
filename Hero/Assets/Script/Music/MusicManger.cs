@@ -32,7 +32,6 @@ public class MusicManager : MonoBehaviour
     // Update køres hver frame
     void Update()
     {
-        // Tjek om der trykkes på 'P'
         if (Input.GetKeyDown(KeyCode.P))
         {
             if (isGamePaused)
@@ -41,18 +40,23 @@ public class MusicManager : MonoBehaviour
             }
             else
             {
+                // Block opening pause if Upgrade menu is open
+                if (!MenuLock.CanOpen(MenuOwner.Pause))
+                    return;
+
                 PauseGame();
             }
         }
     }
-
     void PauseGame()
     {
         if (pauseMenuUI != null)
         {
-            pauseMenuUI.SetActive(true); // Vis menuen
-            Time.timeScale = 0f;         // Stop tiden i spillet
+            pauseMenuUI.SetActive(true);
+            Time.timeScale = 0f;
             isGamePaused = true;
+
+            MenuLock.Set(MenuOwner.Pause);
         }
     }
 
@@ -60,12 +64,21 @@ public class MusicManager : MonoBehaviour
     {
         if (pauseMenuUI != null)
         {
-            pauseMenuUI.SetActive(false); // Skjul menuen
-            Time.timeScale = 1f;          // Start tiden igen
+            pauseMenuUI.SetActive(false);
+            Time.timeScale = 1f;
             isGamePaused = false;
+
+            MenuLock.Clear(MenuOwner.Pause);
         }
     }
-
+    private void OnDisable()
+    {
+        if (isGamePaused)
+        {
+            MenuLock.Clear(MenuOwner.Pause);
+            Time.timeScale = 1f;
+        }
+    }
     // Denne funktion kaldes af Slideren
     public void SetLevel(float sliderValue)
     {

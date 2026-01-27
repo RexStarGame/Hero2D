@@ -48,11 +48,13 @@ public class PlayerStats : MonoBehaviour
 
     private void Update()
     {
-        // VIGTIGT: unscaledDeltaTime fortsætter selv når Time.timeScale = 0 (pause)
         if (Input.GetKeyDown(KeyCode.U))
             ToggleUpgradeMenu();
-        timer += Time.unscaledDeltaTime;
 
+        if (upgradeMenuOpen && Input.GetKeyDown(KeyCode.Escape))
+            ToggleUpgradeMenu();
+
+        timer += Time.unscaledDeltaTime;
         if (timer >= refreshInterval)
         {
             timer = 0f;
@@ -63,23 +65,26 @@ public class PlayerStats : MonoBehaviour
     {
         if (upgradeMenu == null)
         {
-           Debug.LogWarning("[PlayerStats] upgradeMenu reference mangler.");
-           return;
+            UnityEngine.Debug.LogWarning("[PlayerStats] upgradeMenu reference mangler.");
+            return;
         }
 
-        upgradeMenuOpen = !upgradeMenuOpen;
+        bool wantsToOpen = !upgradeMenuOpen;
+
+        // If trying to OPEN, block if Pause menu owns the lock
+        if (wantsToOpen && !MenuLock.CanOpen(MenuOwner.Upgrade))
+            return;
+
+        upgradeMenuOpen = wantsToOpen;
         upgradeMenu.SetActive(upgradeMenuOpen);
 
+        if (upgradeMenuOpen)
+            MenuLock.Set(MenuOwner.Upgrade);
+        else
+            MenuLock.Clear(MenuOwner.Upgrade);
+
         if (pauseWhenOpen)
-        {
-            //Time.timeScale = upgradeMenuOpen ? 0f : 1f;
-            upgradeMenuOpen = true;
-            upgradeMenu.SetActive(true);
-            Time.timeScale = 0f; // pause indtil Resume-knap
-
-        }
-
-
+            UnityEngine.Time.timeScale = upgradeMenuOpen ? 0f : 1f;
     }
     private void AutoFind()
     {
@@ -100,19 +105,22 @@ public class PlayerStats : MonoBehaviour
     }
     public void ResumeGame()
     {
-      if (upgradeMenu == null) return;
+        if (upgradeMenu == null) return;
 
-       upgradeMenuOpen = false;
-       upgradeMenu.SetActive(false);
-       Time.timeScale = 1f;
+        upgradeMenuOpen = false;
+        upgradeMenu.SetActive(false);
+        MenuLock.Clear(MenuOwner.Upgrade);
+        UnityEngine.Time.timeScale = 1f;
     }
     private void OnDisable()
     {
-        // failsafe så du ikke bliver “låst” i pause hvis objektet disables
         if (upgradeMenuOpen)
-            Time.timeScale = 1f;
+        {
+            MenuLock.Clear(MenuOwner.Upgrade);
+            UnityEngine.Time.timeScale = 1f;
+        }
     }
-private void ForceUpdate()
+    private void ForceUpdate()
     {
         if (statsText == null) return;
 
