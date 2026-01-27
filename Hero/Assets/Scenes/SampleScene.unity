@@ -10413,6 +10413,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemies level 25
       objectReference: {fileID: 0}
+    - target: {fileID: 8233854846743954295, guid: 4717450b1940da5478471a7f1d8f7c00, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

@@ -57,7 +57,7 @@ public class AbilityPointsUI : MonoBehaviour
 
             if (pressPText != null)
             {
-                pressPText.text = "Tryk på P";
+                pressPText.text = "Tryk på U";
                 pressPText.enabled = true;       // <-- så den starter synlig
                 pressPText.gameObject.SetActive(true);
             }
@@ -66,7 +66,7 @@ public class AbilityPointsUI : MonoBehaviour
         if (pressPText == null) return;
 
         // <-- NY: hvis man trykker P mens den vises, stop blink og skjul
-        if (!dismissed && timer > 0f && Input.GetKeyDown(KeyCode.P))
+        if (!dismissed && timer > 0f && (Input.GetKeyDown(KeyCode.U) || Input.GetKeyDown(KeyCode.P)))
         {
             dismissed = true;
             timer = 0f;

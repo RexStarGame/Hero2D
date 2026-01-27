@@ -62,6 +62,7 @@ public class PlayerAttack : MonoBehaviour
 
     private bool canAttack = true;
     private Vector2 lastFacingDirection = Vector2.down;
+    private Coroutine attackRoutine;
 
     [SerializeField] private DamageUpgrade damageUpgrade;
     public DamageUpgrade DamageUpgrade => damageUpgrade;
@@ -86,10 +87,11 @@ public class PlayerAttack : MonoBehaviour
         UpdateDirection();
 
         // Only start attack if allowed
-        if (Input.GetKeyDown(KeyCode.Space) && canAttack)
+        if (Input.GetKeyDown(KeyCode.Space) && canAttack && attackRoutine == null)
         {
-            StartCoroutine(PerformAttack());
+            attackRoutine = StartCoroutine(PerformAttack());
         }
+
     }
 
 
@@ -113,6 +115,7 @@ public class PlayerAttack : MonoBehaviour
     IEnumerator PerformAttack()
     {
         canAttack = false;
+        attackRoutine = null;
 
         // NEW: set when we will be ready again (includes delays + cooldown)
         AttackReadyTime = Time.time + AttackCycleDuration;
@@ -134,7 +137,22 @@ public class PlayerAttack : MonoBehaviour
 
         yield return new WaitForSeconds(attackCooldown);
         canAttack = true;
+        attackRoutine = null;
+
+
     }
+    private void OnDisable()
+    {
+        if (attackRoutine != null)
+        {
+            StopCoroutine(attackRoutine);
+            attackRoutine = null;
+        }
+
+        canAttack = true;
+        if (attackHitbox != null) attackHitbox.enabled = false;
+    }
+
     public void EnableHitbox()
     {
         Debug.Log("Hitbox enabled");

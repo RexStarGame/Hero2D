@@ -28,6 +28,8 @@ public class BossBehaviorController : MonoBehaviour
         Frost,
         Burn
     }
+    private Coroutine attackRoutine;
+    private readonly List<BossAttackType> options = new List<BossAttackType>(8);
 
     [System.Serializable]
     public class TelegraphedChargeSettings
@@ -235,7 +237,8 @@ public class BossBehaviorController : MonoBehaviour
         BossAttackType? nextAttack = SelectNextAttack();
         if (nextAttack.HasValue)
         {
-            StartCoroutine(ExecuteAttack(nextAttack.Value));
+            isAttacking = true; // set BEFORE starting coroutine
+            attackRoutine = StartCoroutine(ExecuteAttack(nextAttack.Value));
         }
     }
 
@@ -322,7 +325,7 @@ public class BossBehaviorController : MonoBehaviour
 
     private BossAttackType? SelectNextAttack()
     {
-        List<BossAttackType> options = new List<BossAttackType>();
+        options.Clear();
 
         if (IsAttackReady(BossAttackType.TelegraphedCharge))
             options.Add(BossAttackType.TelegraphedCharge);
@@ -348,6 +351,7 @@ public class BossBehaviorController : MonoBehaviour
 
         return selected;
     }
+
 
     private bool IsAttackReady(BossAttackType attack)
     {
@@ -380,7 +384,7 @@ public class BossBehaviorController : MonoBehaviour
 
     private IEnumerator ExecuteAttack(BossAttackType attack)
     {
-        isAttacking = true;
+        //isAttacking = true;
         float attackSpeed = desperation.enabled ? desperation.attackSpeedMultiplier : 1f;
 
         switch (attack)
@@ -412,8 +416,10 @@ public class BossBehaviorController : MonoBehaviour
 
         ApplyWeaknessWindows(attack);
         SetAttackCooldown(attack);
-        isAttacking = false;
         nextAttackTime = Time.time + 0.2f;
+        isAttacking = false;
+        attackRoutine = null;
+
     }
 
     private void ApplyWeaknessWindows(BossAttackType attack)
@@ -493,7 +499,15 @@ public class BossBehaviorController : MonoBehaviour
             blockDisabledUntil = Time.time + weaknesses.statusDisableDuration;
         }
     }
-
+    private void OnDisable()
+    {
+        if (attackRoutine != null)
+        {
+            StopCoroutine(attackRoutine);
+            attackRoutine = null;
+        }
+        isAttacking = false;
+    }
     public bool IsBlockDisabled()
     {
         if (!weaknesses.statusTriggerEnabled)
