@@ -2395,7 +2395,7 @@ MonoBehaviour:
   level: 1
   xp: 0
   xpToNextLevel: 100
-  abilityPoints: 100
+  abilityPoints: 1
 --- !u!1 &256393622
 GameObject:
   m_ObjectHideFlags: 0
