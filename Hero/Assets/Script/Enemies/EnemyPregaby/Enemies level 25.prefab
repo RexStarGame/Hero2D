@@ -49,6 +49,7 @@ GameObject:
   - component: {fileID: 3745639338394277203}
   - component: {fileID: -3651679510663702152}
   - component: {fileID: -8708243518032412209}
+  - component: {fileID: 878880681790245415}
   m_Layer: 3
   m_Name: Enemies level 25
   m_TagString: Enemy
@@ -394,3 +395,15 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
+--- !u!114 &878880681790245415
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8233854846743954295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be42cee28163cab4bb3a26f007ac9409, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

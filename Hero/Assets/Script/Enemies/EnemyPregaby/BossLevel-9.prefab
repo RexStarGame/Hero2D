@@ -768,6 +768,7 @@ GameObject:
   - component: {fileID: 7471907741246943375}
   - component: {fileID: 3449211277808844634}
   - component: {fileID: 3815532356674230061}
+  - component: {fileID: 1721934959143606376}
   m_Layer: 3
   m_Name: BossLevel-9
   m_TagString: Enemy
@@ -1183,6 +1184,13 @@ MonoBehaviour:
   firePoint: {fileID: 5287324975665498792}
   attackRange: 5
   attackCooldown: 8
+  windupTime: 0.45
+  telegraphPrefab: {fileID: 0}
+  telegraphOffset: {x: 0, y: 0.6, z: 0}
+  windupSfx: {fileID: 0}
+  freezeDuringWindup: 1
+  enemySprite: {fileID: 0}
+  blinkInterval: 0.08
 --- !u!114 &3449211277808844634
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1219,6 +1227,18 @@ MonoBehaviour:
   onDeath:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1721934959143606376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8233854846743954295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be42cee28163cab4bb3a26f007ac9409, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8620457369009950218
 GameObject:
   m_ObjectHideFlags: 0

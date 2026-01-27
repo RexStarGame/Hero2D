@@ -12,6 +12,8 @@ public class EnemySpawn : MonoBehaviour
         [Tooltip("Minimum player level for at denne fjende må spawnes (fx 1, 5, 9, 13).")]
         public int minLevel = 1;
     }
+    private readonly List<GameObject> eligible = new List<GameObject>(32);
+    private int lastLevel = -1;
 
     [Header("Referencer")]
     [Tooltip("Fallback enemy prefab (bruges hvis Enemy List er tom eller ingen er eligible).")]
@@ -50,7 +52,7 @@ public class EnemySpawn : MonoBehaviour
     void Update()
     {
         // Husk at dine fjender skal have tagget "Enemy"
-        int currentEnemyCount = GameObject.FindGameObjectsWithTag("Enemy").Length;
+        int currentEnemyCount = EnemyCounter.Count;
 
         bool wasActive = isSpawningActive;
 
@@ -86,6 +88,7 @@ public class EnemySpawn : MonoBehaviour
 
     void SpawnEnemy()
     {
+
         if (enemyManager == null)
         {
             Debug.LogError("Mangler reference til EnemyManager!");
@@ -100,24 +103,32 @@ public class EnemySpawn : MonoBehaviour
         }
 
         Vector2 spawnPosition = enemyManager.GetRandomPointInZone();
-        Instantiate(prefabToSpawn, spawnPosition, Quaternion.identity); 
+        Instantiate(prefabToSpawn, spawnPosition, Quaternion.identity);
+        GameObject spawned = Instantiate(prefabToSpawn, spawnPosition, Quaternion.identity);
+
+        if (!spawned.TryGetComponent<EnemyCounter>(out _))
+            spawned.AddComponent<EnemyCounter>();
+
     }
 
     GameObject GetSpawnPrefab()
     {
-        // Hvis der ikke er en pool, brug fallback
         if (enemyPool == null || enemyPool.Length == 0)
             return enemyPrefab;
 
         int currentLevel = (playerXP != null) ? playerXP.level : 1;
 
-        // Saml alle eligible fjender (minLevel <= currentLevel)
-        List<GameObject> eligible = new List<GameObject>(enemyPool.Length);
-        for (int i = 0; i < enemyPool.Length; i++)
+        if (currentLevel != lastLevel)
         {
-            var entry = enemyPool[i];
-            if (entry != null && entry.prefab != null && entry.minLevel <= currentLevel)
-                eligible.Add(entry.prefab);
+            lastLevel = currentLevel;
+            eligible.Clear();
+
+            for (int i = 0; i < enemyPool.Length; i++)
+            {
+                var entry = enemyPool[i];
+                if (entry != null && entry.prefab != null && entry.minLevel <= currentLevel)
+                    eligible.Add(entry.prefab);
+            }
         }
 
         if (eligible.Count == 0)
@@ -126,3 +137,4 @@ public class EnemySpawn : MonoBehaviour
         return eligible[Random.Range(0, eligible.Count)];
     }
 }
+
