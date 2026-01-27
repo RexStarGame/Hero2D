@@ -11,6 +11,7 @@ public class ProjectIssueScanner : EditorWindow
     private bool onlyShowWarnings = true;
 
     private readonly List<Result> results = new List<Result>(512);
+    private bool includeEditorScripts = false;
 
     private enum Severity { Info, Warning, High }
     private struct Result
@@ -31,6 +32,7 @@ public class ProjectIssueScanner : EditorWindow
     {
         GUILayout.Label("Heuristic scanner (not perfect). Flags common performance/memory smells.", EditorStyles.wordWrappedLabel);
         GUILayout.Space(6);
+        includeEditorScripts = GUILayout.Toggle(includeEditorScripts, "Include Editor", GUILayout.Width(110));
 
         using (new GUILayout.HorizontalScope())
         {
@@ -57,14 +59,6 @@ public class ProjectIssueScanner : EditorWindow
             {
                 if (onlyShowWarnings && r.severity == Severity.Info) continue;
 
-                var style = new GUIStyle(EditorStyles.helpBox);
-                switch (r.severity)
-                {
-                    case Severity.High: style.normal.textColor = new Color(1f, 0.3f, 0.3f); break;
-                    case Severity.Warning: style.normal.textColor = new Color(1f, 0.6f, 0.2f); break;
-                    default: style.normal.textColor = EditorStyles.label.normal.textColor; break;
-                }
-
                 using (new GUILayout.VerticalScope(EditorStyles.helpBox))
                 {
                     GUILayout.Label($"[{r.severity}] {r.scriptName}", EditorStyles.boldLabel);
@@ -73,6 +67,7 @@ public class ProjectIssueScanner : EditorWindow
                     using (new GUILayout.HorizontalScope())
                     {
                         GUILayout.Label(r.assetPath, EditorStyles.miniLabel);
+
                         if (GUILayout.Button("Ping", GUILayout.Width(60)))
                         {
                             var obj = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(r.assetPath);
@@ -96,6 +91,14 @@ public class ProjectIssueScanner : EditorWindow
         {
             string assetPath = AssetDatabase.GUIDToAssetPath(guid);
             if (!assetPath.EndsWith(".cs", StringComparison.OrdinalIgnoreCase)) continue;
+
+            // Skip Editor scripts by default
+            if (!includeEditorScripts && assetPath.Contains("/Editor/"))
+                continue;
+
+            // Never scan the scanner itself (prevents self-false-positives)
+            if (assetPath.EndsWith("/ProjectIssueScanner.cs", StringComparison.OrdinalIgnoreCase))
+                continue;
 
             string text;
             try { text = File.ReadAllText(assetPath); }
