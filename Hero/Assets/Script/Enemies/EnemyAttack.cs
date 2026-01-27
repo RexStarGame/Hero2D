@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class EnemyAttack : MonoBehaviour
@@ -10,80 +11,144 @@ public class EnemyAttack : MonoBehaviour
     [SerializeField] private float attackRange = 5f;
     [SerializeField] private float attackCooldown = 2f;
 
+    [Header("Telegraph (Warning before shot)")]
+    [SerializeField] private float windupTime = 0.45f;                 // tid før skuddet
+    [SerializeField] private GameObject telegraphPrefab;               // fx ! icon eller glow sprite (valgfri)
+    [SerializeField] private Vector3 telegraphOffset = new Vector3(0, 0.6f, 0);
+    [SerializeField] private AudioClip windupSfx;                      // valgfri pip/charge lyd
+    [SerializeField] private bool freezeDuringWindup = true;           // hvis du har movement script, kan du bruge dette som signal
+
+    [Header("Optional Visual Blink")]
+    [SerializeField] private SpriteRenderer enemySprite;               // assign enemy sprite renderer (valgfri)
+    [SerializeField] private float blinkInterval = 0.08f;
+
     private Transform player;
     private float cooldownTimer;
     private Animator animator;
+    private AudioSource audioSource;
+
+    private bool isWindingUp;
+    private GameObject telegraphInstance;
 
     void Start()
     {
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>(); // optional (add AudioSource component if you use SFX)
 
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-        if (playerObj != null)
-        {
-            player = playerObj.transform;
-        }
-        else
-        {
-            Debug.LogWarning("Mangler Player tag!");
-        }
+        if (playerObj != null) player = playerObj.transform;
+        else Debug.LogWarning("Mangler Player tag!");
 
         if (firePoint == null) firePoint = transform;
+
+        // fallback: auto-find sprite if not assigned
+        if (enemySprite == null) enemySprite = GetComponentInChildren<SpriteRenderer>();
     }
 
     void Update()
     {
         if (player == null) return;
 
+        cooldownTimer -= Time.deltaTime;
+        if (isWindingUp) return;
+
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
 
-        if (distanceToPlayer <= attackRange && cooldownTimer <= 0)
+        if (distanceToPlayer <= attackRange && cooldownTimer <= 0f)
         {
-            Shoot();
-            cooldownTimer = attackCooldown;
-        }
-        else
-        {
-            cooldownTimer -= Time.deltaTime;
+            StartCoroutine(WindupThenShoot());
         }
     }
 
-    void Shoot()
+    private IEnumerator WindupThenShoot()
     {
-        // 1. Find retningen til spilleren
+        isWindingUp = true;
+
+        // Lock direction at windup start (fair telegraph)
         Vector2 direction = (player.position - firePoint.position).normalized;
 
-        if (animator != null)
+        // Face player immediately
+        UpdateFacing(direction);
+
+        // Show telegraph object (optional)
+        if (telegraphPrefab != null)
         {
-            // DEL 1: Er vi Oppe (Ryggen til) eller Nede (Ansigt frem)?
-            if (direction.y > 0)
-            {
-                animator.SetBool("IsFacingUp", true); // Vi ser RYGGEN
-            }
-            else
-            {
-                animator.SetBool("IsFacingUp", false); // Vi ser ANSIGTET
-            }
-
-            // DEL 2: Er vi til Højre eller Venstre?
-            if (direction.x > 0)
-            {
-                animator.SetBool("IsFacingRight", true);
-            }
-            else
-            {
-                animator.SetBool("IsFacingRight", false);
-            }
-
-            // 3. Aktivér angrebet
-            animator.SetTrigger("Attack");
+            telegraphInstance = Instantiate(telegraphPrefab, transform.position + telegraphOffset, Quaternion.identity, transform);
         }
 
-        // 4. Roter selve fireballen
+        // Play windup SFX (optional)
+        if (windupSfx != null)
+        {
+            if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
+            audioSource.PlayOneShot(windupSfx);
+        }
+
+        // Simple blink during windup (optional)
+        float t = 0f;
+        bool visible = true;
+
+        while (t < windupTime)
+        {
+            t += Time.deltaTime;
+
+            // keep telegraph positioned
+            if (telegraphInstance != null)
+                telegraphInstance.transform.position = transform.position + telegraphOffset;
+
+            // blink sprite
+            if (enemySprite != null)
+            {
+                // toggle visibility on a fixed interval
+                // (pro tip: you can swap this to color flash instead if you prefer)
+                if (blinkInterval > 0f)
+                {
+                    // manual timer using modulo style
+                    float phase = Mathf.Repeat(t, blinkInterval * 2f);
+                    bool shouldBeVisible = phase < blinkInterval;
+                    if (shouldBeVisible != visible)
+                    {
+                        visible = shouldBeVisible;
+                        enemySprite.enabled = visible;
+                    }
+                }
+            }
+
+            yield return null;
+        }
+
+        // restore sprite
+        if (enemySprite != null) enemySprite.enabled = true;
+
+        // remove telegraph
+        if (telegraphInstance != null) Destroy(telegraphInstance);
+
+        // shoot
+        Shoot(direction);
+
+        // start cooldown AFTER the shot
+        cooldownTimer = attackCooldown;
+        isWindingUp = false;
+    }
+
+    void Shoot(Vector2 direction)
+    {
+        UpdateFacing(direction);
+
+        if (animator != null)
+            animator.SetTrigger("Attack");
+
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         Quaternion rotation = Quaternion.Euler(0, 0, angle);
 
         Instantiate(fireballPrefab, firePoint.position, rotation);
+    }
+
+    private void UpdateFacing(Vector2 direction)
+    {
+        if (animator == null) return;
+
+        animator.SetBool("IsFacingUp", direction.y > 0);
+        animator.SetBool("IsFacingRight", direction.x > 0);
     }
 
     void OnDrawGizmosSelected()

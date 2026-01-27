@@ -109,15 +109,17 @@ public class FlameField : MonoBehaviour
         if (exploded) return;
         exploded = true;
 
-        // stop projectile
         rb.linearVelocity = Vector2.zero;
         rb.simulated = false;
 
-        // VFX explosion
+        // Explosion VFX (one-shot) -> must be destroyed
         if (explosionVfx != null)
-            Instantiate(explosionVfx, transform.position, Quaternion.identity);
+        {
+            var explosionInstance = Instantiate(explosionVfx, transform.position, Quaternion.identity);
+            Destroy(explosionInstance); // instant despawn
+        }
 
-        // instant AoE dmg (valgfrit)
+        // instant AoE dmg (optional)
         if (explosionDamage > 0f)
         {
             int count = Physics2D.OverlapCircleNonAlloc(transform.position, explosionRadius, hits, damageLayers);
@@ -125,7 +127,7 @@ public class FlameField : MonoBehaviour
                 TryDealDamage(hits[i], explosionDamage);
         }
 
-        // skift collider til burn-area
+        // switch collider to burn-area
         if (col is CircleCollider2D cc)
         {
             cc.radius = burnRadius;
@@ -133,7 +135,6 @@ public class FlameField : MonoBehaviour
         }
         else
         {
-            // hvis ikke circle collider, s� tilf�j en
             Destroy(col);
             var newCc = gameObject.AddComponent<CircleCollider2D>();
             newCc.isTrigger = true;
@@ -141,14 +142,51 @@ public class FlameField : MonoBehaviour
             col = newCc;
         }
 
-        // burn VFX (valgfrit)
+        // Burn VFX (can be looping) -> we destroy when burn ends
         if (burnVfx != null)
-        {
             burnVfxInstance = Instantiate(burnVfx, transform.position, Quaternion.identity);
-        }
 
         burnTimer = burnDuration;
         tickTimer = 0f;
+    }
+
+    private void DestroyVfxAfterFinished(GameObject vfxRoot, bool stopLooping, float extra = 0.2f)
+    {
+        if (vfxRoot == null) return;
+
+        var systems = vfxRoot.GetComponentsInChildren<ParticleSystem>(true);
+        if (systems == null || systems.Length == 0)
+        {
+            Destroy(vfxRoot, 2f);
+            return;
+        }
+
+        float maxTime = 0f;
+
+        for (int i = 0; i < systems.Length; i++)
+        {
+            var ps = systems[i];
+            var main = ps.main;
+
+            // ensure it plays (in case Play On Awake is off)
+            if (!ps.isPlaying) ps.Play(true);
+
+            // If looping and we want to end it, stop emitting now (existing particles still live out their lifetime)
+            if (stopLooping && main.loop)
+                ps.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+
+            float startDelay = main.startDelay.constantMax;
+            float startLifetime = main.startLifetime.constantMax;
+
+            // For looping systems, after StopEmitting the remaining time is basically lifetime (not duration)
+            float total = main.loop
+                ? (startDelay + startLifetime)
+                : (startDelay + main.duration + startLifetime);
+
+            if (total > maxTime) maxTime = total;
+        }
+
+        Destroy(vfxRoot, maxTime + extra);
     }
 
     private void RunBurnField()
@@ -173,10 +211,17 @@ public class FlameField : MonoBehaviour
 
         if (burnTimer <= 0f)
         {
-            if (burnVfxInstance != null) Destroy(burnVfxInstance);
+            if (burnVfxInstance != null)
+            {
+                // hard cut: remove immediately
+                Destroy(burnVfxInstance);
+            }
+
             Destroy(gameObject);
         }
+
     }
+
 
     private void TryDealDamage(Collider2D targetCol, float dmg)
     {
