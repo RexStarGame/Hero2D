@@ -1,48 +1,79 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
 public class Fireball : MonoBehaviour
 {
-    [Header("Indstillinger")]
+    [Header("Movement")]
     [SerializeField] private float speed = 7f;
     [SerializeField] private float lifeTime = 4f;
 
+    [Header("Damage")]
     [SerializeField] private float damage = 10f;
 
-    void Start()
+    [Header("Layer Rules (set in Inspector)")]
+    [Tooltip("Layers the projectile should ignore completely (no destroy, no damage).")]
+    [SerializeField] private LayerMask ignoreLayers;
+
+    [Tooltip("Layers that should be damaged (Player layer etc.).")]
+    [SerializeField] private LayerMask damageLayers;
+
+    [Tooltip("Layers that destroy the projectile (Walls, Obstacles, Tilemap collider layer, etc.).")]
+    [SerializeField] private LayerMask destroyOnLayers;
+
+    private Rigidbody2D rb;
+    private Collider2D col;
+
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        col = GetComponent<Collider2D>();
+
+        // Make it stable for projectiles
+        rb.gravityScale = 0f;
+        rb.bodyType = RigidbodyType2D.Kinematic;
+        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+
+        // Use trigger hits (recommended)
+        col.isTrigger = true;
+    }
+
+    private void Start()
     {
         Destroy(gameObject, lifeTime);
     }
 
-    void Update()
+    private void FixedUpdate()
     {
-        transform.Translate(Vector2.right * speed * Time.deltaTime);
+        // Always move forward based on rotation
+        rb.linearVelocity = (Vector2)transform.right * speed;
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("Hit: " + other.name + " | Tag: " + other.tag);
-        // Ignore enemies (including the shooter)
-        if (other.CompareTag("Enemy")) return;
+        int otherLayer = other.gameObject.layer;
 
-        // Ignore zone/controller if needed
-        if (other.CompareTag("GameController")) return;
+        Debug.Log($"Hit: {other.name} | Layer: {LayerMask.LayerToName(otherLayer)} | Tag: {other.tag}");
 
-        // Damage player if PlayerHealth exists (works even if collider is on a child)
-        PlayerHealth health = other.GetComponentInParent<PlayerHealth>();
-        if (health != null)
+        // 1) Ignore layers
+        if (((1 << otherLayer) & ignoreLayers) != 0)
+            return;
+
+        // 2) Damage layers (player)
+        if (((1 << otherLayer) & damageLayers) != 0)
         {
-            health.TakeDamage(damage);
+            PlayerHealth health = other.GetComponentInParent<PlayerHealth>();
+            if (health != null)
+                health.TakeDamage(damage);
+
             Destroy(gameObject);
             return;
         }
-        if (other.CompareTag("Environment"))
+
+        // 3) Destroy on environment/obstacles
+        if (((1 << otherLayer) & destroyOnLayers) != 0)
         {
             Destroy(gameObject);
             return;
         }
-
-
-        // Anything else (walls, props, etc.)
-        Destroy(gameObject);
     }
 }

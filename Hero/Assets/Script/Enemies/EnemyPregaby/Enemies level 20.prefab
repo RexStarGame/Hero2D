@@ -262,7 +262,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d58054457ced4b4d8bb9496e5601418, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fireballPrefab: {fileID: 8772340623762868832, guid: 24832c4426b889a468176c02b135615f, type: 3}
+  fireballPrefab: {fileID: 8772340623762868832, guid: ed7135e63e6178d479db2641cb0928d5, type: 3}
   firePoint: {fileID: 5287324975665498792}
   attackRange: 6
   attackCooldown: 1.5

@@ -188,13 +188,13 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   fuseTime: 1
-  explosionRadius: 1.5
+  explosionRadius: 0.5
   explosionDamage: 120
   explosionVfx: {fileID: 8382735912724396506, guid: 0b7943d4e26ffa44dbb8f1bcca7759d0, type: 3}
   damageLayers:
     serializedVersion: 2
     m_Bits: 64
-  burnRadius: 2.5
+  burnRadius: 1.5
   burnDuration: 5
   damagePerSecond: 15
   tickInterval: 0.2
