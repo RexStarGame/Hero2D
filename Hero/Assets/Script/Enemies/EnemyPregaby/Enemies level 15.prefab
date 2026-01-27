@@ -46,9 +46,9 @@ GameObject:
   - component: {fileID: 4390320154030271449}
   - component: {fileID: 1378482468039930319}
   - component: {fileID: 7752190014984649726}
-  - component: {fileID: 3745639338394277203}
   - component: {fileID: -3651679510663702152}
   - component: {fileID: -4153961850059975942}
+  - component: {fileID: 6278456148619787416}
   m_Layer: 3
   m_Name: Enemies level 15
   m_TagString: Enemy
@@ -250,29 +250,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 80
   xpReward: 250
---- !u!114 &3745639338394277203
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8233854846743954295}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2d58054457ced4b4d8bb9496e5601418, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  fireballPrefab: {fileID: 8772340623762868832, guid: fb5ae6a7c8d012447bc8039684d447a8, type: 3}
-  firePoint: {fileID: 5287324975665498792}
-  attackRange: 5
-  attackCooldown: 1.5
-  windupTime: 0.6
-  telegraphPrefab: {fileID: 6559678956785867411, guid: 4c328d844ee1a574e8698e9d120f0633, type: 3}
-  telegraphOffset: {x: 0, y: 0.6, z: 0}
-  windupSfx: {fileID: 0}
-  freezeDuringWindup: 1
-  enemySprite: {fileID: 6053141890638132086}
-  blinkInterval: 0.08
 --- !u!114 &-3651679510663702152
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -299,3 +276,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be42cee28163cab4bb3a26f007ac9409, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &6278456148619787416
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8233854846743954295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 549414a0159582c49aedd7b3576f34c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bulletPrefab: {fileID: 8772340623762868832, guid: 1e0c7f984ee2b4546ba9be0bcece87c1, type: 3}
+  firePoint: {fileID: 5287324975665498792}
+  attackRange: 6
+  attackCooldown: 2.5
+  windupTime: 0.6
+  telegraphPrefab: {fileID: 6559678956785867411, guid: 4c328d844ee1a574e8698e9d120f0633, type: 3}
+  telegraphOffset: {x: 0, y: 0.6, z: 0}
+  windupSfx: {fileID: 0}
+  bulletCount: 24
+  shotDelay: 0.06
+  angleStep: 15
+  clockwise: 1
+  lockFirstAim: 1
