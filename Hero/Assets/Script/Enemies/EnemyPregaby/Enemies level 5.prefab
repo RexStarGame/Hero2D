@@ -265,6 +265,13 @@ MonoBehaviour:
   firePoint: {fileID: 5287324975665498792}
   attackRange: 5
   attackCooldown: 2
+  windupTime: 0.45
+  telegraphPrefab: {fileID: 0}
+  telegraphOffset: {x: 0, y: 0.6, z: 0}
+  windupSfx: {fileID: 0}
+  freezeDuringWindup: 1
+  enemySprite: {fileID: 0}
+  blinkInterval: 0.08
 --- !u!114 &-3651679510663702152
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -277,5 +284,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5e3741ffa8b64b4a9c07edb8ab8d0be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashColor: {r: 0.07735002, g: 1, b: 0, a: 1}
   flashDuration: 0.1

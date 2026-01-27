@@ -249,7 +249,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 1800
-  xpReward: 3450
+  xpReward: 9450
 --- !u!114 &3745639338394277203
 MonoBehaviour:
   m_ObjectHideFlags: 0
