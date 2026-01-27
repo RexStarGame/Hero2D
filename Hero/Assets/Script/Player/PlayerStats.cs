@@ -71,10 +71,16 @@ public class PlayerStats : MonoBehaviour
         upgradeMenu.SetActive(upgradeMenuOpen);
 
         if (pauseWhenOpen)
-    Time.timeScale = upgradeMenuOpen ? 0f : 1f;
-    }
- 
+        {
+            //Time.timeScale = upgradeMenuOpen ? 0f : 1f;
+            upgradeMenuOpen = true;
+            upgradeMenu.SetActive(true);
+            Time.timeScale = 0f; // pause indtil Resume-knap
 
+        }
+
+
+    }
     private void AutoFind()
     {
         if (playerXP == null) playerXP = FindAny<PlayerXP>();
@@ -92,8 +98,21 @@ public class PlayerStats : MonoBehaviour
              if (go != null) upgradeMenu = go;
         }
     }
+    public void ResumeGame()
+    {
+      if (upgradeMenu == null) return;
 
-    private void ForceUpdate()
+       upgradeMenuOpen = false;
+       upgradeMenu.SetActive(false);
+       Time.timeScale = 1f;
+    }
+    private void OnDisable()
+    {
+        // failsafe så du ikke bliver “låst” i pause hvis objektet disables
+        if (upgradeMenuOpen)
+            Time.timeScale = 1f;
+    }
+private void ForceUpdate()
     {
         if (statsText == null) return;
 
