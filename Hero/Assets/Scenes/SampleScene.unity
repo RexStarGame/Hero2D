@@ -2089,6 +2089,7 @@ GameObject:
   - component: {fileID: 239307048}
   - component: {fileID: 239307049}
   - component: {fileID: 239307050}
+  - component: {fileID: 239307051}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -2396,6 +2397,22 @@ MonoBehaviour:
   xp: 0
   xpToNextLevel: 100
   abilityPoints: 10000
+--- !u!114 &239307051
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 239307039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 363c47038570c47419e37a161037015e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerHealth: {fileID: 239307047}
+  sprites: []
+  hitColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.12
 --- !u!1 &256393622
 GameObject:
   m_ObjectHideFlags: 0
@@ -19900,6 +19917,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemies level 20
       objectReference: {fileID: 0}
+    - target: {fileID: 8233854846743954295, guid: 2b3118a88f756cc4786e1ed4c60b687f, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -21166,6 +21187,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: FireBall
       objectReference: {fileID: 0}
+    - target: {fileID: 4499386179326399607, guid: bcf54148a68a6504591ff483f78f2d46, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6157171588496969798, guid: bcf54148a68a6504591ff483f78f2d46, type: 3}
       propertyPath: m_LocalPosition.x
       value: -4.0134296
@@ -21263,6 +21288,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Explosion4
       objectReference: {fileID: 0}
+    - target: {fileID: 8382735912724396506, guid: 0b7943d4e26ffa44dbb8f1bcca7759d0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -21319,6 +21348,10 @@ PrefabInstance:
     - target: {fileID: 2243677477616997772, guid: 82ce84d77f30eab48b88139a4e5803f3, type: 3}
       propertyPath: m_Name
       value: Explosion5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2243677477616997772, guid: 82ce84d77f30eab48b88139a4e5803f3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
