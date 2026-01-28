@@ -196,7 +196,7 @@ MonoBehaviour:
     m_Bits: 64
   burnRadius: 1.5
   burnDuration: 5
-  damagePerSecond: 15
+  damagePerSecond: 25
   tickInterval: 0.2
   burnVfx: {fileID: 4499386179326399607, guid: bcf54148a68a6504591ff483f78f2d46, type: 3}
   damageMethodName: TakeDamage
