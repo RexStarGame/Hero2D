@@ -8,6 +8,8 @@ public class FireballSpin : MonoBehaviour
     [SerializeField] private float angularSpeed = 4f; // radians/sec
     [SerializeField] private float lifeTime = 5f;
     [SerializeField] private int damage = 10;
+    [SerializeField] private float selfSpinSpeed = 720; // degrees per second
+
 
     private Transform enemyTarget;
     private float angle;
@@ -20,6 +22,9 @@ public class FireballSpin : MonoBehaviour
 
     void Update()
     {
+        // Always spin around itself
+        transform.Rotate(0f, 0f, selfSpinSpeed * Time.deltaTime);
+
         if (!attached)
         {
             // Fly forward first
@@ -33,7 +38,7 @@ public class FireballSpin : MonoBehaviour
             return;
         }
 
-        // --- ORBIT ALGORITHM ---
+        // --- ORBIT AROUND ENEMY ---
         angle += angularSpeed * Time.deltaTime;
 
         float x = Mathf.Cos(angle) * radius;
@@ -41,6 +46,7 @@ public class FireballSpin : MonoBehaviour
 
         transform.position = enemyTarget.position + new Vector3(x, y, 0f);
     }
+
 
     void OnTriggerEnter2D(Collider2D other)
     {
