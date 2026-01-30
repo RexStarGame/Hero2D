@@ -27,7 +27,6 @@ public class FireballSpin : MonoBehaviour
 
         if (!attached)
         {
-            // Fly outwards from enemy first
             transform.Translate(Vector2.right * speed * Time.deltaTime);
             return;
         }
