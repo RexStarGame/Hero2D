@@ -38,7 +38,7 @@ public class FireballSpin : MonoBehaviour
             return;
         }
 
-        // Spin fireball around enemy
+        // Spin fireball around the enemy
         angle += angularSpeed * Time.deltaTime;
 
         float x = Mathf.Cos(angle) * radius;
@@ -50,7 +50,7 @@ public class FireballSpin : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        // Fireball attaches to enemy
+        // Fireball attaches to the enemy
         if (!attached && other.CompareTag("Enemy"))
         {
             enemyTarget = other.transform;
