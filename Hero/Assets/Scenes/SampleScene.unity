@@ -2396,7 +2396,7 @@ MonoBehaviour:
   level: 1
   xp: 0
   xpToNextLevel: 100
-  abilityPoints: 10000
+  abilityPoints: 50
 --- !u!114 &239307051
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19919,7 +19919,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8233854846743954295, guid: 2b3118a88f756cc4786e1ed4c60b687f, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

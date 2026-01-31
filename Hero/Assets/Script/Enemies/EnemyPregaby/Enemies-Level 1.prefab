@@ -271,7 +271,7 @@ MonoBehaviour:
   telegraphOffset: {x: 0, y: 1.2, z: 0}
   windupSfx: {fileID: 0}
   freezeDuringWindup: 1
-  enemySprite: {fileID: 6053141890638132086}
+  enemySprite: {fileID: 100685221371169544, guid: 34a572f49e742fe4da4de4dc69a47df0, type: 3}
   blinkInterval: 0.08
 --- !u!114 &-3651679510663702152
 MonoBehaviour:
