@@ -5,10 +5,10 @@ public class FireballSpin : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private float speed = 7f;
     [SerializeField] private float radius = 1.5f;
-    [SerializeField] private float angularSpeed = 4f; // radians/sec
+    [SerializeField] private float angularSpeed = 4f; 
     [SerializeField] private float lifeTime = 5f;
     [SerializeField] private int damage = 10;
-    [SerializeField] private float selfSpinSpeed = 720; // degrees per second
+    [SerializeField] private float selfSpinSpeed = 720; 
 
 
     private Transform enemyTarget;
@@ -27,7 +27,6 @@ public class FireballSpin : MonoBehaviour
 
         if (!attached)
         {
-            // Fly forward first
             transform.Translate(Vector2.right * speed * Time.deltaTime);
             return;
         }
@@ -38,7 +37,7 @@ public class FireballSpin : MonoBehaviour
             return;
         }
 
-        // --- ORBIT AROUND ENEMY ---
+        // Spin fireball around the enemy
         angle += angularSpeed * Time.deltaTime;
 
         float x = Mathf.Cos(angle) * radius;
@@ -50,7 +49,7 @@ public class FireballSpin : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        // Attach to enemy once
+        // Fireball attaches to the enemy
         if (!attached && other.CompareTag("Enemy"))
         {
             enemyTarget = other.transform;
@@ -60,14 +59,14 @@ public class FireballSpin : MonoBehaviour
             return;
         }
 
-        // Damage ONLY if player is hit
+        // Damage if the player gets hit
         if (attached && other.CompareTag("Player"))
         {
             PlayerHealth health = other.GetComponentInParent<PlayerHealth>();
             if (health != null)
             {
                 health.TakeDamage(damage);
-                Destroy(gameObject); // remove fireball after hit
+                Destroy(gameObject);
             }
         }
     }
