@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class BossStompAoeTelegraph2D : MonoBehaviour
 {
+    [Header("Animation")]
+    [SerializeField] private BossAttackAnimation bossAnim;
+
     [Header("Target")]
     [SerializeField] private string playerTag = "Player";
     [SerializeField] private Transform player;
@@ -58,17 +61,24 @@ public class BossStompAoeTelegraph2D : MonoBehaviour
 
     private void Awake()
     {
+        // Cache animation component (optional if set in Inspector)
+        if (bossAnim == null)
+            bossAnim = GetComponentInChildren<BossAttackAnimation>(true);
+
         EnsurePlayer();
 
-        if (player != null) lastPlayerPos = player.position;
+        if (player != null)
+            lastPlayerPos = player.position;
 
         if (logDebug)
         {
-            Debug.Log($"[AOE] Awake on {name}. player={(player ? player.name : "NULL")} " +
-                      $"primaryPrefab={(telegraphPrimaryPrefab ? telegraphPrimaryPrefab.name : "NULL")}");
+            Debug.Log(
+                $"[AOE] Awake on {name}. player={(player ? player.name : "NULL")} " +
+                $"primaryPrefab={(telegraphPrimaryPrefab ? telegraphPrimaryPrefab.name : "NULL")} " +
+                $"bossAnim={(bossAnim ? bossAnim.name : "NULL")}"
+            );
         }
     }
-
     private void Update()
     {
         if (testWithKey && Input.GetKeyDown(testKey))
@@ -115,93 +125,114 @@ public class BossStompAoeTelegraph2D : MonoBehaviour
         }
 
         if (logDebug) Debug.Log("[AOE] PlayStompAoe START");
+
+        // Trigger attack animation once for the whole combo
+        bossAnim?.PlayAttack();
+
         StartCoroutine(StompRoutine());
     }
+
 
     private void EnsurePlayer()
     {
         if (player != null) return;
 
         GameObject p = GameObject.FindGameObjectWithTag(playerTag);
-        if (p != null) player = p.transform;
+        if (p != null)
+        {
+            player = p.transform;
+            lastPlayerPos = player.position;
+            approxVelocity = Vector2.zero;
+        }
     }
+
 
     private IEnumerator StompRoutine()
     {
         running = true;
 
-        float startTime = Time.time;
-
-        float GetHitTimeAbs(int idx)
-        {
-            // Absolute hit time for strike idx
-            return startTime + warningTime * (idx + 1) + timeBetweenStrikes * idx;
-        }
-
-        // Precompute strike positions (so we can show "next" early)
-        List<Vector2> strikes = new List<Vector2>(strikeCount);
-        for (int i = 0; i < strikeCount; i++)
-            strikes.Add(GetStrikePosition(i));
-
-        // Spawn first + next warning immediately (with correct time-to-hit)
-        GameObject currentTele = SpawnTelegraph(
-            strikes[0],
-            telegraphPrimaryPrefab,
-            radius,
-            Mathf.Max(0.01f, GetHitTimeAbs(0) - Time.time)
-        );
-
+        GameObject currentTele = null;
         GameObject nextTele = null;
-        if (strikeCount > 1)
+
+        try
         {
-            GameObject nextPrefab = telegraphNextPrefab != null ? telegraphNextPrefab : telegraphPrimaryPrefab;
-            nextTele = SpawnTelegraph(
-                strikes[1],
-                nextPrefab,
+            float startTime = Time.time;
+
+            float GetHitTimeAbs(int idx)
+            {
+                // Absolute hit time for strike idx
+                return startTime + warningTime * (idx + 1) + timeBetweenStrikes * idx;
+            }
+
+            // Precompute strike positions (so we can show "next" early)
+            List<Vector2> strikes = new List<Vector2>(strikeCount);
+            for (int i = 0; i < strikeCount; i++)
+                strikes.Add(GetStrikePosition(i));
+
+            // Spawn first + next warning immediately (with correct time-to-hit)
+            currentTele = SpawnTelegraph(
+                strikes[0],
+                telegraphPrimaryPrefab,
                 radius,
-                Mathf.Max(0.01f, GetHitTimeAbs(1) - Time.time)
+                Mathf.Max(0.01f, GetHitTimeAbs(0) - Time.time)
             );
-        }
 
-        for (int i = 0; i < strikeCount; i++)
-        {
-            if (logDebug) Debug.Log($"[AOE] Strike {i + 1}/{strikeCount} warning for {warningTime}s");
-
-            // Wait warning time then hit
-            yield return new WaitForSeconds(warningTime);
-
-            DoHit(strikes[i]);
-
-            // Remove the telegraph that just hit
-            if (currentTele != null) Destroy(currentTele);
-
-            // Shift "next" telegraph to become "current"
-            currentTele = nextTele;
-            nextTele = null;
-
-            // Spawn the next-next telegraph early (with correct time-to-hit)
-            int nextIndex = i + 2;
-            if (nextIndex < strikeCount)
+            if (strikeCount > 1)
             {
                 GameObject nextPrefab = telegraphNextPrefab != null ? telegraphNextPrefab : telegraphPrimaryPrefab;
                 nextTele = SpawnTelegraph(
-                    strikes[nextIndex],
+                    strikes[1],
                     nextPrefab,
                     radius,
-                    Mathf.Max(0.01f, GetHitTimeAbs(nextIndex) - Time.time)
+                    Mathf.Max(0.01f, GetHitTimeAbs(1) - Time.time)
                 );
             }
 
-            if (i < strikeCount - 1)
-                yield return new WaitForSeconds(timeBetweenStrikes);
+            for (int i = 0; i < strikeCount; i++)
+            {
+                if (logDebug) Debug.Log($"[AOE] Strike {i + 1}/{strikeCount} warning for {warningTime}s");
+
+                yield return new WaitForSeconds(warningTime);
+
+                DoHit(strikes[i]);
+
+                // Remove the telegraph that just hit
+                if (currentTele != null) Destroy(currentTele);
+
+                // Shift "next" telegraph to become "current"
+                currentTele = nextTele;
+                nextTele = null;
+
+                int nextIndex = i + 2;
+                if (nextIndex < strikeCount)
+                {
+                    GameObject nextPrefab = telegraphNextPrefab != null ? telegraphNextPrefab : telegraphPrimaryPrefab;
+                    nextTele = SpawnTelegraph(
+                        strikes[nextIndex],
+                        nextPrefab,
+                        radius,
+                        Mathf.Max(0.01f, GetHitTimeAbs(nextIndex) - Time.time)
+                    );
+                }
+
+                if (i < strikeCount - 1)
+                    yield return new WaitForSeconds(timeBetweenStrikes);
+            }
+
+            if (logDebug) Debug.Log("[AOE] PlayStompAoe END");
         }
+        finally
+        {
+            // Always reset state + animation, even if something interrupts the coroutine
+            running = false;
+            bossAnim?.PlayIdle();
 
-        if (currentTele != null) Destroy(currentTele);
-        if (nextTele != null) Destroy(nextTele);
-
-        running = false;
-        if (logDebug) Debug.Log("[AOE] PlayStompAoe END");
+            // Safety: if coroutine ends early, clean leftovers
+            if (currentTele != null) Destroy(currentTele);
+            if (nextTele != null) Destroy(nextTele);
+        }
     }
+
 
     private Vector2 GetStrikePosition(int index)
     {
