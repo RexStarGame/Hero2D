@@ -267,7 +267,7 @@ MonoBehaviour:
   attackRange: 5
   attackCooldown: 2
   windupTime: 0.6
-  telegraphPrefab: {fileID: 6559678956785867411, guid: 4c328d844ee1a574e8698e9d120f0633, type: 3}
+  telegraphPrefab: {fileID: 455661892177236867, guid: 34a572f49e742fe4da4de4dc69a47df0, type: 3}
   telegraphOffset: {x: 0, y: 0.6, z: 0}
   windupSfx: {fileID: 0}
   freezeDuringWindup: 1

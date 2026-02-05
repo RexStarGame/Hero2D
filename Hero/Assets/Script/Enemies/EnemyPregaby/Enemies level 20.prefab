@@ -266,8 +266,8 @@ MonoBehaviour:
   firePoint: {fileID: 5287324975665498792}
   attackRange: 6
   attackCooldown: 1.5
-  windupTime: 0.45
-  telegraphPrefab: {fileID: 0}
+  windupTime: 0.6
+  telegraphPrefab: {fileID: 455661892177236867, guid: 34a572f49e742fe4da4de4dc69a47df0, type: 3}
   telegraphOffset: {x: 0, y: 0.6, z: 0}
   windupSfx: {fileID: 0}
   freezeDuringWindup: 1

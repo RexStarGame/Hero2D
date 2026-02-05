@@ -769,6 +769,7 @@ GameObject:
   - component: {fileID: 3449211277808844634}
   - component: {fileID: 3815532356674230061}
   - component: {fileID: -353263611511735779}
+  - component: {fileID: 8080646030184910480}
   m_Layer: 3
   m_Name: BossLevel-21
   m_TagString: Enemy
@@ -1040,6 +1041,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a340a8051bda31144987d24ff81bb96e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bossAnim: {fileID: 0}
+  damageLayers:
+    serializedVersion: 2
+    m_Bits: 0
   playerTag: Player
   player: {fileID: 0}
   hitMask:
@@ -1056,7 +1061,7 @@ MonoBehaviour:
   usePrediction: 1
   leadTime: 0.35
   maxPredictDistance: 10
-  damage: 240
+  damage: 260
   applyKnockback: 1
   knockbackForce: 0
   logDebug: 0
@@ -1067,6 +1072,9 @@ MonoBehaviour:
   fillChildName: Fill
   fillScaleMultiplier: 10
   fillSortingOffset: -1
+  telegraphFirePrefab: {fileID: 2243677477616997772, guid: 82ce84d77f30eab48b88139a4e5803f3, type: 3}
+  fireSortingOffset: -2
+  fireSimulationLocal: 1
 --- !u!114 &4704375403556210813
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1175,7 +1183,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8233854846743954295}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2d58054457ced4b4d8bb9496e5601418, type: 3}
   m_Name: 
@@ -1239,6 +1247,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be42cee28163cab4bb3a26f007ac9409, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &8080646030184910480
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8233854846743954295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a881d649e9eaea4eb24cbbb383272a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 1378482468039930319}
+  idleTrigger: Idle
+  attackTrigger: Attack
+  forceIdleAfterDelay: 0
+  idleDelaySeconds: 0.6
 --- !u!1 &8620457369009950218
 GameObject:
   m_ObjectHideFlags: 0
