@@ -47,7 +47,7 @@ public class DashDoge : MonoBehaviour
 
     void Update()
     {
-        // Gem sidste bev�gelsesretning (s� dash virker selv n�r du slipper taster)
+        // Gem sidste bev�gelsesretning (så dash virker selv når du slipper taster)
         float moveX = Input.GetAxisRaw("Horizontal");
         float moveY = Input.GetAxisRaw("Vertical");
         Vector2 inputDir = new Vector2(moveX, moveY);
@@ -65,6 +65,13 @@ public class DashDoge : MonoBehaviour
     {
         canDash = false;
         isDashing = true;
+
+        if (animator != null)
+        {
+            animator.SetBool("IsDashing", true);
+            animator.SetTrigger("Roll");
+        }
+
 
         if (direction.sqrMagnitude < 0.0001f)
             direction = Vector2.right;
@@ -95,6 +102,13 @@ public class DashDoge : MonoBehaviour
 
         // Slut: brems lidt ned
         rb.linearVelocity *= 0.1f;
+
+        isDashing = false;
+
+        if (animator != null)
+        {
+            animator.SetBool("IsDashing", false);
+        }
 
         // Gendan visuals
         if (sprite != null) sprite.color = Color.white;
