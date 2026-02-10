@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class BossStompAoeTelegraph2D : MonoBehaviour
 {
+    [Header("Animation")]
+    [SerializeField] private BossAttackAnimation bossAnim;
+    [Header("Layer Rules")]
+    [SerializeField] private LayerMask damageLayers; // vælg Player-layer (eller din hitbox-layer) i Inspector
+
     [Header("Target")]
     [SerializeField] private string playerTag = "Player";
     [SerializeField] private Transform player;
@@ -50,6 +55,11 @@ public class BossStompAoeTelegraph2D : MonoBehaviour
     [Tooltip("Fill sorting order relative to ring. -1 means fill behind ring.")]
     [SerializeField] private int fillSortingOffset = -1;
 
+    [Header("Telegraph Fire (inside circle)")]
+    [SerializeField] private GameObject telegraphFirePrefab; // ParticleSystem prefab (looping)
+    [SerializeField] private int fireSortingOffset = -2;     // bag ring/fill
+    [SerializeField] private bool fireSimulationLocal = true;
+
     private bool running;
 
     // For prediction fallback if player has no Rigidbody2D velocity:
@@ -58,17 +68,24 @@ public class BossStompAoeTelegraph2D : MonoBehaviour
 
     private void Awake()
     {
+        // Cache animation component (optional if set in Inspector)
+        if (bossAnim == null)
+            bossAnim = GetComponentInChildren<BossAttackAnimation>(true);
+
         EnsurePlayer();
 
-        if (player != null) lastPlayerPos = player.position;
+        if (player != null)
+            lastPlayerPos = player.position;
 
         if (logDebug)
         {
-            Debug.Log($"[AOE] Awake on {name}. player={(player ? player.name : "NULL")} " +
-                      $"primaryPrefab={(telegraphPrimaryPrefab ? telegraphPrimaryPrefab.name : "NULL")}");
+            Debug.Log(
+                $"[AOE] Awake on {name}. player={(player ? player.name : "NULL")} " +
+                $"primaryPrefab={(telegraphPrimaryPrefab ? telegraphPrimaryPrefab.name : "NULL")} " +
+                $"bossAnim={(bossAnim ? bossAnim.name : "NULL")}"
+            );
         }
     }
-
     private void Update()
     {
         if (testWithKey && Input.GetKeyDown(testKey))
@@ -115,93 +132,114 @@ public class BossStompAoeTelegraph2D : MonoBehaviour
         }
 
         if (logDebug) Debug.Log("[AOE] PlayStompAoe START");
+
+        // Trigger attack animation once for the whole combo
+        bossAnim?.PlayAttack();
+
         StartCoroutine(StompRoutine());
     }
+
 
     private void EnsurePlayer()
     {
         if (player != null) return;
 
         GameObject p = GameObject.FindGameObjectWithTag(playerTag);
-        if (p != null) player = p.transform;
+        if (p != null)
+        {
+            player = p.transform;
+            lastPlayerPos = player.position;
+            approxVelocity = Vector2.zero;
+        }
     }
+
 
     private IEnumerator StompRoutine()
     {
         running = true;
 
-        float startTime = Time.time;
-
-        float GetHitTimeAbs(int idx)
-        {
-            // Absolute hit time for strike idx
-            return startTime + warningTime * (idx + 1) + timeBetweenStrikes * idx;
-        }
-
-        // Precompute strike positions (so we can show "next" early)
-        List<Vector2> strikes = new List<Vector2>(strikeCount);
-        for (int i = 0; i < strikeCount; i++)
-            strikes.Add(GetStrikePosition(i));
-
-        // Spawn first + next warning immediately (with correct time-to-hit)
-        GameObject currentTele = SpawnTelegraph(
-            strikes[0],
-            telegraphPrimaryPrefab,
-            radius,
-            Mathf.Max(0.01f, GetHitTimeAbs(0) - Time.time)
-        );
-
+        GameObject currentTele = null;
         GameObject nextTele = null;
-        if (strikeCount > 1)
+
+        try
         {
-            GameObject nextPrefab = telegraphNextPrefab != null ? telegraphNextPrefab : telegraphPrimaryPrefab;
-            nextTele = SpawnTelegraph(
-                strikes[1],
-                nextPrefab,
+            float startTime = Time.time;
+
+            float GetHitTimeAbs(int idx)
+            {
+                // Absolute hit time for strike idx
+                return startTime + warningTime * (idx + 1) + timeBetweenStrikes * idx;
+            }
+
+            // Precompute strike positions (so we can show "next" early)
+            List<Vector2> strikes = new List<Vector2>(strikeCount);
+            for (int i = 0; i < strikeCount; i++)
+                strikes.Add(GetStrikePosition(i));
+
+            // Spawn first + next warning immediately (with correct time-to-hit)
+            currentTele = SpawnTelegraph(
+                strikes[0],
+                telegraphPrimaryPrefab,
                 radius,
-                Mathf.Max(0.01f, GetHitTimeAbs(1) - Time.time)
+                Mathf.Max(0.01f, GetHitTimeAbs(0) - Time.time)
             );
-        }
 
-        for (int i = 0; i < strikeCount; i++)
-        {
-            if (logDebug) Debug.Log($"[AOE] Strike {i + 1}/{strikeCount} warning for {warningTime}s");
-
-            // Wait warning time then hit
-            yield return new WaitForSeconds(warningTime);
-
-            DoHit(strikes[i]);
-
-            // Remove the telegraph that just hit
-            if (currentTele != null) Destroy(currentTele);
-
-            // Shift "next" telegraph to become "current"
-            currentTele = nextTele;
-            nextTele = null;
-
-            // Spawn the next-next telegraph early (with correct time-to-hit)
-            int nextIndex = i + 2;
-            if (nextIndex < strikeCount)
+            if (strikeCount > 1)
             {
                 GameObject nextPrefab = telegraphNextPrefab != null ? telegraphNextPrefab : telegraphPrimaryPrefab;
                 nextTele = SpawnTelegraph(
-                    strikes[nextIndex],
+                    strikes[1],
                     nextPrefab,
                     radius,
-                    Mathf.Max(0.01f, GetHitTimeAbs(nextIndex) - Time.time)
+                    Mathf.Max(0.01f, GetHitTimeAbs(1) - Time.time)
                 );
             }
 
-            if (i < strikeCount - 1)
-                yield return new WaitForSeconds(timeBetweenStrikes);
+            for (int i = 0; i < strikeCount; i++)
+            {
+                if (logDebug) Debug.Log($"[AOE] Strike {i + 1}/{strikeCount} warning for {warningTime}s");
+
+                yield return new WaitForSeconds(warningTime);
+
+                DoHit(strikes[i]);
+
+                // Remove the telegraph that just hit
+                if (currentTele != null) Destroy(currentTele);
+
+                // Shift "next" telegraph to become "current"
+                currentTele = nextTele;
+                nextTele = null;
+
+                int nextIndex = i + 2;
+                if (nextIndex < strikeCount)
+                {
+                    GameObject nextPrefab = telegraphNextPrefab != null ? telegraphNextPrefab : telegraphPrimaryPrefab;
+                    nextTele = SpawnTelegraph(
+                        strikes[nextIndex],
+                        nextPrefab,
+                        radius,
+                        Mathf.Max(0.01f, GetHitTimeAbs(nextIndex) - Time.time)
+                    );
+                }
+
+                if (i < strikeCount - 1)
+                    yield return new WaitForSeconds(timeBetweenStrikes);
+            }
+
+            if (logDebug) Debug.Log("[AOE] PlayStompAoe END");
         }
+        finally
+        {
+            // Always reset state + animation, even if something interrupts the coroutine
+            running = false;
+            bossAnim?.PlayIdle();
 
-        if (currentTele != null) Destroy(currentTele);
-        if (nextTele != null) Destroy(nextTele);
-
-        running = false;
-        if (logDebug) Debug.Log("[AOE] PlayStompAoe END");
+            // Safety: if coroutine ends early, clean leftovers
+            if (currentTele != null) Destroy(currentTele);
+            if (nextTele != null) Destroy(nextTele);
+        }
     }
+
 
     private Vector2 GetStrikePosition(int index)
     {
@@ -268,12 +306,16 @@ public class BossStompAoeTelegraph2D : MonoBehaviour
 
             // Scale Fill sprite to match radius (works regardless of Pixels Per Unit)
             ApplyFillSizing(go, r);
+
+            
         }
         else
         {
             // Sprite-only: scale whole object to diameter
             float d = r * 2f;
             go.transform.localScale = new Vector3(d, d, 1f);
+
+            
         }
 
         // Blink / color timing (optional)
@@ -283,6 +325,46 @@ public class BossStompAoeTelegraph2D : MonoBehaviour
 
         if (logDebug) Debug.Log($"[AOE] SpawnTelegraph {prefab.name} at {spawnPos} timeToHit={timeToHit:0.00}s");
         return go;
+    }
+    private void SpawnFireAtHit(Vector2 center, float r)
+    {
+        if (telegraphFirePrefab == null) return;
+
+        GameObject fireGo = Instantiate(telegraphFirePrefab, new Vector3(center.x, center.y, 0f), Quaternion.identity);
+
+        var ps = fireGo.GetComponent<ParticleSystem>();
+        if (ps != null)
+        {
+            var main = ps.main;
+            main.simulationSpace = fireSimulationLocal
+                ? ParticleSystemSimulationSpace.Local
+                : ParticleSystemSimulationSpace.World;
+
+            var shape = ps.shape;
+            shape.enabled = true;
+            shape.shapeType = ParticleSystemShapeType.Circle;
+            shape.radius = r;
+            shape.radiusThickness = 1f; // ✅ fyld hele området
+
+            ps.Play(true);
+
+            Destroy(fireGo, Mathf.Max(0.5f, main.duration + main.startLifetime.constantMax));
+        }
+        else
+        {
+            Destroy(fireGo, 1.5f);
+        }
+
+        var psr = fireGo.GetComponent<ParticleSystemRenderer>();
+        if (psr != null)
+        {
+            psr.sortingOrder = telegraphSortingOrder + fireSortingOffset;
+
+            // match sorting layer (valgfrit)
+            var anySR = GetComponentInChildren<SpriteRenderer>(true);
+            if (anySR != null)
+                psr.sortingLayerID = anySR.sortingLayerID;
+        }
     }
 
     private void ApplyFillSizing(GameObject telegraphInstance, float r)
@@ -360,41 +442,55 @@ public class BossStompAoeTelegraph2D : MonoBehaviour
     {
         if (logDebug) Debug.Log($"[AOE] HIT at {center}");
 
+        // 🔥 VFX ved hit
+        SpawnFireAtHit(center, radius);
+
         if (impactPrefab != null)
         {
-            GameObject impactInstance = Instantiate(impactPrefab, new Vector3(center.x, center.y, 0f), Quaternion.identity);
+            GameObject impactInstance = Instantiate(
+                impactPrefab,
+                new Vector3(center.x, center.y, 0f),
+                Quaternion.identity
+            );
+
             if (impactLifetime > 0f)
-            {
-                Destroy(impactInstance, impactLifetime); // auto-cleanup after time
-            }
+                Destroy(impactInstance, impactLifetime);
         }
-        ContactFilter2D filter = new ContactFilter2D();
-        filter.useLayerMask = true;
-        filter.layerMask = hitMask;
-        filter.useTriggers = true;
 
-        List<Collider2D> results = new List<Collider2D>(16);
-        Physics2D.OverlapCircle(center, radius, filter, results);
+        // ✅ Samme metode som EnemyBullet: OverlapCircleAll + damageLayers
+        Collider2D[] hits = Physics2D.OverlapCircleAll(center, radius, damageLayers);
 
-        for (int i = 0; i < results.Count; i++)
+        if (logDebug) Debug.Log($"[AOE] Overlap hits={hits.Length}");
+
+        for (int i = 0; i < hits.Length; i++)
         {
-            Collider2D c = results[i];
-            if (c == null) continue;
-            if (!c.CompareTag(playerTag)) continue;
+            Collider2D other = hits[i];
+            if (other == null) continue;
 
-            c.gameObject.SendMessage("TakeDamage", damage, SendMessageOptions.DontRequireReceiver);
+            // ✅ Samme som i EnemyBullet (finder PlayerHealth på parent)
+            var hp = other.GetComponentInParent<PlayerHealth>();
+            if (hp == null) continue;
 
+            // Damage (kun én gang)
+            hp.TakeDamage(damage);
+
+            // Knockback (brug rb på parent hvis child collider ikke har rb)
             if (applyKnockback)
             {
-                Rigidbody2D rb = c.attachedRigidbody;
+                Rigidbody2D rb = other.attachedRigidbody != null
+                    ? other.attachedRigidbody
+                    : other.GetComponentInParent<Rigidbody2D>();
+
                 if (rb != null)
                 {
-                    Vector2 dir = ((Vector2)c.transform.position - center);
+                    Vector2 dir = ((Vector2)hp.transform.position - center);
                     if (dir.sqrMagnitude < 0.0001f) dir = Vector2.right;
-                    dir = dir.normalized;
-                    rb.AddForce(dir * knockbackForce, ForceMode2D.Impulse);
+                    rb.AddForce(dir.normalized * knockbackForce, ForceMode2D.Impulse);
                 }
             }
+
+            if (logDebug) Debug.Log($"[AOE] Damaged player for {damage}");
+            break; // stop så du ikke rammer flere gange pga flere colliders
         }
     }
 }
