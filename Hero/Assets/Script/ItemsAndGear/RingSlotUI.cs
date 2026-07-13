@@ -16,6 +16,7 @@ public class RingSlotUI : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDr
     [SerializeField] private Image icon;
     [SerializeField] private Image highlight;
     [SerializeField] private TMP_Text emptyLabel;
+    [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private Color validDropColor = new Color(0.13f, 0.77f, 0.37f, 0.55f);
 
     private void OnEnable()
@@ -23,6 +24,11 @@ public class RingSlotUI : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDr
         if (inventory != null) inventory.InventoryChanged += Refresh;
         if (equipment != null) equipment.EquipmentChanged += Refresh;
         Refresh();
+    }
+
+    private void Awake()
+    {
+        if (canvasGroup == null) canvasGroup = GetComponent<CanvasGroup>();
     }
 
     private void OnDisable()
@@ -47,12 +53,14 @@ public class RingSlotUI : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDr
     {
         if (GetRing() == null) return;
         DraggedSlot = this;
+        if (canvasGroup != null) canvasGroup.blocksRaycasts = false;
         ShowEquipmentTargets(true);
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
         ShowEquipmentTargets(false);
+        if (canvasGroup != null) canvasGroup.blocksRaycasts = true;
         DraggedSlot = null;
         Refresh();
     }
