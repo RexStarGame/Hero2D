@@ -22,8 +22,11 @@ public class RingDefinition : ScriptableObject
     [SerializeField] private float damageBonus;
     [SerializeField] private float defenseBonus;
     [SerializeField] private float regenerationBonus;
+    [Tooltip("Decimal value: 0.04 means +4% life steal.")]
     [SerializeField] private float lifeStealBonus;
+    [Tooltip("Decimal value: 0.02 means +2% critical chance.")]
     [SerializeField] private float criticalChanceBonus;
+    [Tooltip("Decimal value: 0.10 means +10% attack speed.")]
     [SerializeField] private float attackSpeedBonus;
 
     [Header("Visuals")]
