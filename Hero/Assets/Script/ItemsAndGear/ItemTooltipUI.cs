@@ -10,6 +10,7 @@ public class ItemTooltipUI : MonoBehaviour
     [SerializeField] private TMP_Text detailsText;
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private Vector2 pointerOffset = new Vector2(18f, -18f);
+    [SerializeField] private PlayerEquipment equipment;
     private readonly StringBuilder text = new StringBuilder(384);
 
     private void Awake()
@@ -32,6 +33,15 @@ public class ItemTooltipUI : MonoBehaviour
             text.Append("\n\n<color=#C7D2FE>STAT BONUSES</color>");
             AppendStats(gear.StatModifiers);
             text.Append("\n\nFits: ").Append(gear.EquipmentSlot);
+            if (!equipped && equipment != null)
+            {
+                EquippableItemDefinition current = equipment.GetItem(gear.EquipmentSlot, 0);
+                if (current != null && current != gear)
+                {
+                    text.Append("\n\n<color=#C7D2FE>COMPARED WITH ").Append(current.ItemName.ToUpperInvariant()).Append("</color>");
+                    AppendComparison(gear.StatModifiers, current.StatModifiers);
+                }
+            }
         }
         if (item is WeaponDefinition weapon)
             text.Append("\nBase damage: ").Append(weapon.BaseDamage.ToString("0.##"));
@@ -85,6 +95,27 @@ public class ItemTooltipUI : MonoBehaviour
         string sign = value > 0f ? "+" : "";
         text.Append("\n").Append(label).Append(": <color=").Append(color).Append(">")
             .Append(sign).Append(value.ToString("0.##")).Append(suffix).Append("</color>");
+    }
+
+    private void AppendComparison(ItemStatModifiers next, ItemStatModifiers old)
+    {
+        Compare("Max Health", next.MaxHealth - old.MaxHealth);
+        Compare("Damage", next.Damage - old.Damage);
+        Compare("Defense", next.Defense - old.Defense);
+        Compare("Regeneration", next.Regeneration - old.Regeneration, "/s");
+        Compare("Life Steal", (next.LifeSteal - old.LifeSteal) * 100f, "%");
+        Compare("Critical Chance", (next.CriticalChance - old.CriticalChance) * 100f, "%");
+        Compare("Attack Speed", (next.AttackSpeed - old.AttackSpeed) * 100f, "%");
+        Compare("Movement Speed", (next.MovementSpeed - old.MovementSpeed) * 100f, "%");
+    }
+
+    private void Compare(string label, float difference, string suffix = "")
+    {
+        if (Mathf.Approximately(difference, 0f)) return;
+        bool better = difference > 0f;
+        text.Append("\n").Append(label).Append(": <color=").Append(better ? "#22C55E" : "#EF4444").Append(">")
+            .Append(better ? "+" : "").Append(difference.ToString("0.##")).Append(suffix)
+            .Append(better ? " ▲" : " ▼").Append("</color>");
     }
 
     private static string ItemTypeName(ItemDefinition item) => item.GetType().Name.Replace("Definition", "");
