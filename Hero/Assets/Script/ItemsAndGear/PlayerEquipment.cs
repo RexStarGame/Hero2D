@@ -5,9 +5,8 @@ public class PlayerEquipment : MonoBehaviour
 {
     public const int RingSlotCount = 2;
 
-    [SerializeField]
-    private RingDefinition[] equippedRings =
-        new RingDefinition[RingSlotCount];
+    [SerializeField] private RingDefinition ringSlot1;
+    [SerializeField] private RingDefinition ringSlot2;
 
     public event Action EquipmentChanged;
 
@@ -16,7 +15,7 @@ public class PlayerEquipment : MonoBehaviour
         if (!IsValidSlot(slotIndex))
             return null;
 
-        return equippedRings[slotIndex];
+        return slotIndex == 0 ? ringSlot1 : ringSlot2;
     }
 
     public RingDefinition EquipRing(
@@ -33,8 +32,8 @@ public class PlayerEquipment : MonoBehaviour
             return newRing;
         }
 
-        RingDefinition previouslyEquipped = equippedRings[slotIndex];
-        equippedRings[slotIndex] = newRing;
+        RingDefinition previouslyEquipped = GetRing(slotIndex);
+        SetRing(slotIndex, newRing);
 
         EquipmentChanged?.Invoke();
 
@@ -47,12 +46,12 @@ public class PlayerEquipment : MonoBehaviour
         if (!IsValidSlot(slotIndex))
             return null;
 
-        RingDefinition removedRing = equippedRings[slotIndex];
+        RingDefinition removedRing = GetRing(slotIndex);
 
         if (removedRing == null)
             return null;
 
-        equippedRings[slotIndex] = null;
+        SetRing(slotIndex, null);
         EquipmentChanged?.Invoke();
 
         return removedRing;
@@ -62,7 +61,7 @@ public class PlayerEquipment : MonoBehaviour
     {
         float total = 0f;
 
-        foreach (RingDefinition ring in equippedRings)
+        foreach (RingDefinition ring in GetEquippedRings())
             if (ring != null)
                 total += ring.HealthBonus;
 
@@ -73,7 +72,7 @@ public class PlayerEquipment : MonoBehaviour
     {
         float total = 0f;
 
-        foreach (RingDefinition ring in equippedRings)
+        foreach (RingDefinition ring in GetEquippedRings())
             if (ring != null)
                 total += ring.DamageBonus;
 
@@ -84,7 +83,7 @@ public class PlayerEquipment : MonoBehaviour
     {
         float total = 0f;
 
-        foreach (RingDefinition ring in equippedRings)
+        foreach (RingDefinition ring in GetEquippedRings())
             if (ring != null)
                 total += ring.LifeStealBonus;
 
@@ -95,7 +94,7 @@ public class PlayerEquipment : MonoBehaviour
     {
         float total = 0f;
 
-        foreach (RingDefinition ring in equippedRings)
+        foreach (RingDefinition ring in GetEquippedRings())
             if (ring != null)
                 total += ring.RegenerationBonus;
 
@@ -106,7 +105,7 @@ public class PlayerEquipment : MonoBehaviour
     {
         float total = 0f;
 
-        foreach (RingDefinition ring in equippedRings)
+        foreach (RingDefinition ring in GetEquippedRings())
             if (ring != null)
                 total += ring.CriticalChanceBonus;
 
@@ -117,11 +116,39 @@ public class PlayerEquipment : MonoBehaviour
     {
         float total = 0f;
 
-        foreach (RingDefinition ring in equippedRings)
+        foreach (RingDefinition ring in GetEquippedRings())
             if (ring != null)
                 total += ring.DefenseBonus;
 
         return total;
+    }
+
+    public float GetAttackSpeedBonus()
+    {
+        float total = 0f;
+        foreach (RingDefinition ring in GetEquippedRings())
+            if (ring != null)
+                total += ring.AttackSpeedBonus;
+        return total;
+    }
+
+    public void SwapRingSlots()
+    {
+        RingDefinition oldSlot1 = ringSlot1;
+        ringSlot1 = ringSlot2;
+        ringSlot2 = oldSlot1;
+        EquipmentChanged?.Invoke();
+    }
+
+    private RingDefinition[] GetEquippedRings()
+    {
+        return new[] { ringSlot1, ringSlot2 };
+    }
+
+    private void SetRing(int slotIndex, RingDefinition ring)
+    {
+        if (slotIndex == 0) ringSlot1 = ring;
+        else ringSlot2 = ring;
     }
 
     private bool IsValidSlot(int slotIndex)
