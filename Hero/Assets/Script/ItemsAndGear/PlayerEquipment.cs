@@ -1,158 +1,153 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerEquipment : MonoBehaviour
 {
-    public const int RingSlotCount = 2;
-
-    [SerializeField] private RingDefinition ringSlot1;
-    [SerializeField] private RingDefinition ringSlot2;
-
-    public event Action EquipmentChanged;
-
-    public RingDefinition GetRing(int slotIndex)
+    [Serializable]
+    public class EquippedSlot
     {
-        if (!IsValidSlot(slotIndex))
-            return null;
-
-        return slotIndex == 0 ? ringSlot1 : ringSlot2;
+        public EquipmentSlotType slotType;
+        public int slotNumber;
+        public EquippableItemDefinition item;
     }
 
-    public RingDefinition EquipRing(
-        RingDefinition newRing,
-        int slotIndex,
-        int playerLevel)
-    {
-        if (newRing == null || !IsValidSlot(slotIndex))
-            return newRing;
+    [SerializeField] private List<EquippedSlot> slots = new List<EquippedSlot>();
+    public event Action EquipmentChanged;
+    public event Action<string, bool> EquipmentFeedback;
 
-        if (playerLevel < newRing.RequiredLevel)
+    private static readonly EquipmentSlotType[] SingleSlots =
+    {
+        EquipmentSlotType.Weapon, EquipmentSlotType.Helmet, EquipmentSlotType.Chest,
+        EquipmentSlotType.Gloves, EquipmentSlotType.Boots, EquipmentSlotType.Necklace
+    };
+
+    private void Awake() => EnsureSlots();
+    private void OnValidate() => EnsureSlots();
+
+    public EquippableItemDefinition GetItem(EquipmentSlotType type, int number = 0)
+    {
+        EquippedSlot slot = FindSlot(type, number);
+        return slot == null ? null : slot.item;
+    }
+
+    public bool TryEquip(EquippableItemDefinition item, EquipmentSlotType targetType, int targetNumber,
+        int playerLevel, out EquippableItemDefinition replaced)
+    {
+        replaced = null;
+        if (item == null || item.EquipmentSlot != targetType)
         {
-            Debug.Log($"Requires level {newRing.RequiredLevel}.");
-            return newRing;
+            EquipmentFeedback?.Invoke("That item does not fit this slot.", false);
+            return false;
+        }
+        if (targetType == EquipmentSlotType.Ring && (targetNumber < 0 || targetNumber > 1)) return false;
+        if (targetType != EquipmentSlotType.Ring) targetNumber = 0;
+        if (playerLevel < item.RequiredLevel)
+        {
+            EquipmentFeedback?.Invoke($"Requires level {item.RequiredLevel}.", false);
+            return false;
         }
 
-        RingDefinition previouslyEquipped = GetRing(slotIndex);
-        SetRing(slotIndex, newRing);
-
+        EquippedSlot slot = FindSlot(targetType, targetNumber);
+        if (slot == null) return false;
+        replaced = slot.item;
+        slot.item = item;
         EquipmentChanged?.Invoke();
-
-        // Return this ring to the inventory when swapping.
-        return previouslyEquipped;
+        EquipmentFeedback?.Invoke($"{item.ItemName} equipped", true);
+        return true;
     }
 
-    public RingDefinition UnequipRing(int slotIndex)
+    public EquippableItemDefinition Unequip(EquipmentSlotType type, int number = 0)
     {
-        if (!IsValidSlot(slotIndex))
-            return null;
-
-        RingDefinition removedRing = GetRing(slotIndex);
-
-        if (removedRing == null)
-            return null;
-
-        SetRing(slotIndex, null);
+        EquippedSlot slot = FindSlot(type, type == EquipmentSlotType.Ring ? number : 0);
+        if (slot == null || slot.item == null) return null;
+        EquippableItemDefinition removed = slot.item;
+        slot.item = null;
         EquipmentChanged?.Invoke();
-
-        return removedRing;
+        EquipmentFeedback?.Invoke($"{removed.ItemName} unequipped", true);
+        return removed;
     }
 
-    public float GetHealthBonus()
+    public void SwapRings()
     {
-        float total = 0f;
+        EquippedSlot a = FindSlot(EquipmentSlotType.Ring, 0);
+        EquippedSlot b = FindSlot(EquipmentSlotType.Ring, 1);
+        EquippableItemDefinition old = a.item; a.item = b.item; b.item = old;
+        EquipmentChanged?.Invoke();
+    }
 
-        foreach (RingDefinition ring in GetEquippedRings())
-            if (ring != null)
-                total += ring.HealthBonus;
-
+    public ItemStatModifiers GetCombinedModifiers()
+    {
+        ItemStatModifiers total = new ItemStatModifiers();
+        foreach (EquippedSlot slot in slots)
+        {
+            if (slot.item == null) continue;
+            total += slot.item.StatModifiers;
+            if (slot.item is ArmorDefinition armor && armor.ArmorRating > 0f)
+            {
+                // Armor rating is displayed by its definition; shared defense bonuses belong in modifiers.
+            }
+        }
         return total;
     }
 
+    public float GetHealthBonus() => GetCombinedModifiers().MaxHealth;
     public float GetDamageBonus()
     {
-        float total = 0f;
-
-        foreach (RingDefinition ring in GetEquippedRings())
-            if (ring != null)
-                total += ring.DamageBonus;
-
+        float total = GetCombinedModifiers().Damage;
+        foreach (EquippedSlot slot in slots) if (slot.item is WeaponDefinition weapon) total += weapon.BaseDamage;
         return total;
     }
-
-    public float GetLifeStealBonus()
-    {
-        float total = 0f;
-
-        foreach (RingDefinition ring in GetEquippedRings())
-            if (ring != null)
-                total += ring.LifeStealBonus;
-
-        return total;
-    }
-
-    public float GetRegenerationBonus()
-    {
-        float total = 0f;
-
-        foreach (RingDefinition ring in GetEquippedRings())
-            if (ring != null)
-                total += ring.RegenerationBonus;
-
-        return total;
-    }
-
-    public float GetCriticalChanceBonus()
-    {
-        float total = 0f;
-
-        foreach (RingDefinition ring in GetEquippedRings())
-            if (ring != null)
-                total += ring.CriticalChanceBonus;
-
-        return total;
-    }
-
     public float GetDefenseBonus()
     {
-        float total = 0f;
-
-        foreach (RingDefinition ring in GetEquippedRings())
-            if (ring != null)
-                total += ring.DefenseBonus;
-
+        float total = GetCombinedModifiers().Defense;
+        foreach (EquippedSlot slot in slots) if (slot.item is ArmorDefinition armor) total += armor.ArmorRating;
         return total;
     }
+    public float GetRegenerationBonus() => GetCombinedModifiers().Regeneration;
+    public float GetLifeStealBonus() => GetCombinedModifiers().LifeSteal;
+    public float GetCriticalChanceBonus() => GetCombinedModifiers().CriticalChance;
+    public float GetAttackSpeedBonus() => GetCombinedModifiers().AttackSpeed;
+    public float GetMovementSpeedBonus() => GetCombinedModifiers().MovementSpeed;
 
-    public float GetAttackSpeedBonus()
+    // Compatibility while the old ring UI is being migrated.
+    public RingDefinition GetRing(int index) => GetItem(EquipmentSlotType.Ring, index) as RingDefinition;
+    public RingDefinition EquipRing(RingDefinition ring, int index, int level)
     {
-        float total = 0f;
-        foreach (RingDefinition ring in GetEquippedRings())
-            if (ring != null)
-                total += ring.AttackSpeedBonus;
-        return total;
+        return TryEquip(ring, EquipmentSlotType.Ring, index, level, out EquippableItemDefinition old)
+            ? old as RingDefinition : ring;
+    }
+    public RingDefinition UnequipRing(int index) => Unequip(EquipmentSlotType.Ring, index) as RingDefinition;
+    public void SwapRingSlots() => SwapRings();
+
+    public IReadOnlyList<EquippedSlot> Slots => slots;
+
+    public void RestoreSlot(EquipmentSlotType type, int number, EquippableItemDefinition item)
+    {
+        EnsureSlots();
+        EquippedSlot slot = FindSlot(type, type == EquipmentSlotType.Ring ? number : 0);
+        if (slot != null && (item == null || item.EquipmentSlot == type)) slot.item = item;
     }
 
-    public void SwapRingSlots()
+    public void NotifyRestored() => EquipmentChanged?.Invoke();
+
+    private EquippedSlot FindSlot(EquipmentSlotType type, int number)
+        => slots.Find(s => s.slotType == type && s.slotNumber == number);
+
+    private void EnsureSlots()
     {
-        RingDefinition oldSlot1 = ringSlot1;
-        ringSlot1 = ringSlot2;
-        ringSlot2 = oldSlot1;
-        EquipmentChanged?.Invoke();
+        if (slots == null) slots = new List<EquippedSlot>();
+        foreach (EquipmentSlotType type in SingleSlots) EnsureSlot(type, 0);
+        EnsureSlot(EquipmentSlotType.Ring, 0);
+        EnsureSlot(EquipmentSlotType.Ring, 1);
+        slots.RemoveAll(s => s == null || s.slotType == EquipmentSlotType.None ||
+            (s.slotType == EquipmentSlotType.Ring && (s.slotNumber < 0 || s.slotNumber > 1)) ||
+            (s.slotType != EquipmentSlotType.Ring && s.slotNumber != 0));
     }
 
-    private RingDefinition[] GetEquippedRings()
+    private void EnsureSlot(EquipmentSlotType type, int number)
     {
-        return new[] { ringSlot1, ringSlot2 };
-    }
-
-    private void SetRing(int slotIndex, RingDefinition ring)
-    {
-        if (slotIndex == 0) ringSlot1 = ring;
-        else ringSlot2 = ring;
-    }
-
-    private bool IsValidSlot(int slotIndex)
-    {
-        return slotIndex >= 0 && slotIndex < RingSlotCount;
+        if (FindSlot(type, number) == null)
+            slots.Add(new EquippedSlot { slotType = type, slotNumber = number });
     }
 }
