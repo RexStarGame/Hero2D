@@ -7,6 +7,14 @@ public class PlayerHealth : MonoBehaviour
     [Header("Health")]
     public float maxHealth = 100f;
     public float health;
+    [SerializeField] private PlayerEquipment equipment;
+
+    public float BaseAndAbilityMaxHealth => maxHealth;
+    public float EquipmentHealthBonus => equipment == null ? 0f : equipment.GetHealthBonus();
+    public float MaxHealth => Mathf.Max(1f, BaseAndAbilityMaxHealth + EquipmentHealthBonus);
+    public float EquipmentRegenBonus => equipment == null ? 0f : equipment.GetRegenerationBonus();
+    public float RegenPerSecond => Mathf.Max(0f, baseRegen + regenLevel * regenPerLevel + EquipmentRegenBonus);
+    public float Defense => equipment == null ? 0f : Mathf.Max(0f, equipment.GetDefenseBonus());
 
     [Header("UI")]
     public Slider healthSlider;
@@ -28,10 +36,12 @@ public class PlayerHealth : MonoBehaviour
 
     void Start()
     {
+        if (equipment == null) equipment = GetComponent<PlayerEquipment>();
+        if (equipment != null) equipment.EquipmentChanged += OnEquipmentChanged;
         dashDoge = GetComponent<DashDoge>();
 
         // Start fuld HP
-        health = maxHealth;
+        health = MaxHealth;
 
         // Find GameOverMenu hvis ikke sat i Inspector
         if (gameOverManager == null)
@@ -55,12 +65,12 @@ public class PlayerHealth : MonoBehaviour
 
     void Regenerate()
     {
-        if (health >= maxHealth) return;
+        if (health >= MaxHealth) return;
 
-        float regenAmount = (baseRegen + regenLevel * regenPerLevel) * Time.deltaTime;
+        float regenAmount = RegenPerSecond * Time.deltaTime;
         float oldHealth = health;
 
-        health = Mathf.Min(health + regenAmount, maxHealth);
+        health = Mathf.Min(health + regenAmount, MaxHealth);
 
         if (!Mathf.Approximately(oldHealth, health))
             UpdateHealthUI(false);
@@ -78,7 +88,7 @@ public class PlayerHealth : MonoBehaviour
         maxHealth += maxHealthUpgradeAmount;
 
         // Heal fuldt ved upgrade
-        health = maxHealth;
+        health = MaxHealth;
 
         UpdateHealthUI(true);
         Debug.Log("Max Health upgraded! New max: " + maxHealth);
@@ -92,8 +102,9 @@ public class PlayerHealth : MonoBehaviour
 
         if (damage <= 0f) return;
 
-        health -= damage;
-        health = Mathf.Clamp(health, 0f, maxHealth);
+        float reduction = Defense / (Defense + 100f);
+        damage *= 1f - reduction;
+        health = Mathf.Clamp(health - damage, 0f, MaxHealth);
 
         UpdateHealthUI(false);
 
@@ -108,7 +119,7 @@ public class PlayerHealth : MonoBehaviour
         if (health <= 0f) return; // don't heal if dead
 
         float oldHealth = health;
-        health = Mathf.Min(maxHealth, health + amount);
+        health = Mathf.Min(MaxHealth, health + amount);
 
         if (!Mathf.Approximately(oldHealth, health))
             UpdateHealthUI(false);
@@ -129,8 +140,19 @@ public class PlayerHealth : MonoBehaviour
         if (healthSlider == null) return;
 
         if (updateMaxValue)
-            healthSlider.maxValue = maxHealth;
+            healthSlider.maxValue = MaxHealth;
 
         healthSlider.value = health;
+    }
+
+    private void OnEquipmentChanged()
+    {
+        health = Mathf.Min(health, MaxHealth);
+        UpdateHealthUI(true);
+    }
+
+    private void OnDestroy()
+    {
+        if (equipment != null) equipment.EquipmentChanged -= OnEquipmentChanged;
     }
 }
