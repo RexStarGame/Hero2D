@@ -14,6 +14,7 @@ public class DamageUpgrade : MonoBehaviour
     [Header("Upgrade Cost")]
     [SerializeField] private int cost = 1;
     [SerializeField] private PlayerXP playerXP;
+    [SerializeField] private PlayerEquipment equipment;
 
     [Header("UI")]
     [SerializeField] private TMP_Text levelText;
@@ -22,7 +23,9 @@ public class DamageUpgrade : MonoBehaviour
     public UnityEvent<int> onDamageChanged; // sends new Damage value
 
     // ✅ This is the REAL damage used by the player
-    public int Damage => damage + (damageLevel * damagePerLevel);
+    public int BaseAndAbilityDamage => damage + (damageLevel * damagePerLevel);
+    public int EquipmentDamageBonus => equipment == null ? 0 : Mathf.RoundToInt(equipment.GetDamageBonus());
+    public int Damage => BaseAndAbilityDamage + EquipmentDamageBonus;
 
     public int DamageLevel => damageLevel;
 
@@ -36,6 +39,9 @@ public class DamageUpgrade : MonoBehaviour
             playerXP = FindObjectOfType<PlayerXP>();
 #endif
         }
+
+        if (equipment == null)
+            equipment = GetComponent<PlayerEquipment>();
 
         UpdateLevelText();
         onDamageChanged?.Invoke(Damage);
