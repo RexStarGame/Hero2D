@@ -131,6 +131,7 @@ public class PlayerStats : MonoBehaviour
         // Title
         sb.AppendLine(Head("PLAYER STATS"));
         sb.AppendLine(Soft("──────────────"));
+        sb.AppendLine();
 
         // Ability Points
         if (playerXP != null)
@@ -143,10 +144,11 @@ public class PlayerStats : MonoBehaviour
             sb.AppendLine(Row("Ability Points", Soft("N/A")));
         }
 
-        sb.AppendLine(Soft(" "));
+        sb.AppendLine("<size=45%> </size>");
 
         // Health + Regen
         sb.AppendLine(Head("SURVIVABILITY"));
+        sb.AppendLine("<size=35%> </size>");
 
         if (playerHealth != null)
         {
@@ -156,6 +158,8 @@ public class PlayerStats : MonoBehaviour
             sb.AppendLine(Row("HP",
                 $"{Color($"{playerHealth.health:0}", hpCol)}/{Color($"{playerHealth.BaseAndAbilityMaxHealth:0}", valueColor)}{Bonus(playerHealth.EquipmentHealthBonus, "0")}  {Soft($"(MaxHP Lv {playerHealth.maxHealthLevel})")}"));
 
+            sb.AppendLine("<size=35%> </size>");
+
             float regenPerSec = playerHealth.baseRegen + playerHealth.regenLevel * playerHealth.regenPerLevel;
             string regenCol = regenPerSec > 0f ? blueColor : mutedColor;
 
@@ -163,18 +167,23 @@ public class PlayerStats : MonoBehaviour
                 $"{Soft($"Lv {playerHealth.regenLevel}")}  {Color($"{regenPerSec:0.00}/s", regenCol)}{Bonus(playerHealth.EquipmentRegenBonus, "0.00", "/s")}"));
 
             if (playerHealth.Defense > 0f)
+            {
+                sb.AppendLine("<size=35%> </size>");
                 sb.AppendLine(Row("Defense", BonusOnly(playerHealth.Defense, "0")));
+            }
         }
         else
         {
             sb.AppendLine(Row("HP", Soft("N/A")));
+            sb.AppendLine("<size=35%> </size>");
             sb.AppendLine(Row("Regen", Soft("N/A")));
         }
 
-        sb.AppendLine(Soft(" "));
+        sb.AppendLine("<size=55%> </size>");
 
         // Damage
         sb.AppendLine(Head("OFFENSE"));
+        sb.AppendLine("<size=35%> </size>");
 
         if (damageUpgrade != null)
         {
@@ -186,6 +195,8 @@ public class PlayerStats : MonoBehaviour
             sb.AppendLine(Row("Damage", Soft("N/A")));
         }
 
+        sb.AppendLine("<size=35%> </size>");
+
         // Attack stats
         if (playerAttack != null)
         {
@@ -195,13 +206,19 @@ public class PlayerStats : MonoBehaviour
             sb.AppendLine(Row("Attack Speed",
                 $"{Soft($"Lv {playerAttack.attackSpeedLevel}")}  {Color($"{cd:0.00}s", valueColor)}{Bonus(playerAttack.EquipmentAttackSpeedBonus * 100f, "0.##", "% speed")} {Soft($"(~{aps:0.00}/s)")}"));
 
+            sb.AppendLine("<size=35%> </size>");
+
             float lsPct = playerAttack.LifeStealPercent * 100f;
             string lsCol = lsPct > 0f ? goodColor : mutedColor;
+
             sb.AppendLine(Row("Life Steal",
                 $"{Soft($"Lv {playerAttack.lifeStealLevel}")}  {Color($"{playerAttack.AbilityLifeStealPercent * 100f:0.###}%", lsCol)}{Bonus(playerAttack.EquipmentLifeStealPercent * 100f, "0.###", "%")} {Soft("per hit")}"));
 
+            sb.AppendLine("<size=35%> </size>");
+
             float critPct = playerAttack.CritChance * 100f;
             string critCol = critPct >= 10f ? goodColor : (critPct > 0f ? warnColor : mutedColor);
+
             sb.AppendLine(Row("Crit",
                 $"{Soft($"Lv {playerAttack.critLevel}")}  {Color($"{playerAttack.AbilityCritChance * 100f:0.##}%", critCol)}{Bonus(playerAttack.EquipmentCritChance * 100f, "0.##", "%")} {Soft("chance")}  {Color($"x{playerAttack.CritMultiplier:0.00}", valueColor)}"));
         }
