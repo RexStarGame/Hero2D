@@ -8,10 +8,20 @@ public class HealthBarUI : MonoBehaviour
 
     private void Start()
     {
-        slider.maxValue = player.maxHealth;
+        UpdateHealthBar();
     }
+
     void Update()
     {
-        slider.value = player.health;
+        UpdateHealthBar();
+    }
+
+    private void UpdateHealthBar()
+    {
+        if (player == null || slider == null) return;
+
+        // Refresh this continuously because equipping or removing gear changes MaxHealth.
+        slider.maxValue = player.MaxHealth;
+        slider.value = Mathf.Clamp(player.health, 0f, player.MaxHealth);
     }
 }
