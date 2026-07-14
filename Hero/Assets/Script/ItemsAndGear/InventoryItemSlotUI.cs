@@ -70,12 +70,13 @@ public class InventoryItemSlotUI : MonoBehaviour,
         if (droppedOutside)
             inventory?.DropItemToWorld(InventoryIndex);
 
+        ItemDragContext.CancelDrag();
+    }
+
+    public void RestoreAfterDrag()
+    {
         if (canvasGroup != null)
             canvasGroup.blocksRaycasts = true;
-
-        EquipmentSlotUI.SetHighlights(false, null);
-        ItemDragVisualUI.Instance?.Hide();
-        ItemDragContext.Clear();
     }
 
     public void OnDrop(PointerEventData eventData)
