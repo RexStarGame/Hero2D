@@ -6,6 +6,7 @@ public class PlayerStats : MonoBehaviour
 {
     [Header("UI")]
     [SerializeField] private TMP_Text statsText;
+    [SerializeField] private TMP_Text defenseText;
 
     [Header("References (auto-find if null)")]
     [SerializeField] private PlayerXP playerXP;
@@ -124,6 +125,8 @@ public class PlayerStats : MonoBehaviour
     }
     private void ForceUpdate()
     {
+        UpdateDefenseText();
+
         if (statsText == null) return;
 
         sb.Clear();
@@ -163,12 +166,8 @@ public class PlayerStats : MonoBehaviour
             float regenPerSec = playerHealth.baseRegen + playerHealth.regenLevel * playerHealth.regenPerLevel;
             string regenCol = regenPerSec > 0f ? blueColor : mutedColor;
 
-            string defenseText = playerHealth.Defense > 0f
-                ? $"  {Label("Defense")}{Soft(": ")}{BonusOnly(playerHealth.Defense, "0")}"
-                : string.Empty;
-
             sb.AppendLine(Row("Regen",
-                $"{Soft($"Lv {playerHealth.regenLevel}")}  {Color($"{regenPerSec:0.00}/s", regenCol)}{Bonus(playerHealth.EquipmentRegenBonus, "0.00", "/s")}{defenseText}"));
+                $"{Soft($"Lv {playerHealth.regenLevel}")}  {Color($"{regenPerSec:0.00}/s", regenCol)}{Bonus(playerHealth.EquipmentRegenBonus, "0.00", "/s")}"));
         }
         else
         {
@@ -226,6 +225,23 @@ public class PlayerStats : MonoBehaviour
         }
 
         statsText.text = sb.ToString();
+    }
+
+    private void UpdateDefenseText()
+    {
+        if (defenseText == null)
+            return;
+
+        if (playerHealth == null)
+        {
+            defenseText.text = Row("Defense", Soft("N/A"));
+            return;
+        }
+
+        float defense = playerHealth.Defense;
+        defenseText.text = defense > 0f
+            ? Row("Defense", BonusOnly(defense, "0"))
+            : Row("Defense", Soft("0"));
     }
 
     // ---------- Formatting helpers ----------
