@@ -11,6 +11,7 @@ public class WorldItemPickup : MonoBehaviour
 
     [Header("Pickup")]
     [SerializeField] private bool destroyAfterPickup = true;
+    [Tooltip("Applied only when this specific instance was dropped by a player.")]
     [Min(0f)] [SerializeField] private float pickupDelay = 1.25f;
 
     [Header("Ground Lifetime")]
@@ -45,10 +46,12 @@ public class WorldItemPickup : MonoBehaviour
 
     private void OnEnable()
     {
-        ResetGroundTimers();
         dropOwner = null;
         waitingForDropOwnerExit = false;
         collected = false;
+
+        // A naturally placed or newly spawned ground instance is collectible immediately.
+        ResetGroundTimers(false);
     }
 
     private void Update()
@@ -121,6 +124,7 @@ public class WorldItemPickup : MonoBehaviour
 
     public void Initialize(ItemDefinition itemDefinition)
     {
+        // Used by normal world spawners: this is a fresh ground instance.
         Initialize(itemDefinition, null);
     }
 
@@ -129,13 +133,19 @@ public class WorldItemPickup : MonoBehaviour
         item = itemDefinition;
         dropOwner = ownerWhoDroppedIt;
         waitingForDropOwnerExit = dropOwner != null;
-        ResetGroundTimers();
+        collected = false;
+
+        // Delay only this exact GameObject instance when it came from a player inventory.
+        ResetGroundTimers(dropOwner != null);
         ApplyItemIcon();
     }
 
-    private void ResetGroundTimers()
+    private void ResetGroundTimers(bool applyPickupDelay)
     {
-        pickupAvailableAt = Time.time + Mathf.Max(0f, pickupDelay);
+        pickupAvailableAt = applyPickupDelay
+            ? Time.time + Mathf.Max(0f, pickupDelay)
+            : Time.time;
+
         despawnAt = despawnAfterSeconds > 0f
             ? Time.time + despawnAfterSeconds
             : float.PositiveInfinity;
