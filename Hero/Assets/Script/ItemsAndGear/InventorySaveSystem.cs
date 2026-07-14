@@ -52,8 +52,18 @@ public class InventorySaveSystem : MonoBehaviour
 
         foreach (ItemDefinition item in inventory.Items)
         {
-            if (item != null)
-                data.inventory.Add(item.ItemID);
+            if (item == null)
+                continue;
+
+            if (string.IsNullOrWhiteSpace(item.ItemID))
+            {
+                Debug.LogError(
+                    $"[InventorySaveSystem] '{item.name}' has no Item ID and cannot be saved.",
+                    item);
+                continue;
+            }
+
+            data.inventory.Add(item.ItemID);
         }
 
         foreach (PlayerEquipment.EquippedSlot slot in equipment.Slots)
@@ -86,7 +96,14 @@ public class InventorySaveSystem : MonoBehaviour
             {
                 ItemDefinition item = database.Find(id);
                 if (item != null)
+                {
                     restored.Add(item);
+                }
+                else
+                {
+                    Debug.LogWarning(
+                        $"[InventorySaveSystem] Saved item ID '{id}' is not registered in the Item Database.");
+                }
             }
         }
 
@@ -96,10 +113,16 @@ public class InventorySaveSystem : MonoBehaviour
         {
             foreach (SlotData slot in data.equipment)
             {
-                equipment.RestoreSlot(
-                    slot.type,
-                    slot.number,
-                    database.Find(slot.itemID) as EquippableItemDefinition);
+                EquippableItemDefinition restoredItem =
+                    database.Find(slot.itemID) as EquippableItemDefinition;
+
+                if (!string.IsNullOrWhiteSpace(slot.itemID) && restoredItem == null)
+                {
+                    Debug.LogWarning(
+                        $"[InventorySaveSystem] Equipped item ID '{slot.itemID}' is not registered in the Item Database.");
+                }
+
+                equipment.RestoreSlot(slot.type, slot.number, restoredItem);
             }
         }
 
