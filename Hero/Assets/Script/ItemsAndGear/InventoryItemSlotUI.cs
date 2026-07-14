@@ -10,6 +10,7 @@ public class InventoryItemSlotUI : MonoBehaviour,
     [SerializeField] private Image rarityBorder;
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private ItemHoverSource hover;
+    [Min(0f)] [SerializeField] private float iconPadding = 1f;
 
     private PlayerInventory inventory;
 
@@ -24,6 +25,7 @@ public class InventoryItemSlotUI : MonoBehaviour,
         ItemDefinition item = Item;
         if (icon != null)
         {
+            FitIconToSlot();
             icon.enabled = item != null;
             icon.sprite = item == null ? null : item.Icon;
         }
@@ -39,6 +41,28 @@ public class InventoryItemSlotUI : MonoBehaviour,
     {
         if (canvasGroup == null)
             canvasGroup = GetComponent<CanvasGroup>();
+
+        FitIconToSlot();
+    }
+
+    private void FitIconToSlot()
+    {
+        if (icon == null)
+            return;
+
+        RectTransform iconRect = icon.rectTransform;
+        float padding = Mathf.Max(0f, iconPadding);
+
+        iconRect.anchorMin = Vector2.zero;
+        iconRect.anchorMax = Vector2.one;
+        iconRect.pivot = new Vector2(0.5f, 0.5f);
+        iconRect.anchoredPosition = Vector2.zero;
+        iconRect.offsetMin = new Vector2(padding, padding);
+        iconRect.offsetMax = new Vector2(-padding, -padding);
+        iconRect.localScale = Vector3.one;
+
+        icon.preserveAspect = true;
+        icon.raycastTarget = false;
     }
 
     public void OnBeginDrag(PointerEventData eventData)
