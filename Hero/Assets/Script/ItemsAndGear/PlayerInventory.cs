@@ -158,7 +158,7 @@ public class PlayerInventory : MonoBehaviour
             pickup = spawnedItem.GetComponentInChildren<WorldItemPickup>();
 
         if (pickup != null)
-            pickup.Initialize(item);
+            pickup.Initialize(item, this);
         else
             Debug.LogWarning($"[PlayerInventory] {item.WorldPrefab.name} needs WorldItemPickup.", spawnedItem);
     }
