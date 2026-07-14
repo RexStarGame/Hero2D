@@ -38,7 +38,6 @@ public static class InventorySceneSetupEditor
     }
 
     private const string SlotPrefabPath = "Assets/Script/ItemsAndGear/InventoryItemSlot.prefab";
-    private const string RingPath = "Assets/Script/ItemsAndGear/RingS/GolenRing.asset";
     private const string DatabasePath = "Assets/Script/ItemsAndGear/Item Database.asset";
 
     [MenuItem("Hero2D/Setup/Complete Inventory Equipment UI")]
@@ -336,25 +335,42 @@ public static class InventorySceneSetupEditor
             AssetDatabase.CreateAsset(database, DatabasePath);
         }
 
-        RingDefinition ring = AssetDatabase.LoadAssetAtPath<RingDefinition>(RingPath);
+        string[] itemGuids = AssetDatabase.FindAssets("t:ItemDefinition");
+        System.Array.Sort(itemGuids, System.StringComparer.Ordinal);
+
         SerializedObject serializedDatabase = new SerializedObject(database);
         SerializedProperty items = serializedDatabase.FindProperty("items");
+        items.ClearArray();
 
-        bool containsRing = false;
-        for (int i = 0; i < items.arraySize; i++)
+        System.Collections.Generic.HashSet<string> usedIDs =
+            new System.Collections.Generic.HashSet<string>(System.StringComparer.Ordinal);
+
+        int itemIndex = 0;
+        foreach (string guid in itemGuids)
         {
-            if (items.GetArrayElementAtIndex(i).objectReferenceValue == ring)
+            string itemPath = AssetDatabase.GUIDToAssetPath(guid);
+            ItemDefinition item = AssetDatabase.LoadAssetAtPath<ItemDefinition>(itemPath);
+            if (item == null)
+                continue;
+
+            if (string.IsNullOrWhiteSpace(item.ItemID))
             {
-                containsRing = true;
-                break;
+                Debug.LogError(
+                    $"[ItemDatabase] '{item.name}' has an empty Item ID and cannot be saved. " +
+                    "Give it a permanent unique Item ID in the Inspector.",
+                    item);
             }
-        }
+            else if (!usedIDs.Add(item.ItemID))
+            {
+                Debug.LogError(
+                    $"[ItemDatabase] Duplicate Item ID '{item.ItemID}' found on '{item.name}'. " +
+                    "Every item asset needs a different permanent Item ID.",
+                    item);
+            }
 
-        if (!containsRing && ring != null)
-        {
-            int index = items.arraySize;
-            items.InsertArrayElementAtIndex(index);
-            items.GetArrayElementAtIndex(index).objectReferenceValue = ring;
+            items.InsertArrayElementAtIndex(itemIndex);
+            items.GetArrayElementAtIndex(itemIndex).objectReferenceValue = item;
+            itemIndex++;
         }
 
         serializedDatabase.ApplyModifiedPropertiesWithoutUndo();
