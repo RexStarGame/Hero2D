@@ -21,7 +21,11 @@ public class ItemTooltipUI : MonoBehaviour
 
     public void Show(ItemDefinition item, Vector2 screenPosition, bool equipped)
     {
-        if (item == null) return;
+        if (item == null)
+        {
+            Hide();
+            return;
+        }
         titleText.text = item.ItemName;
         titleText.color = RarityColor(item.Rarity);
         text.Clear();
@@ -68,6 +72,16 @@ public class ItemTooltipUI : MonoBehaviour
         if (corners[2].y > Screen.height) correction.y -= corners[2].y - Screen.height;
         if (corners[0].y < 0f) correction.y -= corners[0].y;
         panel.position += (Vector3)correction;
+    }
+
+    private void OnDisable()
+    {
+        Hide();
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
     }
 
     public void Hide()
