@@ -62,7 +62,7 @@ public static class CoinSystemSetupEditor
         if (saveSystem != null)
             SetObject(saveSystem, "wallet", wallet);
 
-        int updatedPrefabs = AddEnemyCoinsToAllPrefabs();
+        int updatedPrefabs = AddEnemyCoinsToAllPrefabsInternal();
 
         EditorUtility.SetDirty(wallet);
         EditorUtility.SetDirty(counter);
@@ -79,7 +79,13 @@ public static class CoinSystemSetupEditor
     }
 
     [MenuItem("Hero2D/Setup/Add EnemyCoins To All Enemy Prefabs")]
-    public static int AddEnemyCoinsToAllPrefabs()
+    public static void AddEnemyCoinsToAllPrefabs()
+    {
+        int changed = AddEnemyCoinsToAllPrefabsInternal();
+        Debug.Log($"[Coin Setup] EnemyCoins added to {changed} enemy prefab(s).");
+    }
+
+    private static int AddEnemyCoinsToAllPrefabsInternal()
     {
         string[] prefabGuids = AssetDatabase.FindAssets(
             "t:Prefab", new[] { "Assets/Script/Enemies" });
