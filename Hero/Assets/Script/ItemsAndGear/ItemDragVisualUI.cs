@@ -19,6 +19,12 @@ public class ItemDragVisualUI : MonoBehaviour
         Hide();
     }
 
+    private void Update()
+    {
+        if (ItemDragContext.IsDragging && !Input.GetMouseButton(0))
+            ItemDragContext.CancelDrag();
+    }
+
     private void OnDestroy()
     {
         if (Instance == this) Instance = null;
