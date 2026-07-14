@@ -35,6 +35,7 @@ public class InventoryPanelUI : MonoBehaviour, IDropHandler
     private void OnDisable()
     {
         if (inventory != null) inventory.InventoryChanged -= Refresh;
+        ItemDragContext.CancelDrag();
     }
 
     private void OnDestroy()
