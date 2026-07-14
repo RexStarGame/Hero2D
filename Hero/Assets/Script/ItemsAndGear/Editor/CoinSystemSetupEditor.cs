@@ -42,7 +42,7 @@ public static class CoinSystemSetupEditor
         Scene scene = SceneManager.GetActiveScene();
         PlayerInventory inventory = FindSceneComponent<PlayerInventory>(scene);
         InventorySaveSystem saveSystem = FindSceneComponent<InventorySaveSystem>(scene);
-        Canvas canvas = FindSceneComponent<Canvas>(scene);
+        Canvas canvas = FindMainCanvas(scene);
 
         if (inventory == null || canvas == null)
         {
@@ -57,7 +57,9 @@ public static class CoinSystemSetupEditor
         if (wallet == null)
             wallet = Undo.AddComponent<PlayerWallet>(inventory.gameObject);
 
-        CoinCounterUI counter = CreateCoinCounter(canvas.transform, wallet);
+        CoinCounterUI existingCounter = FindSceneComponent<CoinCounterUI>(scene);
+        CoinCounterUI counter = CreateCoinCounter(
+            canvas.transform, wallet, existingCounter);
 
         if (saveSystem != null)
             SetObject(saveSystem, "wallet", wallet);
@@ -134,12 +136,18 @@ public static class CoinSystemSetupEditor
     }
 
     private static CoinCounterUI CreateCoinCounter(
-        Transform canvasRoot, PlayerWallet wallet)
+        Transform canvasRoot, PlayerWallet wallet, CoinCounterUI existingCounter)
     {
         Transform existing = canvasRoot.Find("CoinCounterHUD");
         GameObject target;
 
-        if (existing != null)
+        if (existingCounter != null)
+        {
+            target = existingCounter.gameObject;
+            target.name = "CoinCounterHUD";
+            target.transform.SetParent(canvasRoot, false);
+        }
+        else if (existing != null)
         {
             target = existing.gameObject;
         }
@@ -179,6 +187,43 @@ public static class CoinSystemSetupEditor
         SetObject(counter, "wallet", wallet);
         SetObject(counter, "coinText", text);
         return counter;
+    }
+
+    private static Canvas FindMainCanvas(Scene scene)
+    {
+        StorePanelUI store = FindSceneComponent<StorePanelUI>(scene);
+        if (store != null)
+        {
+            Canvas storeCanvas = store.GetComponentInParent<Canvas>();
+            if (storeCanvas != null)
+                return storeCanvas;
+        }
+
+        InventoryPanelUI inventoryPanel =
+            FindSceneComponent<InventoryPanelUI>(scene);
+        if (inventoryPanel != null)
+        {
+            Canvas inventoryCanvas =
+                inventoryPanel.GetComponentInParent<Canvas>();
+            if (inventoryCanvas != null)
+                return inventoryCanvas;
+        }
+
+        Canvas fallback = null;
+        foreach (Canvas candidate in Resources.FindObjectsOfTypeAll<Canvas>())
+        {
+            if (candidate == null || candidate.gameObject.scene != scene)
+                continue;
+
+            if (candidate.isRootCanvas &&
+                candidate.renderMode == RenderMode.ScreenSpaceOverlay)
+                return candidate;
+
+            if (fallback == null && candidate.isRootCanvas)
+                fallback = candidate;
+        }
+
+        return fallback;
     }
 
     private static T FindSceneComponent<T>(Scene scene) where T : Component
