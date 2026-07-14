@@ -6,8 +6,37 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+[InitializeOnLoad]
 public static class InventorySceneSetupEditor
 {
+    static InventorySceneSetupEditor()
+    {
+        EditorApplication.delayCall += TryAutomaticSetup;
+        EditorSceneManager.sceneOpened += OnSceneOpened;
+    }
+
+    private static void OnSceneOpened(Scene scene, OpenSceneMode mode)
+    {
+        EditorApplication.delayCall += TryAutomaticSetup;
+    }
+
+    private static void TryAutomaticSetup()
+    {
+        if (EditorApplication.isPlayingOrWillChangePlaymode)
+            return;
+
+        Scene scene = SceneManager.GetActiveScene();
+        if (!scene.IsValid() || !scene.isLoaded ||
+            scene.path != "Assets/Scenes/SampleScene.unity")
+            return;
+
+        InventoryPanelUI panel = FindSceneComponent<InventoryPanelUI>(scene);
+        if (panel == null || FindChildRecursive(panel.transform, "EquipmentSlots") != null)
+            return;
+
+        CompleteSetup();
+    }
+
     private const string SlotPrefabPath = "Assets/Script/ItemsAndGear/InventoryItemSlot.prefab";
     private const string RingPath = "Assets/Script/ItemsAndGear/RingS/GolenRing.asset";
     private const string DatabasePath = "Assets/Script/ItemsAndGear/Item Database.asset";
