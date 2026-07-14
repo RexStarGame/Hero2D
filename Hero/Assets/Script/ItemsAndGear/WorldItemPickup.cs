@@ -21,6 +21,7 @@ public class WorldItemPickup : MonoBehaviour
     private float despawnAt;
     private PlayerInventory dropOwner;
     private bool waitingForDropOwnerExit;
+    private bool collected;
 
     public ItemDefinition Item => item;
 
@@ -47,6 +48,7 @@ public class WorldItemPickup : MonoBehaviour
         ResetGroundTimers();
         dropOwner = null;
         waitingForDropOwnerExit = false;
+        collected = false;
     }
 
     private void Update()
@@ -95,14 +97,19 @@ public class WorldItemPickup : MonoBehaviour
 
     public bool TryPickup(PlayerInventory inventory)
     {
-        if (inventory == null || item == null || Time.time < pickupAvailableAt)
+        if (collected || inventory == null || item == null || Time.time < pickupAvailableAt)
             return false;
 
         if (waitingForDropOwnerExit && inventory == dropOwner)
             return false;
 
+        collected = true;
+
         if (!inventory.Add(item))
+        {
+            collected = false;
             return false;
+        }
 
         if (destroyAfterPickup)
             Destroy(gameObject);
