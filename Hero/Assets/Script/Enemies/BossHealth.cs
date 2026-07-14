@@ -14,7 +14,7 @@ public class BossHealth : MonoBehaviour
 
     [Header("Events")]
     public UnityEvent<float, float> onHealthChanged; // (current, max)
-    public UnityEvent onDeath;
+    public UnityEvent onDeath = new UnityEvent();
 
     private bool dead;
 
