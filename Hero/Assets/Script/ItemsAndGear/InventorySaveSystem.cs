@@ -16,12 +16,15 @@ public class InventorySaveSystem : MonoBehaviour
     [Serializable]
     private class SaveData
     {
+        public int saveVersion = 2;
+        public int gold;
         public List<string> inventory = new List<string>();
         public List<SlotData> equipment = new List<SlotData>();
     }
 
     [SerializeField] private PlayerInventory inventory;
     [SerializeField] private PlayerEquipment equipment;
+    [SerializeField] private PlayerWallet wallet;
     [SerializeField] private ItemDatabase database;
     [SerializeField] private string fileName = "equipment.json";
     [SerializeField] private bool loadOnStart = true;
@@ -35,6 +38,9 @@ public class InventorySaveSystem : MonoBehaviour
 
         if (equipment == null)
             equipment = GetComponent<PlayerEquipment>();
+
+        if (wallet == null)
+            wallet = GetComponent<PlayerWallet>();
     }
 
     private void Start()
@@ -48,7 +54,10 @@ public class InventorySaveSystem : MonoBehaviour
         if (inventory == null || equipment == null)
             return;
 
-        SaveData data = new SaveData();
+        SaveData data = new SaveData
+        {
+            gold = wallet == null ? 0 : wallet.Gold
+        };
 
         foreach (ItemDefinition item in inventory.Items)
         {
@@ -108,6 +117,10 @@ public class InventorySaveSystem : MonoBehaviour
         }
 
         inventory.ReplaceContents(restored);
+
+        // Older save files did not contain wallet data, so keep startingGold for them.
+        if (wallet != null && data.saveVersion >= 2)
+            wallet.RestoreGold(data.gold);
 
         if (data.equipment != null)
         {
