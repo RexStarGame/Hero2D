@@ -11,7 +11,7 @@ public class EnemyHealth : MonoBehaviour
     public int xpReward = 25;
 
     [Header("Events")]
-    public UnityEvent onDeath;
+    public UnityEvent onDeath = new UnityEvent();
 
     private PlayerXP player;
     private bool dead;
