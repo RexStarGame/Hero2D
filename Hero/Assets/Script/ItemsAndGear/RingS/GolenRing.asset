@@ -29,5 +29,5 @@ MonoBehaviour:
     regeneration: 0
     lifeSteal: 0
     criticalChance: 0
-    attackSpeed: 0.05
+    attackSpeed: 0.04
     movementSpeed: 0
