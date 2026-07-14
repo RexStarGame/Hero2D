@@ -2810,7 +2810,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inventory: {fileID: 239307053}
   gridRoot: {fileID: 1581976685}
-  slotPrefab: {fileID: 0}
+  slotPrefab: {fileID: 11400001, guid: b9716cdd2f644be9ab08fc2af928db0e, type: 3}
   filter: 0
 --- !u!1 &256393622
 GameObject:
