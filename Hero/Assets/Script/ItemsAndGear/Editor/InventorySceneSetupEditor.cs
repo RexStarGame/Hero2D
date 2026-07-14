@@ -325,7 +325,7 @@ public static class InventorySceneSetupEditor
         SetObject(feedback, "group", group);
     }
 
-    private static ItemDatabase CreateOrUpdateDatabase()
+    public static ItemDatabase CreateOrUpdateDatabase()
     {
         ItemDatabase database = AssetDatabase.LoadAssetAtPath<ItemDatabase>(DatabasePath);
 
