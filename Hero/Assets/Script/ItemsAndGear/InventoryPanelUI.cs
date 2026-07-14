@@ -1,10 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public enum InventoryFilter { All, Equipment, Rings, Unique }
 
-public class InventoryPanelUI : MonoBehaviour
+public class InventoryPanelUI : MonoBehaviour, IDropHandler
 {
+    public static InventoryPanelUI Instance { get; private set; }
+
     [SerializeField] private PlayerInventory inventory;
     [SerializeField] private Transform gridRoot;
     [SerializeField] private InventoryItemSlotUI slotPrefab;
@@ -17,8 +20,14 @@ public class InventoryPanelUI : MonoBehaviour
 
     private readonly List<InventoryItemSlotUI> spawned = new List<InventoryItemSlotUI>();
 
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     private void OnEnable()
     {
+        Instance = this;
         if (inventory != null) inventory.InventoryChanged += Refresh;
         Refresh();
     }
@@ -26,6 +35,27 @@ public class InventoryPanelUI : MonoBehaviour
     private void OnDisable()
     {
         if (inventory != null) inventory.InventoryChanged -= Refresh;
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
+    }
+
+    public bool IsScreenPointInside(Vector2 screenPosition, Camera eventCamera)
+    {
+        RectTransform panel = transform as RectTransform;
+        return panel != null &&
+            RectTransformUtility.RectangleContainsScreenPoint(panel, screenPosition, eventCamera);
+    }
+
+    public void OnDrop(PointerEventData eventData)
+    {
+        EquipmentSlotUI source = ItemDragContext.EquipmentSource;
+        if (source == null || inventory == null) return;
+
+        if (inventory.UnequipToInventory(source.SlotType, source.SlotNumber))
+            ItemDragContext.MarkDropHandled();
     }
 
     public void SetFilter(int value)
