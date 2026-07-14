@@ -156,7 +156,7 @@ public class PlayerStats : MonoBehaviour
             string hpCol = hpPct >= 0.60f ? goodColor : (hpPct >= 0.25f ? warnColor : badColor);
 
             sb.AppendLine(Row("HP",
-                $"{Color($"{playerHealth.health:0}", hpCol)}/{Color($"{playerHealth.BaseAndAbilityMaxHealth:0}", valueColor)}{Bonus(playerHealth.EquipmentHealthBonus, "0")}  {Soft($"(MaxHP Lv {playerHealth.maxHealthLevel})")}"));
+                $"{Color($"{playerHealth.health:0}", hpCol)}/{Color($"{playerHealth.MaxHealth:0}", valueColor)}{Bonus(playerHealth.EquipmentHealthBonus, "0")}  {Soft($"(MaxHP Lv {playerHealth.maxHealthLevel})")}"));
 
             sb.AppendLine("<size=35%> </size>");
 
