@@ -45,6 +45,7 @@ public class InventoryItemSlotUI : MonoBehaviour,
     {
         if (Item == null) return;
 
+        ItemTooltipUI.Instance?.Hide();
         ItemDragContext.Begin(this);
         ItemDragVisualUI.Instance?.Show(Item, eventData.position);
 
