@@ -163,14 +163,12 @@ public class PlayerStats : MonoBehaviour
             float regenPerSec = playerHealth.baseRegen + playerHealth.regenLevel * playerHealth.regenPerLevel;
             string regenCol = regenPerSec > 0f ? blueColor : mutedColor;
 
-            sb.AppendLine(Row("Regen",
-                $"{Soft($"Lv {playerHealth.regenLevel}")}  {Color($"{regenPerSec:0.00}/s", regenCol)}{Bonus(playerHealth.EquipmentRegenBonus, "0.00", "/s")}"));
+            string defenseText = playerHealth.Defense > 0f
+                ? $"  {Label("Defense")}{Soft(": ")}{BonusOnly(playerHealth.Defense, "0")}"
+                : string.Empty;
 
-            if (playerHealth.Defense > 0f)
-            {
-                sb.AppendLine("<size=35%> </size>");
-                sb.AppendLine(Row("Defense", BonusOnly(playerHealth.Defense, "0")));
-            }
+            sb.AppendLine(Row("Regen",
+                $"{Soft($"Lv {playerHealth.regenLevel}")}  {Color($"{regenPerSec:0.00}/s", regenCol)}{Bonus(playerHealth.EquipmentRegenBonus, "0.00", "/s")}{defenseText}"));
         }
         else
         {
