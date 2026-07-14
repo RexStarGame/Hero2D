@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 public class EnemyHealth : MonoBehaviour
 {
@@ -6,15 +7,19 @@ public class EnemyHealth : MonoBehaviour
     [SerializeField] private int maxHealth = 100;
     private int currentHealth;
 
-    [Header("Belønning")]
+    [Header("BelÃ¸nning")]
     public int xpReward = 25;
 
+    [Header("Events")]
+    public UnityEvent onDeath;
+
     private PlayerXP player;
+    private bool dead;
     private HitFeedback feedback;
 
     void Start()
     {
-        // Sæt liv til max ved start
+        // SÃ¦t liv til max ved start
         currentHealth = maxHealth;
 
         // Find referencer
@@ -22,19 +27,22 @@ public class EnemyHealth : MonoBehaviour
         feedback = GetComponent<HitFeedback>();
     }
 
-    // Denne funktion kaldes når spilleren rammer fjenden
+    // Denne funktion kaldes nÃ¥r spilleren rammer fjenden
     public void TakeDamage(int damage)
     {
+        if (dead || damage <= 0)
+            return;
+
         currentHealth -= damage;
         Debug.Log(gameObject.name + " tog " + damage + " skade! Liv tilbage: " + currentHealth);
 
-        // 1. Vis visuelt feedback (Blink rød)
+        // 1. Vis visuelt feedback (Blink rÃ¸d)
         if (feedback != null)
         {
             feedback.PlayHitFeedback();
         }
 
-        // 2. Tjek om fjenden skal dø
+        // 2. Tjek om fjenden skal dÃ¸
         if (currentHealth <= 0)
         {
             Die();
@@ -43,7 +51,11 @@ public class EnemyHealth : MonoBehaviour
 
     void Die()
     {
-        Debug.Log(gameObject.name + " er død!");
+        if (dead)
+            return;
+
+        dead = true;
+        Debug.Log(gameObject.name + " er dÃ¸d!");
 
         // Giv XP til spilleren
         if (player != null)
@@ -51,12 +63,15 @@ public class EnemyHealth : MonoBehaviour
             player.AddXP(xpReward);
         }
 
+        // Giv alle death listeners besked Ã©n gang (coins, quests osv.)
+        onDeath?.Invoke();
+
         // Fjern fjenden fra spillet
         Destroy(gameObject);
     }
 
     // TEST FUNKTION: 
-    // Gør det muligt at teste skade og blink ved at klikke på fjenden i spillet
+    // GÃ¸r det muligt at teste skade og blink ved at klikke pÃ¥ fjenden i spillet
     private void OnMouseDown()
     {
         TakeDamage(25);
