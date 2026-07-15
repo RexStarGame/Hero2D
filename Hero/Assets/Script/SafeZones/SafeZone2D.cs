@@ -163,6 +163,28 @@ public sealed class SafeZone2D : MonoBehaviour
         return false;
     }
 
+    /// <summary>
+    /// Used by enemy navigation to reject patrol destinations and routes that
+    /// enter an active enemy-blocking safe zone.
+    /// </summary>
+    public static bool IsEnemyMovementBlocked(Vector2 worldPosition)
+    {
+        for (int i = activeZones.Count - 1; i >= 0; i--)
+        {
+            SafeZone2D zone = activeZones[i];
+            if (zone == null)
+            {
+                activeZones.RemoveAt(i);
+                continue;
+            }
+
+            if (zone.blockEnemies && zone.Contains(worldPosition))
+                return true;
+        }
+
+        return false;
+    }
+
     private void EnforceEnemyBoundary(Collider2D other)
     {
         if (!blockEnemies || other == null || zoneCollider == null) return;
