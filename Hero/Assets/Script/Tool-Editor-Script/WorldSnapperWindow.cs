@@ -32,7 +32,7 @@ public class WorldSnapperWindow : EditorWindow
 
         EditorGUILayout.Space(8);
 
-        useFirstSelectedAsOrigin = EditorGUILayout.Toggle("Use First Selected as Origin", useFirstSelectedAsOrigin);
+        useFirstSelectedAsOrigin = EditorGUILayout.Toggle("Use Active Selected as Origin", useFirstSelectedAsOrigin);
         using (new EditorGUI.DisabledScope(useFirstSelectedAsOrigin))
             origin = EditorGUILayout.Vector2Field("Origin", origin);
 
@@ -111,8 +111,9 @@ public class WorldSnapperWindow : EditorWindow
         if (targets.Count == 0) return;
 
         Vector2 usedOrigin = origin;
-        if (useFirstSelectedAsOrigin && roots[0] != null)
-            usedOrigin = roots[0].position;
+        Transform activeTransform = Selection.activeTransform;
+        if (useFirstSelectedAsOrigin && activeTransform != null)
+            usedOrigin = activeTransform.position;
 
         if (mode == SnapMode.SpriteSize && preparePixelArtTextures)
             PrepareTextures(targets);
