@@ -3,93 +3,129 @@ using UnityEngine;
 
 public class MageRed : MonoBehaviour
 {
-    [Header("Indstillinger")]
+    [Header("Patrol")]
     [SerializeField] private float moveSpeed = 3f;
     [SerializeField] private float waitTime = 2f;
 
-    // Vi behøver ikke trække den ind manuelt længere, den finder den selv
-    private EnemyManager myManager;
+    [Header("Smart Chase")]
+    [Min(0.1f)] [SerializeField] private float detectionRange = 6f;
+    [Min(0.1f)] [SerializeField] private float giveUpRange = 10f;
+    [Min(0f)] [SerializeField] private float chaseStopDistance = 0.9f;
+    [SerializeField] private float chaseSpeedMultiplier = 1.15f;
 
+    private EnemyManager myManager;
+    private EnemyAggro2D aggro;
     private Rigidbody2D rb;
     private Animator animator;
     private Vector2 currentTarget;
-    private bool isMoving = false;
+    private bool isMoving;
+    private bool wasChasing;
+    private Coroutine waitRoutine;
 
-    void Start()
+    private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         if (rb != null) rb.constraints = RigidbodyConstraints2D.FreezeRotation;
 
-        // --- HER ER MAGIEN: FIND MANAGEREN SELV ---
+        aggro = GetComponent<EnemyAggro2D>();
+        if (aggro == null) aggro = gameObject.AddComponent<EnemyAggro2D>();
+        aggro.ConfigureRanges(detectionRange, giveUpRange);
 
-        // Metode A: Find via TAG (Husk at sætte tagget 'GameController' på din Manager i scenen!)
         GameObject managerObject = GameObject.FindGameObjectWithTag("Manger");
-
         if (managerObject != null)
         {
             myManager = managerObject.GetComponent<EnemyManager>();
-
-            // Nu har vi fundet den, så start med at gå!
             FindNewPosition();
         }
         else
         {
-            Debug.LogError("Fjenden kunne ikke finde 'GameController'! Har du husket at sætte Tagget?");
+            Debug.LogError("Enemy could not find the object tagged 'Manger'.", this);
         }
     }
 
-    void Update()
+    private void Update()
     {
-        // Hvis vi ikke har en manager eller ikke skal bevæge os, så stop
-        if (myManager == null || !isMoving) return;
+        Transform playerTarget = aggro != null ? aggro.CurrentTarget : null;
+        if (playerTarget != null)
+        {
+            wasChasing = true;
+            UpdateAnimation(((Vector2)playerTarget.position - (Vector2)transform.position).normalized, true);
+            return;
+        }
+
+        if (wasChasing)
+        {
+            wasChasing = false;
+            FindNewPosition();
+        }
+
+        if (myManager == null || !isMoving)
+        {
+            UpdateAnimation(Vector2.zero, false);
+            return;
+        }
 
         Vector2 direction = (currentTarget - (Vector2)transform.position).normalized;
-        float distance = Vector2.Distance(transform.position, currentTarget);
+        UpdateAnimation(direction, true);
 
-        // --- ANIMATION ---
-        if (animator != null)
-        {
-            animator.SetFloat("Speed", 1f);
-            if (direction.y > 0.01f) animator.SetBool("IsFacingUp", true);
-            else if (direction.y < -0.01f) animator.SetBool("IsFacingUp", false);
-        }
-
-        if (distance < 0.2f)
-        {
-            StartCoroutine(WaitAndMove());
-        }
+        if (Vector2.Distance(transform.position, currentTarget) < 0.2f && waitRoutine == null)
+            waitRoutine = StartCoroutine(WaitAndMove());
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
-        if (isMoving && rb != null)
+        if (rb == null || aggro == null || !aggro.HasAuthority()) return;
+
+        Transform playerTarget = aggro.CurrentTarget;
+        if (playerTarget != null)
         {
-            Vector2 direction = (currentTarget - (Vector2)transform.position).normalized;
-            rb.linearVelocity = direction * moveSpeed;
+            Vector2 offset = (Vector2)playerTarget.position - rb.position;
+            if (offset.sqrMagnitude <= chaseStopDistance * chaseStopDistance)
+                rb.linearVelocity = Vector2.zero;
+            else
+                rb.linearVelocity = offset.normalized * moveSpeed * chaseSpeedMultiplier;
+            return;
         }
-        else if (rb != null)
-        {
-            rb.linearVelocity = Vector2.zero;
-        }
+
+        rb.linearVelocity = isMoving
+            ? (currentTarget - rb.position).normalized * moveSpeed
+            : Vector2.zero;
     }
 
-    void FindNewPosition()
+    private void FindNewPosition()
     {
-        if (myManager != null)
-        {
-            currentTarget = myManager.GetRandomPointInZone();
-            isMoving = true;
-        }
+        if (myManager == null) return;
+        currentTarget = myManager.GetRandomPointInZone();
+        isMoving = true;
     }
 
-    IEnumerator WaitAndMove()
+    private IEnumerator WaitAndMove()
     {
         isMoving = false;
-        if (animator != null) animator.SetFloat("Speed", 0f);
-
+        UpdateAnimation(Vector2.zero, false);
         yield return new WaitForSeconds(waitTime);
-
         FindNewPosition();
+        waitRoutine = null;
+    }
+
+    private void UpdateAnimation(Vector2 direction, bool moving)
+    {
+        if (animator == null) return;
+        animator.SetFloat("Speed", moving ? 1f : 0f);
+        if (direction.y > 0.01f) animator.SetBool("IsFacingUp", true);
+        else if (direction.y < -0.01f) animator.SetBool("IsFacingUp", false);
+    }
+
+    private void OnDisable()
+    {
+        if (waitRoutine != null)
+        {
+            StopCoroutine(waitRoutine);
+            waitRoutine = null;
+        }
+
+        if (rb != null && aggro != null && aggro.HasAuthority())
+            rb.linearVelocity = Vector2.zero;
     }
 }
