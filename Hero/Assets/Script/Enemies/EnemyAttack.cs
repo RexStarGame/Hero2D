@@ -29,6 +29,7 @@ public class EnemyAttack : MonoBehaviour
 
     private bool isWindingUp;
     private GameObject telegraphInstance;
+    private EnemyAggro2D aggro;
 
     void Start()
     {
@@ -43,10 +44,14 @@ public class EnemyAttack : MonoBehaviour
 
         // fallback: auto-find sprite if not assigned
         if (enemySprite == null) enemySprite = GetComponentInChildren<SpriteRenderer>();
+
+        aggro = GetComponent<EnemyAggro2D>();
+        if (aggro == null) aggro = gameObject.AddComponent<EnemyAggro2D>();
     }
 
     void Update()
     {
+        if (aggro != null) player = aggro.CurrentTarget;
         if (player == null) return;
         if (SafeZone2D.IsPlayerProtected(player.position)) return;
 
