@@ -569,4 +569,20 @@ public class BossBehaviorController : MonoBehaviour
 
         return blockDisabled;
     }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = new Color(1f, 0.75f, 0.1f, 0.9f);
+        Gizmos.DrawWireSphere(transform.position, detectionRange);
+
+        Gizmos.color = new Color(1f, 0.2f, 0.15f, 0.8f);
+        Gizmos.DrawWireSphere(transform.position, giveUpRange);
+
+#if UNITY_EDITOR
+        UnityEditor.Handles.color = new Color(1f, 0.75f, 0.1f, 1f);
+        UnityEditor.Handles.Label(transform.position + Vector3.right * detectionRange, "CHASE START");
+        UnityEditor.Handles.color = new Color(1f, 0.2f, 0.15f, 1f);
+        UnityEditor.Handles.Label(transform.position + Vector3.right * giveUpRange, "CHASE STOPS");
+#endif
+    }
 }
