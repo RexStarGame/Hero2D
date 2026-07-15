@@ -13,6 +13,9 @@ public class MageRed : MonoBehaviour
     [Min(0f)] [SerializeField] private float chaseStopDistance = 0.9f;
     [SerializeField] private float chaseSpeedMultiplier = 1.15f;
 
+    [Header("Patrol Validation")]
+    [Min(0.05f)] [SerializeField] private float routeValidationInterval = 0.2f;
+
     private EnemyManager myManager;
     private EnemyAggro2D aggro;
     private Rigidbody2D rb;
@@ -21,6 +24,7 @@ public class MageRed : MonoBehaviour
     private bool isMoving;
     private bool wasChasing;
     private Coroutine waitRoutine;
+    private float nextRouteValidationTime;
 
     private void Start()
     {
@@ -66,6 +70,16 @@ public class MageRed : MonoBehaviour
             return;
         }
 
+        if (Time.time >= nextRouteValidationTime)
+        {
+            nextRouteValidationTime = Time.time + routeValidationInterval;
+            if (!myManager.IsPatrolRouteValid(transform.position, currentTarget))
+            {
+                FindNewPosition();
+                return;
+            }
+        }
+
         Vector2 direction = (currentTarget - (Vector2)transform.position).normalized;
         UpdateAnimation(direction, true);
 
@@ -97,7 +111,16 @@ public class MageRed : MonoBehaviour
     {
         if (myManager == null) return;
         currentTarget = myManager.GetRandomPointInZone(transform.position);
+        nextRouteValidationTime = Time.time + routeValidationInterval;
         isMoving = true;
+    }
+
+    private void OnValidate()
+    {
+        detectionRange = Mathf.Max(0.1f, detectionRange);
+        giveUpRange = Mathf.Max(detectionRange, giveUpRange);
+        chaseStopDistance = Mathf.Max(0f, chaseStopDistance);
+        routeValidationInterval = Mathf.Max(0.05f, routeValidationInterval);
     }
 
     private IEnumerator WaitAndMove()
