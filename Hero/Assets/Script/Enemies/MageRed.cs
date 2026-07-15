@@ -96,7 +96,7 @@ public class MageRed : MonoBehaviour
     private void FindNewPosition()
     {
         if (myManager == null) return;
-        currentTarget = myManager.GetRandomPointInZone();
+        currentTarget = myManager.GetRandomPointInZone(transform.position);
         isMoving = true;
     }
 
