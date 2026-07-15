@@ -34,11 +34,24 @@ public class EnemyBullet : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (SafeZone2D.IsEnemyProjectileBlocked(transform.position))
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         rb.linearVelocity = (Vector2)transform.right * speed;
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        SafeZone2D safeZone = other.GetComponent<SafeZone2D>();
+        if (safeZone != null && safeZone.DestroysEnemyProjectiles)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         int layer = other.gameObject.layer;
 
         if (((1 << layer) & ignoreLayers) != 0)
