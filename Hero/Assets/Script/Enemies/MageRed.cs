@@ -15,6 +15,11 @@ public class MageRed : MonoBehaviour
 
     [Header("Patrol Validation")]
     [Min(0.05f)] [SerializeField] private float routeValidationInterval = 0.2f;
+    [Min(0.1f)] [SerializeField] private float stuckTimeout = 1f;
+    [Min(0.001f)] [SerializeField] private float minimumProgressDistance = 0.05f;
+
+    [Header("Scene Debug")]
+    [SerializeField] private bool showPatrolTarget = true;
 
     private EnemyManager myManager;
     private EnemyAggro2D aggro;
@@ -25,6 +30,12 @@ public class MageRed : MonoBehaviour
     private bool wasChasing;
     private Coroutine waitRoutine;
     private float nextRouteValidationTime;
+    private Vector2 lastProgressPosition;
+    private float lastProgressTime;
+    private Vector2 lastRejectedTarget;
+    private float showRejectedTargetUntil;
+
+    public Vector2 CurrentPatrolTarget => currentTarget;
 
     private void Start()
     {
@@ -75,9 +86,11 @@ public class MageRed : MonoBehaviour
             nextRouteValidationTime = Time.time + routeValidationInterval;
             if (!myManager.IsPatrolRouteValid(transform.position, currentTarget))
             {
-                FindNewPosition();
+                CancelCurrentPatrolAndFindAnother();
                 return;
             }
+
+            CheckForBlockedPatrol();
         }
 
         Vector2 direction = (currentTarget - (Vector2)transform.position).normalized;
@@ -112,7 +125,36 @@ public class MageRed : MonoBehaviour
         if (myManager == null) return;
         currentTarget = myManager.GetRandomPointInZone(transform.position);
         nextRouteValidationTime = Time.time + routeValidationInterval;
+        lastProgressPosition = transform.position;
+        lastProgressTime = Time.time;
         isMoving = true;
+    }
+
+    private void CancelCurrentPatrolAndFindAnother()
+    {
+        lastRejectedTarget = currentTarget;
+        showRejectedTargetUntil = Time.time + 1f;
+
+        if (rb != null && aggro != null && aggro.HasAuthority())
+            rb.linearVelocity = Vector2.zero;
+
+        isMoving = false;
+        FindNewPosition();
+    }
+
+    private void CheckForBlockedPatrol()
+    {
+        float progressSqr = ((Vector2)transform.position - lastProgressPosition).sqrMagnitude;
+        if (progressSqr >= minimumProgressDistance * minimumProgressDistance)
+        {
+            lastProgressPosition = transform.position;
+            lastProgressTime = Time.time;
+            return;
+        }
+
+        bool hasNotReachedTarget = Vector2.Distance(transform.position, currentTarget) >= 0.2f;
+        if (hasNotReachedTarget && Time.time - lastProgressTime >= stuckTimeout)
+            CancelCurrentPatrolAndFindAnother();
     }
 
     private void OnValidate()
@@ -121,6 +163,8 @@ public class MageRed : MonoBehaviour
         giveUpRange = Mathf.Max(detectionRange, giveUpRange);
         chaseStopDistance = Mathf.Max(0f, chaseStopDistance);
         routeValidationInterval = Mathf.Max(0.05f, routeValidationInterval);
+        stuckTimeout = Mathf.Max(0.1f, stuckTimeout);
+        minimumProgressDistance = Mathf.Max(0.001f, minimumProgressDistance);
     }
 
     private IEnumerator WaitAndMove()
@@ -155,6 +199,41 @@ public class MageRed : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         DrawChaseRanges(detectionRange, giveUpRange);
+        DrawPatrolTarget();
+    }
+
+    private void DrawPatrolTarget()
+    {
+        if (!showPatrolTarget || !Application.isPlaying || myManager == null) return;
+
+        bool valid = myManager.IsPatrolRouteValid(transform.position, currentTarget);
+        Color routeColor = valid
+            ? new Color(0.15f, 0.9f, 1f, 0.95f)
+            : new Color(1f, 0.1f, 0.1f, 1f);
+
+        Gizmos.color = routeColor;
+        Gizmos.DrawLine(transform.position, currentTarget);
+        Gizmos.DrawWireSphere(currentTarget, 0.18f);
+        Gizmos.DrawLine(currentTarget + Vector2.left * 0.25f, currentTarget + Vector2.right * 0.25f);
+        Gizmos.DrawLine(currentTarget + Vector2.down * 0.25f, currentTarget + Vector2.up * 0.25f);
+
+        if (Time.time < showRejectedTargetUntil)
+        {
+            Gizmos.color = new Color(1f, 0.1f, 0.1f, 1f);
+            Gizmos.DrawLine(transform.position, lastRejectedTarget);
+            Gizmos.DrawWireSphere(lastRejectedTarget, 0.24f);
+        }
+
+#if UNITY_EDITOR
+        UnityEditor.Handles.color = routeColor;
+        string state = valid ? "PATROL TARGET - VALID" : "PATROL TARGET - CANCELLED";
+        UnityEditor.Handles.Label((Vector3)currentTarget + Vector3.up * 0.3f, state);
+        if (Time.time < showRejectedTargetUntil)
+        {
+            UnityEditor.Handles.color = Color.red;
+            UnityEditor.Handles.Label((Vector3)lastRejectedTarget + Vector3.up * 0.3f, "REJECTED - NEW TARGET SELECTED");
+        }
+#endif
     }
 
     private void DrawChaseRanges(float detect, float giveUp)
