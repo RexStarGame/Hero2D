@@ -96,6 +96,10 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
+        // Central check covers projectiles, boss attacks, AoE and future damage sources.
+        if (SafeZone2D.IsPlayerProtected(transform.position))
+            return;
+
         // Invulnerability under dash
         if (dashDoge != null && dashDoge.IsInvulnerable())
             return;
