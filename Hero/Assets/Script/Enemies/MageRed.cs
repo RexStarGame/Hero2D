@@ -128,4 +128,25 @@ public class MageRed : MonoBehaviour
         if (rb != null && aggro != null && aggro.HasAuthority())
             rb.linearVelocity = Vector2.zero;
     }
+
+    private void OnDrawGizmosSelected()
+    {
+        DrawChaseRanges(detectionRange, giveUpRange);
+    }
+
+    private void DrawChaseRanges(float detect, float giveUp)
+    {
+        Gizmos.color = new Color(1f, 0.75f, 0.1f, 0.9f);
+        Gizmos.DrawWireSphere(transform.position, detect);
+
+        Gizmos.color = new Color(1f, 0.2f, 0.15f, 0.8f);
+        Gizmos.DrawWireSphere(transform.position, giveUp);
+
+#if UNITY_EDITOR
+        UnityEditor.Handles.color = new Color(1f, 0.75f, 0.1f, 1f);
+        UnityEditor.Handles.Label(transform.position + Vector3.right * detect, "CHASE START");
+        UnityEditor.Handles.color = new Color(1f, 0.2f, 0.15f, 1f);
+        UnityEditor.Handles.Label(transform.position + Vector3.right * giveUp, "CHASE STOPS");
+#endif
+    }
 }
