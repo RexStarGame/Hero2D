@@ -169,6 +169,13 @@ public sealed class SafeZone2D : MonoBehaviour
     /// </summary>
     public static bool IsEnemyMovementBlocked(Vector2 worldPosition)
     {
+        return IsEnemyMovementBlocked(worldPosition, 0f);
+    }
+
+    public static bool IsEnemyMovementBlocked(Vector2 worldPosition, float clearance)
+    {
+        clearance = Mathf.Max(0f, clearance);
+
         for (int i = activeZones.Count - 1; i >= 0; i--)
         {
             SafeZone2D zone = activeZones[i];
@@ -178,8 +185,17 @@ public sealed class SafeZone2D : MonoBehaviour
                 continue;
             }
 
-            if (zone.blockEnemies && zone.Contains(worldPosition))
-                return true;
+            if (!zone.blockEnemies || !zone.isActiveAndEnabled || zone.zoneCollider == null)
+                continue;
+
+            if (zone.zoneCollider.OverlapPoint(worldPosition)) return true;
+
+            if (clearance > 0f)
+            {
+                Vector2 closestPoint = zone.zoneCollider.ClosestPoint(worldPosition);
+                if ((closestPoint - worldPosition).sqrMagnitude <= clearance * clearance)
+                    return true;
+            }
         }
 
         return false;
