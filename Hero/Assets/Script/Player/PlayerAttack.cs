@@ -99,6 +99,9 @@ public class PlayerAttack : MonoBehaviour
         // Only start attack if allowed
         if (Input.GetKeyDown(KeyCode.Space) && canAttack && attackRoutine == null)
         {
+            if (SafeZone2D.IsPlayerAttackBlocked(transform.position))
+                return;
+
             attackRoutine = StartCoroutine(PerformAttack());
         }
 
