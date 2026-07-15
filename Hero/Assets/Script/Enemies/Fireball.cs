@@ -44,12 +44,25 @@ public class Fireball : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (SafeZone2D.IsEnemyProjectileBlocked(transform.position))
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         // Always move forward based on rotation
         rb.linearVelocity = (Vector2)transform.right * speed;
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        SafeZone2D safeZone = other.GetComponent<SafeZone2D>();
+        if (safeZone != null && safeZone.DestroysEnemyProjectiles)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         int otherLayer = other.gameObject.layer;
 
         Debug.Log($"Hit: {other.name} | Layer: {LayerMask.LayerToName(otherLayer)} | Tag: {other.tag}");
