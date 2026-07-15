@@ -22,6 +22,12 @@ public class FireballSpin : MonoBehaviour
 
     void Update()
     {
+        if (SafeZone2D.IsEnemyProjectileBlocked(transform.position))
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         // Always spin around itself
         transform.Rotate(0f, 0f, selfSpinSpeed * Time.deltaTime);
 
@@ -49,6 +55,13 @@ public class FireballSpin : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
+        SafeZone2D safeZone = other.GetComponent<SafeZone2D>();
+        if (safeZone != null && safeZone.DestroysEnemyProjectiles)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         // Fireball attaches to the enemy
         if (!attached && other.CompareTag("Enemy"))
         {
