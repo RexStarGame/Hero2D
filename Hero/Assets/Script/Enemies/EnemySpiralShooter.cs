@@ -64,6 +64,7 @@ public class EnemySpiralShooter : MonoBehaviour
     private void Update()
     {
         if (player == null || bulletPrefab == null) return;
+        if (SafeZone2D.IsPlayerProtected(player.position)) return;
         if (isShooting || shootRoutine != null) return;
         if (Time.time < AttackReadyTime) return;
 
@@ -102,6 +103,14 @@ public class EnemySpiralShooter : MonoBehaviour
 
         if (telegraphInstance != null)
             Destroy(telegraphInstance);
+
+        // The player may enter safety during the telegraph.
+        if (player == null || SafeZone2D.IsPlayerProtected(player.position))
+        {
+            isShooting = false;
+            shootRoutine = null;
+            yield break;
+        }
 
         // Base direction for first bullet
         Vector2 baseDir = (targetPos - (Vector2)firePoint.position).normalized;
