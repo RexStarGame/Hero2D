@@ -12,7 +12,7 @@ public class EnemyAttack : MonoBehaviour
     [SerializeField] private float attackCooldown = 2f;
 
     [Header("Telegraph (Warning before shot)")]
-    [SerializeField] private float windupTime = 0.45f;                 // tid før skuddet
+    [SerializeField] private float windupTime = 0.45f;                 // tid fÃ¸r skuddet
     [SerializeField] private GameObject telegraphPrefab;               // fx ! icon eller glow sprite (valgfri)
     [SerializeField] private Vector3 telegraphOffset = new Vector3(0, 0.6f, 0);
     [SerializeField] private AudioClip windupSfx;                      // valgfri pip/charge lyd
@@ -48,6 +48,7 @@ public class EnemyAttack : MonoBehaviour
     void Update()
     {
         if (player == null) return;
+        if (SafeZone2D.IsPlayerProtected(player.position)) return;
 
         cooldownTimer -= Time.deltaTime;
         if (isWindingUp) return;
@@ -123,7 +124,8 @@ public class EnemyAttack : MonoBehaviour
         if (telegraphInstance != null) Destroy(telegraphInstance);
 
         // shoot
-        Shoot(direction);
+        if (player != null && !SafeZone2D.IsPlayerProtected(player.position))
+            Shoot(direction);
 
         // start cooldown AFTER the shot
         cooldownTimer = attackCooldown;
