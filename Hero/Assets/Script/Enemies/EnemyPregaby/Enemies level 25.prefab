@@ -50,6 +50,7 @@ GameObject:
   - component: {fileID: -3651679510663702152}
   - component: {fileID: -8708243518032412209}
   - component: {fileID: 878880681790245415}
+  - component: {fileID: 4932240404900250367}
   m_Layer: 3
   m_Name: Enemies level 25
   m_TagString: Enemy
@@ -251,6 +252,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 1800
   xpReward: 9450
+  onDeath:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &3745639338394277203
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -407,3 +411,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be42cee28163cab4bb3a26f007ac9409, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4932240404900250367
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8233854846743954295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f6649c0106740a8967350e37e6de719, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minCoins: 170
+  maxCoins: 278
+  wallet: {fileID: 0}
