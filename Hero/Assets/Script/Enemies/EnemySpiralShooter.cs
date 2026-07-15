@@ -47,6 +47,7 @@ public class EnemySpiralShooter : MonoBehaviour
     private bool isShooting;
     private Coroutine shootRoutine;
     private AudioSource audioSource;
+    private EnemyAggro2D aggro;
 
     private void Start()
     {
@@ -59,10 +60,14 @@ public class EnemySpiralShooter : MonoBehaviour
         AttackReadyTime = Time.time;
 
         audioSource = GetComponent<AudioSource>(); // optional (add AudioSource if you want SFX)
+
+        aggro = GetComponent<EnemyAggro2D>();
+        if (aggro == null) aggro = gameObject.AddComponent<EnemyAggro2D>();
     }
 
     private void Update()
     {
+        if (aggro != null) player = aggro.CurrentTarget;
         if (player == null || bulletPrefab == null) return;
         if (SafeZone2D.IsPlayerProtected(player.position)) return;
         if (isShooting || shootRoutine != null) return;
