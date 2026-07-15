@@ -23,6 +23,14 @@ public class AttackHitbox : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        // Use the player's body, not the sword tip: attacks from inside are blocked.
+        Vector2 attackerPosition = ownerAttack != null
+            ? (Vector2)ownerAttack.transform.position
+            : (Vector2)transform.root.position;
+
+        if (SafeZone2D.IsPlayerAttackBlocked(attackerPosition))
+            return;
+
         int baseDamage = (damageUpgrade != null) ? damageUpgrade.Damage : damage;
 
         // Crit
