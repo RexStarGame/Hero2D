@@ -8,6 +8,7 @@ public class EnemyManager : MonoBehaviour
     [Header("Safe-Zone Avoidance")]
     [Min(1)] [SerializeField] private int pointSearchAttempts = 32;
     [Min(0.05f)] [SerializeField] private float routeCheckSpacing = 0.25f;
+    [Min(0f)] [SerializeField] private float safeZoneClearance = 0.35f;
 
     public Vector2 GetRandomPointInZone()
     {
@@ -31,8 +32,7 @@ public class EnemyManager : MonoBehaviour
                 Random.Range(bounds.min.x, bounds.max.x),
                 Random.Range(bounds.min.y, bounds.max.y));
 
-            if (SafeZone2D.IsEnemyMovementBlocked(candidate)) continue;
-            if (RouteCrossesSafeZone(requesterPosition, candidate)) continue;
+            if (!IsPatrolRouteValid(requesterPosition, candidate)) continue;
 
             return candidate;
         }
@@ -42,25 +42,30 @@ public class EnemyManager : MonoBehaviour
         return requesterPosition;
     }
 
-    private bool RouteCrossesSafeZone(Vector2 start, Vector2 end)
+    public bool IsPatrolRouteValid(Vector2 start, Vector2 end)
     {
+        if (patrolArea == null) return false;
+        if (!patrolArea.OverlapPoint(end)) return false;
+        if (SafeZone2D.IsEnemyMovementBlocked(end, safeZoneClearance)) return false;
+
         float distance = Vector2.Distance(start, end);
         int checks = Mathf.Max(1, Mathf.CeilToInt(distance / Mathf.Max(0.05f, routeCheckSpacing)));
 
         for (int i = 0; i <= checks; i++)
         {
             Vector2 sample = Vector2.Lerp(start, end, i / (float)checks);
-            if (SafeZone2D.IsEnemyMovementBlocked(sample))
-                return true;
+            if (SafeZone2D.IsEnemyMovementBlocked(sample, safeZoneClearance))
+                return false;
         }
 
-        return false;
+        return true;
     }
 
     private void OnValidate()
     {
         pointSearchAttempts = Mathf.Max(1, pointSearchAttempts);
         routeCheckSpacing = Mathf.Max(0.05f, routeCheckSpacing);
+        safeZoneClearance = Mathf.Max(0f, safeZoneClearance);
     }
 
     private void OnDrawGizmosSelected()
