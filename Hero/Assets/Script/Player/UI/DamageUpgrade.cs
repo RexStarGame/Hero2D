@@ -24,23 +24,24 @@ public class DamageUpgrade : MonoBehaviour
 
     // ✅ This is the REAL damage used by the player
     public int BaseAndAbilityDamage => damage + (damageLevel * damagePerLevel);
-    public int EquipmentDamageBonus => equipment == null ? 0 : Mathf.RoundToInt(equipment.GetDamageBonus());
+    public int EquipmentDamageBonus
+    {
+        get
+        {
+            // This component currently lives under an upgrade-menu UI object,
+            // which can be inactive at startup. Resolve gameplay references on
+            // demand so equipped-item damage never depends on opening that UI.
+            ResolveReferences();
+            return equipment == null ? 0 : Mathf.RoundToInt(equipment.GetDamageBonus());
+        }
+    }
     public int Damage => BaseAndAbilityDamage + EquipmentDamageBonus;
 
     public int DamageLevel => damageLevel;
 
     private void Awake()
     {
-        if (playerXP == null)
-        {
-#if UNITY_2023_1_OR_NEWER
-            playerXP = FindAnyObjectByType<PlayerXP>();
-#else
-            playerXP = FindObjectOfType<PlayerXP>();
-#endif
-        }
-
-        ResolveEquipment();
+        ResolveReferences();
 
         UpdateLevelText();
         onDamageChanged?.Invoke(Damage);
@@ -48,7 +49,7 @@ public class DamageUpgrade : MonoBehaviour
 
     private void OnEnable()
     {
-        ResolveEquipment();
+        ResolveReferences();
         if (equipment != null)
         {
             equipment.EquipmentChanged -= HandleEquipmentChanged;
@@ -62,8 +63,17 @@ public class DamageUpgrade : MonoBehaviour
             equipment.EquipmentChanged -= HandleEquipmentChanged;
     }
 
-    private void ResolveEquipment()
+    private void ResolveReferences()
     {
+        if (playerXP == null)
+        {
+#if UNITY_2023_1_OR_NEWER
+            playerXP = FindAnyObjectByType<PlayerXP>();
+#else
+            playerXP = FindObjectOfType<PlayerXP>();
+#endif
+        }
+
         if (equipment != null) return;
 
         // DamageUpgrade currently lives on a UI object, while equipment lives
