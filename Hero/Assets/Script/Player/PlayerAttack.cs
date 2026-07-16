@@ -45,6 +45,7 @@ public class PlayerAttack : MonoBehaviour
     [Header("References")]
     [SerializeField] private Collider2D attackHitbox;
     [SerializeField] private Animator animator;
+    [SerializeField] private SwordSwingTrail2D swordSwingTrail;
 
     [Header("Health (for Life Steal)")]
     [SerializeField] private PlayerHealth playerHealth;
@@ -70,6 +71,7 @@ public class PlayerAttack : MonoBehaviour
     private bool canAttack = true;
     private Vector2 lastFacingDirection = Vector2.down;
     private Coroutine attackRoutine;
+    private bool trailPlayedThisAttack;
 
     [SerializeField] private DamageUpgrade damageUpgrade;
     public DamageUpgrade DamageUpgrade => damageUpgrade;
@@ -78,6 +80,13 @@ public class PlayerAttack : MonoBehaviour
     {
         if (attackHitbox != null) attackHitbox.enabled = false;
         if (animator == null) animator = GetComponentInChildren<Animator>();
+
+        if (swordSwingTrail == null && attackHitbox != null)
+        {
+            swordSwingTrail = attackHitbox.GetComponent<SwordSwingTrail2D>();
+            if (swordSwingTrail == null)
+                swordSwingTrail = attackHitbox.gameObject.AddComponent<SwordSwingTrail2D>();
+        }
 
         if (playerHealth == null)
             playerHealth = GetComponent<PlayerHealth>();
@@ -129,6 +138,7 @@ public class PlayerAttack : MonoBehaviour
     {
         canAttack = false;
         attackRoutine = null;
+        trailPlayedThisAttack = false;
 
         // NEW: set when we will be ready again (includes delays + cooldown)
         AttackReadyTime = Time.time + AttackCycleDuration;
@@ -140,13 +150,16 @@ public class PlayerAttack : MonoBehaviour
         }
 
         yield return new WaitForSeconds(hitboxStartDelay);
-        if (attackHitbox != null) attackHitbox.enabled = true;
+        ActivateHitboxAndTrail();
 
         yield return new WaitForSeconds(hitboxActiveTime);
         if (attackHitbox != null) attackHitbox.enabled = false;
 
         if (animator != null)
             animator.SetBool(animationBoolName, false);
+
+        if (swordSwingTrail != null)
+            swordSwingTrail.StopTrail();
 
         yield return new WaitForSeconds(AttackCooldown);
         canAttack = true;
@@ -164,13 +177,14 @@ public class PlayerAttack : MonoBehaviour
 
         canAttack = true;
         if (attackHitbox != null) attackHitbox.enabled = false;
+        if (swordSwingTrail != null) swordSwingTrail.StopTrail();
+        trailPlayedThisAttack = false;
     }
 
     public void EnableHitbox()
     {
         Debug.Log("Hitbox enabled");
-        if (attackHitbox != null)
-            attackHitbox.enabled = true;
+        ActivateHitboxAndTrail();
     }
 
     public void DisableHitbox()
@@ -178,6 +192,22 @@ public class PlayerAttack : MonoBehaviour
         Debug.Log("Hitbox disabled");
         if (attackHitbox != null)
             attackHitbox.enabled = false;
+    }
+
+    private void ActivateHitboxAndTrail()
+    {
+        if (attackHitbox != null)
+            attackHitbox.enabled = true;
+
+        if (trailPlayedThisAttack || swordSwingTrail == null)
+            return;
+
+        // The trail belongs to the visible attack animation, never idle state.
+        if (animator != null && !animator.GetBool(animationBoolName))
+            return;
+
+        trailPlayedThisAttack = true;
+        swordSwingTrail.PlaySwing();
     }
 
 
