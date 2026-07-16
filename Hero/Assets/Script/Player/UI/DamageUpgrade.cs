@@ -40,9 +40,48 @@ public class DamageUpgrade : MonoBehaviour
 #endif
         }
 
-        if (equipment == null)
-            equipment = GetComponent<PlayerEquipment>();
+        ResolveEquipment();
 
+        UpdateLevelText();
+        onDamageChanged?.Invoke(Damage);
+    }
+
+    private void OnEnable()
+    {
+        ResolveEquipment();
+        if (equipment != null)
+        {
+            equipment.EquipmentChanged -= HandleEquipmentChanged;
+            equipment.EquipmentChanged += HandleEquipmentChanged;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (equipment != null)
+            equipment.EquipmentChanged -= HandleEquipmentChanged;
+    }
+
+    private void ResolveEquipment()
+    {
+        if (equipment != null) return;
+
+        // DamageUpgrade currently lives on a UI object, while equipment lives
+        // on Player. PlayerXP is already a reliable reference to that Player.
+        if (playerXP != null)
+            equipment = playerXP.GetComponent<PlayerEquipment>();
+
+        if (equipment != null) return;
+
+#if UNITY_2023_1_OR_NEWER
+        equipment = FindAnyObjectByType<PlayerEquipment>();
+#else
+        equipment = FindObjectOfType<PlayerEquipment>();
+#endif
+    }
+
+    private void HandleEquipmentChanged()
+    {
         UpdateLevelText();
         onDamageChanged?.Invoke(Damage);
     }
