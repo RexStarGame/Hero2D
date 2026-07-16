@@ -8,7 +8,7 @@ public class BossManager : MonoBehaviour
         [Tooltip("Boss prefab der kan spawnes.")]
         public GameObject prefab;
 
-        [Tooltip("Bossen spawner når spilleren er nået til (eller over) dette level.")]
+        [Tooltip("Bossen spawner nÃ¥r spilleren er nÃ¥et til (eller over) dette level.")]
         public int minLevel = 1;
     }
 
@@ -20,11 +20,11 @@ public class BossManager : MonoBehaviour
     public PlayerXP playerXP;
 
     [Header("Boss List")]
-    [Tooltip("Bosses spawnes kun én gang pr. entry (i rækkefølge).")]
+    [Tooltip("Bosses spawnes kun Ã©n gang pr. entry (i rÃ¦kkefÃ¸lge).")]
     public BossEntry[] bossPool;
 
     [Header("Indstillinger")]
-    [Tooltip("Tag der bruges til at finde aktive bosses i scenen (kræver at tag findes i Tag Manager).")]
+    [Tooltip("Tag der bruges til at finde aktive bosses i scenen (krÃ¦ver at tag findes i Tag Manager).")]
     [SerializeField] private string bossTag = "Boss";
 
     [Tooltip("Hvis true: der spawner kun en boss, hvis der ikke allerede er en aktiv boss i scenen.")]
@@ -46,7 +46,9 @@ public class BossManager : MonoBehaviour
         if (playerXP == null)
             playerXP = FindAnyObjectByType<PlayerXP>();
 
-        // Valider tag én gang (FindGameObjectsWithTag crasher hvis tag ikke findes)
+        RestoreDefeatedBossProgress();
+
+        // Valider tag Ã©n gang (FindGameObjectsWithTag crasher hvis tag ikke findes)
         if (requireNoActiveBoss && !string.IsNullOrWhiteSpace(bossTag))
         {
             try
@@ -57,7 +59,7 @@ public class BossManager : MonoBehaviour
             catch (UnityException)
             {
                 bossTagUsable = false;
-                Debug.LogWarning($"BossManager: Tag '{bossTag}' findes ikke. Slår bossTag-check fra.");
+                Debug.LogWarning($"BossManager: Tag '{bossTag}' findes ikke. SlÃ¥r bossTag-check fra.");
             }
         }
     }
@@ -101,7 +103,7 @@ public class BossManager : MonoBehaviour
         if (entry == null || entry.prefab == null)
             return;
 
-        // Spawn når spilleren er nået til (eller over) kravet
+        // Spawn nÃ¥r spilleren er nÃ¥et til (eller over) kravet
         if (currentLevel < entry.minLevel)
             return;
 
@@ -114,8 +116,47 @@ public class BossManager : MonoBehaviour
         Vector2 p2 = enemyManager.GetRandomPointInZone();
         Vector3 spawnPos = new Vector3(p2.x, p2.y, spawnZ);
 
-        Instantiate(entry.prefab, spawnPos, Quaternion.identity);
+        GameObject spawnedBoss = Instantiate(entry.prefab, spawnPos, Quaternion.identity);
+        RegisterCheckpointReward(spawnedBoss, entry.minLevel);
         lastBossIndexSpawned = nextBossIndex;
+    }
+
+    private void RestoreDefeatedBossProgress()
+    {
+        int checkpointLevel = BossLevelCheckpoint.Level;
+        lastBossIndexSpawned = -1;
+
+        if (bossPool == null)
+            return;
+
+        // A saved checkpoint proves that its milestone boss was defeated in an
+        // earlier run. Skip it so it does not immediately respawn.
+        for (int i = 0; i < bossPool.Length; i++)
+        {
+            BossEntry entry = bossPool[i];
+            if (entry == null || entry.minLevel > checkpointLevel)
+                break;
+
+            lastBossIndexSpawned = i;
+        }
+    }
+
+    private static void RegisterCheckpointReward(GameObject spawnedBoss, int checkpointLevel)
+    {
+        if (spawnedBoss == null)
+            return;
+
+        BossHealth bossHealth = spawnedBoss.GetComponentInChildren<BossHealth>(true);
+        if (bossHealth == null)
+        {
+            Debug.LogWarning(
+                $"BossManager: '{spawnedBoss.name}' has no BossHealth, so it cannot unlock a level checkpoint.",
+                spawnedBoss);
+            return;
+        }
+
+        // This listener is invoked only by BossHealth's guarded death path.
+        bossHealth.onDeath.AddListener(() => BossLevelCheckpoint.TryUnlock(checkpointLevel));
     }
 
     // Hvis du starter et nyt run/spil og vil tillade bosses igen:
