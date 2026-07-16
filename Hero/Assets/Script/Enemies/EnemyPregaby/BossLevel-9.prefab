@@ -940,6 +940,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 3
   waitTime: 2
+  detectionRange: 8.5
+  giveUpRange: 15
+  chaseStopDistance: 0.9
+  chaseSpeedMultiplier: 2.5
 --- !u!95 &1378482468039930319
 Animator:
   serializedVersion: 7
@@ -1154,6 +1158,10 @@ MonoBehaviour:
     statusTriggerEnabled: 0
     disablesBlockStatus: 1
     statusDisableDuration: 2
+  detectionRange: 8.5
+  giveUpRange: 15
+  chaseSpeed: 2.5
+  attackEngageRange: 7
   onTelegraphedCharge:
     m_PersistentCalls:
       m_Calls: []
