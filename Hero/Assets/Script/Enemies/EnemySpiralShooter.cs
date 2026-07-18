@@ -48,6 +48,7 @@ public class EnemySpiralShooter : MonoBehaviour
     private Coroutine shootRoutine;
     private AudioSource audioSource;
     private EnemyAggro2D aggro;
+    private EnemyDifficultyProfile difficultyProfile;
 
     private void Start()
     {
@@ -63,6 +64,10 @@ public class EnemySpiralShooter : MonoBehaviour
 
         aggro = GetComponent<EnemyAggro2D>();
         if (aggro == null) aggro = gameObject.AddComponent<EnemyAggro2D>();
+
+        difficultyProfile = GetComponentInParent<EnemyDifficultyProfile>();
+        if (difficultyProfile == null)
+            difficultyProfile = GetComponentInChildren<EnemyDifficultyProfile>(true);
     }
 
     private void Update()
@@ -129,7 +134,10 @@ public class EnemySpiralShooter : MonoBehaviour
             float ang = (i == 0 && lockFirstAim) ? baseAngle : (baseAngle + (i * step));
             Quaternion rot = Quaternion.Euler(0f, 0f, ang);
 
-            Instantiate(bulletPrefab, firePoint.position, rot);
+            GameObject projectile = Instantiate(
+                bulletPrefab, firePoint.position, rot);
+            if (difficultyProfile != null)
+                difficultyProfile.ApplyToSpawnedDamage(projectile);
 
             if (shotDelay > 0f)
                 yield return new WaitForSeconds(shotDelay);

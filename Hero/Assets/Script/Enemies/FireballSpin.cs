@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class FireballSpin : MonoBehaviour
+public class FireballSpin : MonoBehaviour, IDifficultyScaledEnemyDamage
 {
     [Header("Settings")]
     [SerializeField] private float speed = 7f;
@@ -14,9 +14,19 @@ public class FireballSpin : MonoBehaviour
     private Transform enemyTarget;
     private float angle;
     private bool attached;
+    private float difficultyDamageMultiplier = 1f;
+    private bool difficultyMultiplierConfigured;
+
+    public void SetDifficultyDamageMultiplier(float multiplier)
+    {
+        difficultyDamageMultiplier = Mathf.Max(0f, multiplier);
+        difficultyMultiplierConfigured = true;
+    }
 
     void Start()
     {
+        if (!difficultyMultiplierConfigured)
+            difficultyDamageMultiplier = EnemyDifficultyProfile.GetDefaultDamageMultiplier();
         Destroy(gameObject, lifeTime);
     }
 
@@ -68,6 +78,11 @@ public class FireballSpin : MonoBehaviour
             enemyTarget = other.transform;
             attached = true;
 
+            EnemyDifficultyProfile sourceProfile =
+                other.GetComponentInParent<EnemyDifficultyProfile>();
+            if (sourceProfile != null)
+                SetDifficultyDamageMultiplier(sourceProfile.DamageMultiplier);
+
             angle = Random.Range(0f, Mathf.PI * 2f);
             return;
         }
@@ -78,7 +93,7 @@ public class FireballSpin : MonoBehaviour
             PlayerHealth health = other.GetComponentInParent<PlayerHealth>();
             if (health != null)
             {
-                health.TakeDamage(damage);
+                health.TakeDamage(damage * difficultyDamageMultiplier);
                 Destroy(gameObject);
             }
         }

@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
-public class EnemyBullet : MonoBehaviour
+public class EnemyBullet : MonoBehaviour, IDifficultyScaledEnemyDamage
 {
     [SerializeField] private float speed = 7f;
     [SerializeField] private float lifeTime = 4f;
@@ -14,9 +14,16 @@ public class EnemyBullet : MonoBehaviour
 
     private Rigidbody2D rb;
     private Collider2D col;
+    private float difficultyDamageMultiplier = 1f;
+
+    public void SetDifficultyDamageMultiplier(float multiplier)
+    {
+        difficultyDamageMultiplier = Mathf.Max(0f, multiplier);
+    }
 
     private void Awake()
     {
+        difficultyDamageMultiplier = EnemyDifficultyProfile.GetDefaultDamageMultiplier();
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
 
@@ -60,7 +67,7 @@ public class EnemyBullet : MonoBehaviour
         if (((1 << layer) & damageLayers) != 0)
         {
             var hp = other.GetComponentInParent<PlayerHealth>();
-            if (hp != null) hp.TakeDamage(damage);
+            if (hp != null) hp.TakeDamage(damage * difficultyDamageMultiplier);
             Destroy(gameObject);
             return;
         }

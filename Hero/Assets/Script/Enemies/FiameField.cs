@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Reflection;
 
 
-public class FlameField : MonoBehaviour
+public class FlameField : MonoBehaviour, IDifficultyScaledEnemyDamage
 {
     [Header("Movement (projectile)")]
     [SerializeField] private float speed = 10f;
@@ -37,9 +37,21 @@ public class FlameField : MonoBehaviour
     private Collider2D[] hits = new Collider2D[32];
     private GameObject burnVfxInstance;
     private ContactFilter2D damageFilter;
+    private float difficultyDamageMultiplier = 1f;
+
+    public void SetDifficultyDamageMultiplier(float multiplier)
+    {
+        difficultyDamageMultiplier = Mathf.Max(0f, multiplier);
+    }
 
     private void Awake()
     {
+        difficultyDamageMultiplier = EnemyDifficultyProfile.GetDefaultDamageMultiplier();
+        EnemyDifficultyProfile sourceProfile =
+            GetComponentInParent<EnemyDifficultyProfile>();
+        if (sourceProfile != null)
+            difficultyDamageMultiplier = sourceProfile.DamageMultiplier;
+
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
 
@@ -115,7 +127,7 @@ public class FlameField : MonoBehaviour
             int count = Physics2D.OverlapCircle((Vector2)transform.position, explosionRadius, damageFilter, hits);
 
             for (int i = 0; i < count; i++)
-                TryDealDamage(hits[i], explosionDamage);
+                TryDealDamage(hits[i], explosionDamage * difficultyDamageMultiplier);
         }
         // switch collider to burn area
         if (col is CircleCollider2D cc)
@@ -150,7 +162,7 @@ public class FlameField : MonoBehaviour
             float dt = tickInterval;
             tickTimer = 0f;
 
-            float dmg = damagePerSecond * dt;
+            float dmg = damagePerSecond * dt * difficultyDamageMultiplier;
 
             damageFilter.SetLayerMask(damageLayers);
             int count = Physics2D.OverlapCircle((Vector2)transform.position, burnRadius, damageFilter, hits);

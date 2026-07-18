@@ -30,6 +30,7 @@ public class EnemyAttack : MonoBehaviour
     private bool isWindingUp;
     private GameObject telegraphInstance;
     private EnemyAggro2D aggro;
+    private EnemyDifficultyProfile difficultyProfile;
 
     void Start()
     {
@@ -47,6 +48,10 @@ public class EnemyAttack : MonoBehaviour
 
         aggro = GetComponent<EnemyAggro2D>();
         if (aggro == null) aggro = gameObject.AddComponent<EnemyAggro2D>();
+
+        difficultyProfile = GetComponentInParent<EnemyDifficultyProfile>();
+        if (difficultyProfile == null)
+            difficultyProfile = GetComponentInChildren<EnemyDifficultyProfile>(true);
     }
 
     void Update()
@@ -147,7 +152,10 @@ public class EnemyAttack : MonoBehaviour
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         Quaternion rotation = Quaternion.Euler(0, 0, angle);
 
-        Instantiate(fireballPrefab, firePoint.position, rotation);
+        GameObject projectile = Instantiate(
+            fireballPrefab, firePoint.position, rotation);
+        if (difficultyProfile != null)
+            difficultyProfile.ApplyToSpawnedDamage(projectile);
     }
 
     private void UpdateFacing(Vector2 direction)

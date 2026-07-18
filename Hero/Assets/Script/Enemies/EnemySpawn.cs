@@ -35,11 +35,24 @@ public class EnemySpawn : MonoBehaviour
     public float spawnInterval = 3.0f;
 
     [Header("Spawn Limits")]
-    [Tooltip("Det maksimale antal fjender der må være på én gang.")]
-    [SerializeField] private int maxSpawn = 10;
+    [Tooltip("Easy baseline. Det maksimale antal fjender der må være på én gang.")]
+    [SerializeField] private int maxSpawn = 12;
 
-    [Tooltip("Hvis antallet af fjender kommer under dette tal, begynder vi at spawne igen.")]
+    [Tooltip("Easy baseline. Hvis antallet kommer under dette tal, begynder spawning igen.")]
     [SerializeField] private int minSpawn = 3;
+
+    [Header("Difficulty Spawn Limits")]
+    [Tooltip("Normal difficulty. Spawn interval and spawn distance are not changed.")]
+    [SerializeField] private int normalMinSpawn = 4;
+    [SerializeField] private int normalMaxSpawn = 15;
+
+    [Tooltip("Hard difficulty. Spawn interval and spawn distance are not changed.")]
+    [SerializeField] private int hardMinSpawn = 6;
+    [SerializeField] private int hardMaxSpawn = 18;
+
+    [Tooltip("Nightmare difficulty. Spawn interval and spawn distance are not changed.")]
+    [SerializeField] private int nightmareMinSpawn = 8;
+    [SerializeField] private int nightmareMaxSpawn = 22;
 
     [Header("Offscreen Spawn Area")]
     [Tooltip("Camera used to keep normal enemy spawning outside the visible screen. Auto-finds Camera.main if empty.")]
@@ -77,16 +90,18 @@ public class EnemySpawn : MonoBehaviour
 
     void Update()
     {
+        GetActiveSpawnLimits(out int activeMinSpawn, out int activeMaxSpawn);
+
         // Husk at dine fjender skal have tagget "Enemy"
         int currentEnemyCount = EnemyCounter.Count;
 
         bool wasActive = isSpawningActive;
 
-        if (currentEnemyCount >= maxSpawn)
+        if (currentEnemyCount >= activeMaxSpawn)
         {
             isSpawningActive = false;
         }
-        else if (currentEnemyCount <= minSpawn)
+        else if (currentEnemyCount <= activeMinSpawn)
         {
             isSpawningActive = true;
         }
@@ -101,7 +116,7 @@ public class EnemySpawn : MonoBehaviour
             return;
 
         // Safety: hvis vi allerede er på max, spawn ikke (selv hvis timer rammer 0)
-        if (currentEnemyCount >= maxSpawn)
+        if (currentEnemyCount >= activeMaxSpawn)
             return;
 
         timer -= Time.deltaTime;
@@ -109,6 +124,29 @@ public class EnemySpawn : MonoBehaviour
         {
             SpawnEnemy();
             timer = spawnInterval;
+        }
+    }
+
+    private void GetActiveSpawnLimits(out int activeMin, out int activeMax)
+    {
+        switch (DifficultyManager.CurrentDifficulty)
+        {
+            case GameDifficulty.Normal:
+                activeMin = normalMinSpawn;
+                activeMax = normalMaxSpawn;
+                break;
+            case GameDifficulty.Hard:
+                activeMin = hardMinSpawn;
+                activeMax = hardMaxSpawn;
+                break;
+            case GameDifficulty.Nightmare:
+                activeMin = nightmareMinSpawn;
+                activeMax = nightmareMaxSpawn;
+                break;
+            default:
+                activeMin = minSpawn;
+                activeMax = maxSpawn;
+                break;
         }
     }
 
@@ -177,6 +215,12 @@ public class EnemySpawn : MonoBehaviour
         spawnInterval = Mathf.Max(0.01f, spawnInterval);
         maxSpawn = Mathf.Max(1, maxSpawn);
         minSpawn = Mathf.Clamp(minSpawn, 0, maxSpawn);
+        normalMaxSpawn = Mathf.Max(1, normalMaxSpawn);
+        normalMinSpawn = Mathf.Clamp(normalMinSpawn, 0, normalMaxSpawn);
+        hardMaxSpawn = Mathf.Max(1, hardMaxSpawn);
+        hardMinSpawn = Mathf.Clamp(hardMinSpawn, 0, hardMaxSpawn);
+        nightmareMaxSpawn = Mathf.Max(1, nightmareMaxSpawn);
+        nightmareMinSpawn = Mathf.Clamp(nightmareMinSpawn, 0, nightmareMaxSpawn);
         minimumSpawnDistance = Mathf.Max(0f, minimumSpawnDistance);
         maximumSpawnDistance = Mathf.Max(minimumSpawnDistance + 0.1f, maximumSpawnDistance);
         offscreenPadding = Mathf.Max(0f, offscreenPadding);
