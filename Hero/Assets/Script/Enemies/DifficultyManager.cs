@@ -72,7 +72,7 @@ public class DifficultyManager : MonoBehaviour
         return (GameDifficulty)Mathf.Clamp(
             value,
             (int)GameDifficulty.Easy,
-            (int)GameDifficulty.Nightmare);
+            (int)GameDifficulty.Extreme);
     }
 
     private static T FindAnyObjectByType<T>() where T : UnityEngine.Object

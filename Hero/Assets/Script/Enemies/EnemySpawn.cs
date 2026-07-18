@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class EnemySpawn : MonoBehaviour
 {
+    private const int CurrentDifficultySpawnVersion = 2;
+
     [System.Serializable]
     public class EnemySpawnEntry
     {
@@ -49,6 +51,13 @@ public class EnemySpawn : MonoBehaviour
     [Tooltip("Hard difficulty. Spawn interval and spawn distance are not changed.")]
     [SerializeField] private int hardMinSpawn = 6;
     [SerializeField] private int hardMaxSpawn = 18;
+
+    [Tooltip("Keeps Extreme spawn limits halfway between Hard and Nightmare.")]
+    [SerializeField] private bool calculateExtremeSpawnAsMidpoint = true;
+    [SerializeField, HideInInspector] private int difficultySpawnVersion =
+        CurrentDifficultySpawnVersion;
+    [SerializeField] private int extremeMinSpawn = 7;
+    [SerializeField] private int extremeMaxSpawn = 20;
 
     [Tooltip("Nightmare difficulty. Spawn interval and spawn distance are not changed.")]
     [SerializeField] private int nightmareMinSpawn = 8;
@@ -157,6 +166,21 @@ public class EnemySpawn : MonoBehaviour
                 activeMin = hardMinSpawn;
                 activeMax = hardMaxSpawn;
                 break;
+            case GameDifficulty.Extreme:
+                if (difficultySpawnVersion < CurrentDifficultySpawnVersion ||
+                    calculateExtremeSpawnAsMidpoint)
+                {
+                    activeMin = Mathf.RoundToInt(
+                        (hardMinSpawn + nightmareMinSpawn) * 0.5f);
+                    activeMax = Mathf.RoundToInt(
+                        (hardMaxSpawn + nightmareMaxSpawn) * 0.5f);
+                }
+                else
+                {
+                    activeMin = extremeMinSpawn;
+                    activeMax = extremeMaxSpawn;
+                }
+                break;
             case GameDifficulty.Nightmare:
                 activeMin = nightmareMinSpawn;
                 activeMax = nightmareMaxSpawn;
@@ -230,6 +254,12 @@ public class EnemySpawn : MonoBehaviour
 
     private void OnValidate()
     {
+        if (difficultySpawnVersion < CurrentDifficultySpawnVersion)
+        {
+            calculateExtremeSpawnAsMidpoint = true;
+            difficultySpawnVersion = CurrentDifficultySpawnVersion;
+        }
+
         spawnInterval = Mathf.Max(0.01f, spawnInterval);
         maxSpawn = Mathf.Max(1, maxSpawn);
         minSpawn = Mathf.Clamp(minSpawn, 0, maxSpawn);
@@ -237,6 +267,8 @@ public class EnemySpawn : MonoBehaviour
         normalMinSpawn = Mathf.Clamp(normalMinSpawn, 0, normalMaxSpawn);
         hardMaxSpawn = Mathf.Max(1, hardMaxSpawn);
         hardMinSpawn = Mathf.Clamp(hardMinSpawn, 0, hardMaxSpawn);
+        extremeMaxSpawn = Mathf.Max(1, extremeMaxSpawn);
+        extremeMinSpawn = Mathf.Clamp(extremeMinSpawn, 0, extremeMaxSpawn);
         nightmareMaxSpawn = Mathf.Max(1, nightmareMaxSpawn);
         nightmareMinSpawn = Mathf.Clamp(nightmareMinSpawn, 0, nightmareMaxSpawn);
         minimumSpawnDistance = Mathf.Max(0f, minimumSpawnDistance);

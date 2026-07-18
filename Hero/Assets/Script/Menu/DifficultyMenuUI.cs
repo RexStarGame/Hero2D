@@ -8,6 +8,7 @@ public class DifficultyMenuUI : MonoBehaviour
     [SerializeField] private Button easyButton;
     [SerializeField] private Button normalButton;
     [SerializeField] private Button hardButton;
+    [SerializeField] private Button extremeButton;
     [SerializeField] private Button nightmareButton;
 
     [Header("Status and confirmation")]
@@ -29,6 +30,7 @@ public class DifficultyMenuUI : MonoBehaviour
         AddButtonListener(easyButton, GameDifficulty.Easy);
         AddButtonListener(normalButton, GameDifficulty.Normal);
         AddButtonListener(hardButton, GameDifficulty.Hard);
+        AddButtonListener(extremeButton, GameDifficulty.Extreme);
         AddButtonListener(nightmareButton, GameDifficulty.Nightmare);
 
         if (confirmButton != null)
@@ -56,6 +58,7 @@ public class DifficultyMenuUI : MonoBehaviour
     public void RequestEasy() => RequestDifficulty(GameDifficulty.Easy);
     public void RequestNormal() => RequestDifficulty(GameDifficulty.Normal);
     public void RequestHard() => RequestDifficulty(GameDifficulty.Hard);
+    public void RequestExtreme() => RequestDifficulty(GameDifficulty.Extreme);
     public void RequestNightmare() => RequestDifficulty(GameDifficulty.Nightmare);
 
     public void ShowMenu()
@@ -104,6 +107,7 @@ public class DifficultyMenuUI : MonoBehaviour
         Button easy,
         Button normal,
         Button hard,
+        Button extreme,
         Button nightmare,
         TMP_Text current,
         GameObject confirmation,
@@ -114,6 +118,7 @@ public class DifficultyMenuUI : MonoBehaviour
         easyButton = easy;
         normalButton = normal;
         hardButton = hard;
+        extremeButton = extreme;
         nightmareButton = nightmare;
         currentDifficultyText = current;
         confirmationPanel = confirmation;
@@ -142,6 +147,7 @@ public class DifficultyMenuUI : MonoBehaviour
         SetSelected(easyButton, current == GameDifficulty.Easy);
         SetSelected(normalButton, current == GameDifficulty.Normal);
         SetSelected(hardButton, current == GameDifficulty.Hard);
+        SetSelected(extremeButton, current == GameDifficulty.Extreme);
         SetSelected(nightmareButton, current == GameDifficulty.Nightmare);
     }
 

@@ -32,8 +32,14 @@ public static class DifficultySceneSetupEditor
         if (!scene.IsValid() || !scene.isLoaded || scene.path != ScenePath)
             return;
 
-        if (FindSceneObject(scene, "DifficultyPanel") != null)
+        GameObject existingPanel = FindSceneObject(scene, "DifficultyPanel");
+        if (existingPanel != null)
+        {
+            AddProfilesToEnemyPrefabs();
+            if (existingPanel.transform.Find("Extreme") == null)
+                UpgradeExistingDifficultyUI(scene, existingPanel);
             return;
+        }
 
         CompleteDifficultySetup();
     }
@@ -53,7 +59,11 @@ public static class DifficultySceneSetupEditor
         }
 
         AddProfilesToEnemyPrefabs();
-        CreateDifficultyUI(pauseMenu.transform);
+        Transform existingPanel = pauseMenu.transform.Find("DifficultyPanel");
+        if (existingPanel != null && existingPanel.Find("Extreme") == null)
+            UpgradeExistingDifficultyUI(scene, existingPanel.gameObject);
+        else if (existingPanel == null)
+            CreateDifficultyUI(pauseMenu.transform);
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
@@ -80,12 +90,36 @@ public static class DifficultySceneSetupEditor
             {
                 bool isEnemy = root.GetComponentInChildren<EnemyHealth>(true) != null;
                 bool isBoss = root.GetComponentInChildren<BossHealth>(true) != null;
-                if ((!isEnemy && !isBoss) ||
-                    root.GetComponent<EnemyDifficultyProfile>() != null)
+                if (!isEnemy && !isBoss)
                     continue;
 
-                root.AddComponent<EnemyDifficultyProfile>();
-                PrefabUtility.SaveAsPrefabAsset(root, path);
+                bool changed = false;
+                EnemyDifficultyProfile profile =
+                    root.GetComponent<EnemyDifficultyProfile>();
+                if (profile == null)
+                {
+                    profile = root.AddComponent<EnemyDifficultyProfile>();
+                    changed = true;
+                }
+
+                SerializedObject serializedProfile =
+                    new SerializedObject(profile);
+                SerializedProperty version =
+                    serializedProfile.FindProperty("profileVersion");
+                SerializedProperty automaticMidpoint =
+                    serializedProfile.FindProperty("calculateExtremeAsMidpoint");
+
+                if (version != null && version.intValue < 2)
+                {
+                    if (automaticMidpoint != null)
+                        automaticMidpoint.boolValue = true;
+                    version.intValue = 2;
+                    serializedProfile.ApplyModifiedPropertiesWithoutUndo();
+                    changed = true;
+                }
+
+                if (changed)
+                    PrefabUtility.SaveAsPrefabAsset(root, path);
             }
             finally
             {
@@ -128,13 +162,21 @@ public static class DifficultySceneSetupEditor
             new Vector2(0f, 105f), new Vector2(520f, 34f));
 
         Button easy = CreateButton(
-            "Easy", panel.transform, "EASY", new Vector2(-210f, 52f));
+            "Easy", panel.transform, "EASY", new Vector2(-232f, 52f));
         Button normal = CreateButton(
-            "Normal", panel.transform, "NORMAL", new Vector2(-70f, 52f));
+            "Normal", panel.transform, "NORMAL", new Vector2(-116f, 52f));
         Button hard = CreateButton(
-            "Hard", panel.transform, "HARD", new Vector2(70f, 52f));
+            "Hard", panel.transform, "HARD", new Vector2(0f, 52f));
+        Button extreme = CreateButton(
+            "Extreme", panel.transform, "EXTREME", new Vector2(116f, 52f));
         Button nightmare = CreateButton(
-            "Nightmare", panel.transform, "NIGHTMARE", new Vector2(210f, 52f));
+            "Nightmare", panel.transform, "NIGHTMARE", new Vector2(232f, 52f));
+
+        SetDifficultyButtonWidth(easy);
+        SetDifficultyButtonWidth(normal);
+        SetDifficultyButtonWidth(hard);
+        SetDifficultyButtonWidth(extreme);
+        SetDifficultyButtonWidth(nightmare);
 
         TMP_Text summary = CreateText(
             "DifficultySummary", panel.transform,
@@ -161,7 +203,7 @@ public static class DifficultySceneSetupEditor
             "Cancel", confirmation.transform, "CANCEL", new Vector2(85f, -76f));
 
         menu.Configure(
-            easy, normal, hard, nightmare, current,
+            easy, normal, hard, extreme, nightmare, current,
             confirmation, warning, confirm, cancel);
 
         UnityEventTools.AddPersistentListener(openButton.onClick, menu.ShowMenu);
@@ -170,6 +212,107 @@ public static class DifficultySceneSetupEditor
         confirmation.SetActive(false);
         panel.SetActive(false);
         EditorUtility.SetDirty(menu);
+    }
+
+    private static void UpgradeExistingDifficultyUI(
+        Scene scene, GameObject panel)
+    {
+        DifficultyMenuUI menu = panel.GetComponent<DifficultyMenuUI>();
+        if (menu == null)
+            menu = Undo.AddComponent<DifficultyMenuUI>(panel);
+
+        Button easy = GetButton(panel.transform, "Easy");
+        Button normal = GetButton(panel.transform, "Normal");
+        Button hard = GetButton(panel.transform, "Hard");
+        Button nightmare = GetButton(panel.transform, "Nightmare");
+
+        if (easy == null || normal == null || hard == null || nightmare == null)
+        {
+            Debug.LogWarning(
+                "[Difficulty Setup] Existing DifficultyPanel is missing one of " +
+                "the original buttons. Run Complete Difficulty System manually.");
+            return;
+        }
+
+        SetButtonPosition(easy, -232f);
+        SetButtonPosition(normal, -116f);
+        SetButtonPosition(hard, 0f);
+        SetButtonPosition(nightmare, 232f);
+
+        Button extreme = CreateButton(
+            "Extreme", panel.transform, "EXTREME", new Vector2(116f, 52f));
+
+        SetDifficultyButtonWidth(easy);
+        SetDifficultyButtonWidth(normal);
+        SetDifficultyButtonWidth(hard);
+        SetDifficultyButtonWidth(extreme);
+        SetDifficultyButtonWidth(nightmare);
+
+        Transform confirmationTransform = panel.transform.Find("Confirmation");
+        GameObject confirmation = confirmationTransform != null
+            ? confirmationTransform.gameObject
+            : null;
+
+        menu.Configure(
+            easy,
+            normal,
+            hard,
+            extreme,
+            nightmare,
+            GetText(panel.transform, "CurrentDifficulty"),
+            confirmation,
+            confirmationTransform != null
+                ? GetText(confirmationTransform, "Warning")
+                : null,
+            confirmationTransform != null
+                ? GetButton(confirmationTransform, "Confirm")
+                : null,
+            confirmationTransform != null
+                ? GetButton(confirmationTransform, "Cancel")
+                : null);
+
+        EditorUtility.SetDirty(menu);
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        AssetDatabase.SaveAssets();
+
+        Debug.Log(
+            "[Difficulty Setup] Existing Pause Menu upgraded with Extreme " +
+            "between Hard and Nightmare.");
+    }
+
+    private static Button GetButton(Transform parent, string childName)
+    {
+        Transform child = parent.Find(childName);
+        return child != null ? child.GetComponent<Button>() : null;
+    }
+
+    private static TMP_Text GetText(Transform parent, string childName)
+    {
+        Transform child = parent.Find(childName);
+        return child != null ? child.GetComponent<TMP_Text>() : null;
+    }
+
+    private static void SetButtonPosition(Button button, float x)
+    {
+        RectTransform rect = button.GetComponent<RectTransform>();
+        rect.anchoredPosition = new Vector2(x, 52f);
+    }
+
+    private static void SetDifficultyButtonWidth(Button button)
+    {
+        if (button == null)
+            return;
+
+        RectTransform rect = button.GetComponent<RectTransform>();
+        rect.sizeDelta = new Vector2(108f, 42f);
+
+        TMP_Text label = button.GetComponentInChildren<TMP_Text>(true);
+        if (label != null)
+        {
+            label.fontSize = 15f;
+            label.GetComponent<RectTransform>().sizeDelta = new Vector2(102f, 38f);
+        }
     }
 
     private static GameObject CreatePanel(

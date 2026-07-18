@@ -9,6 +9,8 @@ public interface IDifficultyScaledEnemyDamage
 [DisallowMultipleComponent]
 public class EnemyDifficultyProfile : MonoBehaviour
 {
+    private const int CurrentProfileVersion = 2;
+
     [Serializable]
     public struct DifficultyModifiers
     {
@@ -32,6 +34,17 @@ public class EnemyDifficultyProfile : MonoBehaviour
         new DifficultyModifiers(10f, 5f);
     [SerializeField] private DifficultyModifiers hard =
         new DifficultyModifiers(30f, 20f);
+
+    [Tooltip("Keeps Extreme exactly halfway between this prefab's Hard and Nightmare values.")]
+    [SerializeField] private bool calculateExtremeAsMidpoint = true;
+
+    [SerializeField, HideInInspector] private int profileVersion =
+        CurrentProfileVersion;
+
+    [Tooltip("Used only when Calculate Extreme As Midpoint is disabled.")]
+    [SerializeField] private DifficultyModifiers extreme =
+        new DifficultyModifiers(45f, 30f);
+
     [SerializeField] private DifficultyModifiers nightmare =
         new DifficultyModifiers(60f, 40f);
 
@@ -74,6 +87,7 @@ public class EnemyDifficultyProfile : MonoBehaviour
         {
             case GameDifficulty.Normal: return 1.05f;
             case GameDifficulty.Hard: return 1.20f;
+            case GameDifficulty.Extreme: return 1.30f;
             case GameDifficulty.Nightmare: return 1.40f;
             default: return 1f;
         }
@@ -85,13 +99,37 @@ public class EnemyDifficultyProfile : MonoBehaviour
         {
             case GameDifficulty.Normal: return normal;
             case GameDifficulty.Hard: return hard;
+            case GameDifficulty.Extreme:
+                return profileVersion < CurrentProfileVersion ||
+                       calculateExtremeAsMidpoint
+                    ? Midpoint(hard, nightmare)
+                    : extreme;
             case GameDifficulty.Nightmare: return nightmare;
             default: return easy;
         }
     }
 
+    private static DifficultyModifiers Midpoint(
+        DifficultyModifiers lower, DifficultyModifiers upper)
+    {
+        return new DifficultyModifiers(
+            (lower.bonusHealthPercent + upper.bonusHealthPercent) * 0.5f,
+            (lower.bonusDamagePercent + upper.bonusDamagePercent) * 0.5f);
+    }
+
     private static float PercentToMultiplier(float bonusPercent)
     {
         return Mathf.Max(0.01f, 1f + bonusPercent / 100f);
+    }
+
+    private void OnValidate()
+    {
+        if (profileVersion >= CurrentProfileVersion)
+            return;
+
+        // Existing four-mode prefabs have no serialized Extreme fields yet.
+        // Migrate them safely to an exact Hard/Nightmare midpoint.
+        calculateExtremeAsMidpoint = true;
+        profileVersion = CurrentProfileVersion;
     }
 }

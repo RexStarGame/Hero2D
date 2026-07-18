@@ -61,6 +61,7 @@ public class DifficultyDebugHUD : MonoBehaviour
         DrawDifficultyButton(GameDifficulty.Easy);
         DrawDifficultyButton(GameDifficulty.Normal);
         DrawDifficultyButton(GameDifficulty.Hard);
+        DrawDifficultyButton(GameDifficulty.Extreme);
         DrawDifficultyButton(GameDifficulty.Nightmare);
         GUILayout.EndHorizontal();
 
@@ -104,8 +105,8 @@ public class DifficultyDebugHUD : MonoBehaviour
 
         GUILayout.EndScrollView();
         GUILayout.Label(
-            "Expected defaults: Easy 0/0%, Normal +10/+5%, " +
-            "Hard +30/+20%, Nightmare +60/+40% (HP/Damage).");
+            "Extreme uses the midpoint of each prefab's Hard and Nightmare " +
+            "HP/Damage values unless its midpoint option is disabled.");
         GUILayout.Label("F8 closes this panel. Values update while the game is paused too.");
         GUILayout.EndVertical();
 
