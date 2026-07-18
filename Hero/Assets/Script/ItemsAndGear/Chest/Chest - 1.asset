@@ -30,4 +30,5 @@ MonoBehaviour:
     criticalChance: 0
     attackSpeed: 0
     movementSpeed: 0.05
+    experienceGain: 0
   armorRating: 0

@@ -30,3 +30,4 @@ MonoBehaviour:
     criticalChance: 0.05
     attackSpeed: 0
     movementSpeed: 0.04
+    experienceGain: 0.03

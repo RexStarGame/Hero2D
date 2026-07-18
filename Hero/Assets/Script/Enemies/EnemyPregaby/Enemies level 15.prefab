@@ -51,6 +51,7 @@ GameObject:
   - component: {fileID: 6278456148619787416}
   - component: {fileID: 5875407986748143557}
   - component: {fileID: 7037393355130618739}
+  - component: {fileID: 7153433171709013768}
   m_Layer: 3
   m_Name: Enemies level 15
   m_TagString: Enemy
@@ -216,6 +217,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 3
   waitTime: 2
+  detectionRange: 6
+  giveUpRange: 10
+  chaseStopDistance: 0.9
+  chaseSpeedMultiplier: 1.15
+  routeValidationInterval: 0.2
+  stuckTimeout: 1
+  minimumProgressDistance: 0.05
+  showPatrolTarget: 1
 --- !u!95 &1378482468039930319
 Animator:
   serializedVersion: 7
@@ -336,3 +345,27 @@ MonoBehaviour:
   minCoins: 30
   maxCoins: 84
   wallet: {fileID: 0}
+--- !u!114 &7153433171709013768
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8233854846743954295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1f5977c97154415b18d83abfa20cdf6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  easy:
+    bonusHealthPercent: 0
+    bonusDamagePercent: 0
+  normal:
+    bonusHealthPercent: 10
+    bonusDamagePercent: 5
+  hard:
+    bonusHealthPercent: 30
+    bonusDamagePercent: 20
+  nightmare:
+    bonusHealthPercent: 60
+    bonusDamagePercent: 40
