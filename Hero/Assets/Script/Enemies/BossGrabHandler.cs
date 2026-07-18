@@ -272,6 +272,8 @@ public class BossGrabHandler : MonoBehaviour
         float scaledDamage = difficultyProfile != null
             ? difficultyProfile.ScaleDamage(damage)
             : damage * EnemyDifficultyProfile.GetDefaultDamageMultiplier();
+        DifficultyDebugTelemetry.RecordEnemyDamage(
+            this, damage, scaledDamage);
         player.gameObject.SendMessage(
             "TakeDamage", scaledDamage, SendMessageOptions.DontRequireReceiver);
 

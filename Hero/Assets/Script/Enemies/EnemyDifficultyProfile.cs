@@ -41,6 +41,12 @@ public class EnemyDifficultyProfile : MonoBehaviour
     public float DamageMultiplier =>
         PercentToMultiplier(GetCurrentModifiers().bonusDamagePercent);
 
+    public float CurrentHealthBonusPercent =>
+        GetCurrentModifiers().bonusHealthPercent;
+
+    public float CurrentDamageBonusPercent =>
+        GetCurrentModifiers().bonusDamagePercent;
+
     public float ScaleDamage(float baseDamage)
     {
         return Mathf.Max(0f, baseDamage) * DamageMultiplier;

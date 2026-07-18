@@ -67,7 +67,13 @@ public class EnemyBullet : MonoBehaviour, IDifficultyScaledEnemyDamage
         if (((1 << layer) & damageLayers) != 0)
         {
             var hp = other.GetComponentInParent<PlayerHealth>();
-            if (hp != null) hp.TakeDamage(damage * difficultyDamageMultiplier);
+            if (hp != null)
+            {
+                float scaledDamage = damage * difficultyDamageMultiplier;
+                DifficultyDebugTelemetry.RecordEnemyDamage(
+                    this, damage, scaledDamage);
+                hp.TakeDamage(scaledDamage);
+            }
             Destroy(gameObject);
             return;
         }

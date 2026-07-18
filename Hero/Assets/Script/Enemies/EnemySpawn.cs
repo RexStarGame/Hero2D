@@ -82,6 +82,24 @@ public class EnemySpawn : MonoBehaviour
     private float timer;
     private bool isSpawningActive = true;
 
+    public int ActiveMinSpawn
+    {
+        get
+        {
+            GetActiveSpawnLimits(out int activeMin, out _);
+            return activeMin;
+        }
+    }
+
+    public int ActiveMaxSpawn
+    {
+        get
+        {
+            GetActiveSpawnLimits(out _, out int activeMax);
+            return activeMax;
+        }
+    }
+
     void Start()
     {
         AutoFindSpawnReferences();

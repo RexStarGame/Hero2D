@@ -9,6 +9,7 @@ public class BossHealth : MonoBehaviour
     [SerializeField] private float currentHealth;
     public float CurrentHealth => currentHealth;
     public float MaxHealth => maxHealth;
+    public float BaseMaxHealth => baseMaxHealth > 0f ? baseMaxHealth : maxHealth;
 
     [Header("Optional")]
     public bool destroyOnDeath = true;

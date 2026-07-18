@@ -127,7 +127,7 @@ public class FlameField : MonoBehaviour, IDifficultyScaledEnemyDamage
             int count = Physics2D.OverlapCircle((Vector2)transform.position, explosionRadius, damageFilter, hits);
 
             for (int i = 0; i < count; i++)
-                TryDealDamage(hits[i], explosionDamage * difficultyDamageMultiplier);
+                TryDealDamage(hits[i], explosionDamage);
         }
         // switch collider to burn area
         if (col is CircleCollider2D cc)
@@ -162,7 +162,7 @@ public class FlameField : MonoBehaviour, IDifficultyScaledEnemyDamage
             float dt = tickInterval;
             tickTimer = 0f;
 
-            float dmg = damagePerSecond * dt * difficultyDamageMultiplier;
+            float dmg = damagePerSecond * dt;
 
             damageFilter.SetLayerMask(damageLayers);
             int count = Physics2D.OverlapCircle((Vector2)transform.position, burnRadius, damageFilter, hits);
@@ -184,6 +184,8 @@ public class FlameField : MonoBehaviour, IDifficultyScaledEnemyDamage
     {
         if (targetCol == null) return;
 
+        float scaledDamage = dmg * difficultyDamageMultiplier;
+
         // Find en MonoBehaviour p� target og pr�v at kalde TakeDamage(float)
         var behaviours = targetCol.GetComponents<MonoBehaviour>();
         for (int i = 0; i < behaviours.Length; i++)
@@ -197,7 +199,9 @@ public class FlameField : MonoBehaviour, IDifficultyScaledEnemyDamage
             MethodInfo mFloat = t.GetMethod(damageMethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new[] { typeof(float) }, null);
             if (mFloat != null)
             {
-                mFloat.Invoke(b, new object[] { dmg });
+                DifficultyDebugTelemetry.RecordEnemyDamage(
+                    this, dmg, scaledDamage);
+                mFloat.Invoke(b, new object[] { scaledDamage });
                 return;
             }
         }

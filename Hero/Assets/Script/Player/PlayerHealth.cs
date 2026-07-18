@@ -106,8 +106,11 @@ public class PlayerHealth : MonoBehaviour
 
         if (damage <= 0f) return;
 
+        float incomingDifficultyDamage = damage;
         float reduction = Defense / (Defense + 100f);
         damage *= 1f - reduction;
+        DifficultyDebugTelemetry.RecordDamageAfterDefense(
+            incomingDifficultyDamage, damage);
         health = Mathf.Clamp(health - damage, 0f, MaxHealth);
 
         UpdateHealthUI(false);

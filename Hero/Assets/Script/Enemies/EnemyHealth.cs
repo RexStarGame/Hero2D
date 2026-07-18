@@ -22,6 +22,7 @@ public class EnemyHealth : MonoBehaviour
 
     public int CurrentHealth => currentHealth;
     public int MaxHealth => difficultyMaxHealth;
+    public int BaseMaxHealth => maxHealth;
 
     private void Awake()
     {

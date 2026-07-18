@@ -480,6 +480,8 @@ public class BossStompAoeTelegraph2D : MonoBehaviour
             float scaledDamage = difficultyProfile != null
                 ? difficultyProfile.ScaleDamage(damage)
                 : damage * EnemyDifficultyProfile.GetDefaultDamageMultiplier();
+            DifficultyDebugTelemetry.RecordEnemyDamage(
+                this, damage, scaledDamage);
             hp.TakeDamage(scaledDamage);
 
             // Knockback (brug rb på parent hvis child collider ikke har rb)

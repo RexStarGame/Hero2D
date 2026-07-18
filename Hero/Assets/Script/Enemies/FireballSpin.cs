@@ -93,7 +93,10 @@ public class FireballSpin : MonoBehaviour, IDifficultyScaledEnemyDamage
             PlayerHealth health = other.GetComponentInParent<PlayerHealth>();
             if (health != null)
             {
-                health.TakeDamage(damage * difficultyDamageMultiplier);
+                float scaledDamage = damage * difficultyDamageMultiplier;
+                DifficultyDebugTelemetry.RecordEnemyDamage(
+                    this, damage, scaledDamage);
+                health.TakeDamage(scaledDamage);
                 Destroy(gameObject);
             }
         }
