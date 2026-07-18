@@ -21,6 +21,7 @@ public class StorePanelUI : MonoBehaviour
     [SerializeField] private Image previewIcon;
     [SerializeField] private TMP_Text titleText;
     [SerializeField] private TMP_Text detailsText;
+    [SerializeField] private ScrollRect detailsScrollRect;
     [SerializeField] private TMP_Text priceText;
     [SerializeField] private TMP_Text balanceText;
     [SerializeField] private TMP_Text feedbackText;
@@ -40,6 +41,7 @@ public class StorePanelUI : MonoBehaviour
     private void Awake()
     {
         AutoFindPlayer();
+        EnsureDetailsScrollArea();
 
         if (buyButton != null)
         {
@@ -229,7 +231,10 @@ public class StorePanelUI : MonoBehaviour
         }
 
         if (detailsText != null)
+        {
             detailsText.text = details.ToString();
+            RefreshDetailsScroll();
+        }
 
         if (priceText != null)
             priceText.text = $"Price: <color=#FFD166>{item.GoldValue} gold</color>";
@@ -263,7 +268,10 @@ public class StorePanelUI : MonoBehaviour
             titleText.text = "Select an item";
 
         if (detailsText != null)
+        {
             detailsText.text = string.Empty;
+            RefreshDetailsScroll();
+        }
 
         if (priceText != null)
             priceText.text = string.Empty;
@@ -292,6 +300,179 @@ public class StorePanelUI : MonoBehaviour
         feedbackText.text = string.IsNullOrEmpty(message)
             ? string.Empty
             : $"<color={color}>{message}</color>";
+    }
+
+    private void EnsureDetailsScrollArea()
+    {
+        if (detailsText == null)
+            return;
+
+        if (detailsScrollRect == null)
+            detailsScrollRect = detailsText.GetComponentInParent<ScrollRect>();
+
+        if (detailsScrollRect == null)
+            detailsScrollRect = CreateDetailsScrollArea(detailsText);
+
+        if (detailsScrollRect == null)
+            return;
+
+        detailsScrollRect.horizontal = false;
+        detailsScrollRect.vertical = true;
+        detailsScrollRect.movementType = ScrollRect.MovementType.Clamped;
+        detailsScrollRect.inertia = true;
+        detailsScrollRect.decelerationRate = 0.135f;
+        detailsScrollRect.scrollSensitivity = 24f;
+        detailsScrollRect.verticalScrollbarVisibility =
+            ScrollRect.ScrollbarVisibility.AutoHideAndExpandViewport;
+
+        detailsText.enableWordWrapping = true;
+        detailsText.overflowMode = TextOverflowModes.Overflow;
+        detailsText.raycastTarget = false;
+        detailsText.margin = Vector4.zero;
+    }
+
+    private ScrollRect CreateDetailsScrollArea(TMP_Text text)
+    {
+        RectTransform textRect = text.rectTransform;
+        RectTransform oldParent = textRect.parent as RectTransform;
+        if (oldParent == null)
+            return null;
+
+        int siblingIndex = textRect.GetSiblingIndex();
+
+        GameObject scrollObject = new GameObject(
+            "SelectedItemDetailsScrollView",
+            typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(ScrollRect));
+        RectTransform scrollRectTransform = scrollObject.GetComponent<RectTransform>();
+        scrollRectTransform.SetParent(oldParent, false);
+        scrollRectTransform.SetSiblingIndex(siblingIndex);
+        CopyRectTransform(textRect, scrollRectTransform);
+
+        Image scrollRaycastArea = scrollObject.GetComponent<Image>();
+        scrollRaycastArea.color = new Color(0f, 0f, 0f, 0f);
+        scrollRaycastArea.raycastTarget = true;
+
+        GameObject viewportObject = new GameObject(
+            "Viewport", typeof(RectTransform), typeof(RectMask2D));
+        RectTransform viewport = viewportObject.GetComponent<RectTransform>();
+        viewport.SetParent(scrollRectTransform, false);
+        Stretch(viewport);
+
+        GameObject contentObject = new GameObject(
+            "Content", typeof(RectTransform), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
+        RectTransform content = contentObject.GetComponent<RectTransform>();
+        content.SetParent(viewport, false);
+        content.anchorMin = new Vector2(0f, 1f);
+        content.anchorMax = new Vector2(1f, 1f);
+        content.pivot = new Vector2(0.5f, 1f);
+        content.anchoredPosition = Vector2.zero;
+        content.sizeDelta = Vector2.zero;
+
+        VerticalLayoutGroup layout = contentObject.GetComponent<VerticalLayoutGroup>();
+        layout.padding = new RectOffset(2, 2, 2, 2);
+        layout.spacing = 0f;
+        layout.childAlignment = TextAnchor.UpperLeft;
+        layout.childControlWidth = true;
+        layout.childControlHeight = true;
+        layout.childForceExpandWidth = true;
+        layout.childForceExpandHeight = false;
+
+        ContentSizeFitter fitter = contentObject.GetComponent<ContentSizeFitter>();
+        fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+        textRect.SetParent(content, false);
+        textRect.anchorMin = new Vector2(0f, 1f);
+        textRect.anchorMax = new Vector2(1f, 1f);
+        textRect.pivot = new Vector2(0.5f, 1f);
+        textRect.anchoredPosition = Vector2.zero;
+        textRect.sizeDelta = Vector2.zero;
+        textRect.localScale = Vector3.one;
+
+        Scrollbar scrollbar = CreateVerticalScrollbar(scrollRectTransform);
+        ScrollRect scroll = scrollObject.GetComponent<ScrollRect>();
+        scroll.viewport = viewport;
+        scroll.content = content;
+        scroll.verticalScrollbar = scrollbar;
+        scroll.verticalScrollbarSpacing = 3f;
+        return scroll;
+    }
+
+    private static Scrollbar CreateVerticalScrollbar(RectTransform parent)
+    {
+        GameObject scrollbarObject = new GameObject(
+            "Scrollbar Vertical",
+            typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Scrollbar));
+        RectTransform scrollbarRect = scrollbarObject.GetComponent<RectTransform>();
+        scrollbarRect.SetParent(parent, false);
+        scrollbarRect.anchorMin = new Vector2(1f, 0f);
+        scrollbarRect.anchorMax = Vector2.one;
+        scrollbarRect.pivot = new Vector2(1f, 0.5f);
+        scrollbarRect.anchoredPosition = Vector2.zero;
+        scrollbarRect.sizeDelta = new Vector2(9f, 0f);
+
+        Image background = scrollbarObject.GetComponent<Image>();
+        background.color = new Color(0.04f, 0.05f, 0.065f, 0.82f);
+
+        GameObject slidingAreaObject = new GameObject("Sliding Area", typeof(RectTransform));
+        RectTransform slidingArea = slidingAreaObject.GetComponent<RectTransform>();
+        slidingArea.SetParent(scrollbarRect, false);
+        Stretch(slidingArea, 1f);
+
+        GameObject handleObject = new GameObject(
+            "Handle", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        RectTransform handleRect = handleObject.GetComponent<RectTransform>();
+        handleRect.SetParent(slidingArea, false);
+        Stretch(handleRect);
+
+        Image handle = handleObject.GetComponent<Image>();
+        handle.color = new Color(0.78f, 0.54f, 0.18f, 0.95f);
+        handle.raycastTarget = true;
+
+        Scrollbar scrollbar = scrollbarObject.GetComponent<Scrollbar>();
+        scrollbar.handleRect = handleRect;
+        scrollbar.targetGraphic = handle;
+        scrollbar.direction = Scrollbar.Direction.BottomToTop;
+        scrollbar.value = 1f;
+        scrollbar.size = 1f;
+        return scrollbar;
+    }
+
+    private void RefreshDetailsScroll()
+    {
+        if (detailsScrollRect == null || detailsText == null)
+            return;
+
+        detailsText.ForceMeshUpdate();
+        Canvas.ForceUpdateCanvases();
+
+        if (detailsScrollRect.content != null)
+            LayoutRebuilder.ForceRebuildLayoutImmediate(detailsScrollRect.content);
+
+        Canvas.ForceUpdateCanvases();
+        detailsScrollRect.StopMovement();
+        detailsScrollRect.verticalNormalizedPosition = 1f;
+    }
+
+    private static void CopyRectTransform(RectTransform source, RectTransform destination)
+    {
+        destination.anchorMin = source.anchorMin;
+        destination.anchorMax = source.anchorMax;
+        destination.pivot = source.pivot;
+        destination.anchoredPosition = source.anchoredPosition;
+        destination.sizeDelta = source.sizeDelta;
+        destination.localRotation = source.localRotation;
+        destination.localScale = source.localScale;
+    }
+
+    private static void Stretch(RectTransform rect, float padding = 0f)
+    {
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.offsetMin = new Vector2(padding, padding);
+        rect.offsetMax = new Vector2(-padding, -padding);
+        rect.localScale = Vector3.one;
     }
 
     private void SetVisible(bool visible)
