@@ -366,6 +366,11 @@ MonoBehaviour:
   hard:
     bonusHealthPercent: 60
     bonusDamagePercent: 40
+  calculateExtremeAsMidpoint: 1
+  profileVersion: 2
+  extreme:
+    bonusHealthPercent: 100
+    bonusDamagePercent: 70
   nightmare:
-    bonusHealthPercent: 90
-    bonusDamagePercent: 60
+    bonusHealthPercent: 130
+    bonusDamagePercent: 100

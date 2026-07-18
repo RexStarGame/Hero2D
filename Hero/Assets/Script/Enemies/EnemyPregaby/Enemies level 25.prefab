@@ -259,8 +259,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12ad796373a86fb46af69ae35cfd02b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 1800
-  xpReward: 9450
+  maxHealth: 235
+  xpReward: 500
   onDeath:
     m_PersistentCalls:
       m_Calls: []
@@ -456,6 +456,11 @@ MonoBehaviour:
   hard:
     bonusHealthPercent: 60
     bonusDamagePercent: 40
+  calculateExtremeAsMidpoint: 1
+  profileVersion: 2
+  extreme:
+    bonusHealthPercent: 100
+    bonusDamagePercent: 70
   nightmare:
-    bonusHealthPercent: 90
-    bonusDamagePercent: 60
+    bonusHealthPercent: 130
+    bonusDamagePercent: 100
