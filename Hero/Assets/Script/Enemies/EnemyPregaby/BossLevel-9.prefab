@@ -1329,19 +1329,19 @@ MonoBehaviour:
     bonusHealthPercent: 0
     bonusDamagePercent: 0
   normal:
-    bonusHealthPercent: 20
-    bonusDamagePercent: 10
+    bonusHealthPercent: 30
+    bonusDamagePercent: 15
   hard:
-    bonusHealthPercent: 60
-    bonusDamagePercent: 40
+    bonusHealthPercent: 90
+    bonusDamagePercent: 60
   calculateExtremeAsMidpoint: 1
   profileVersion: 2
   extreme:
-    bonusHealthPercent: 100
-    bonusDamagePercent: 70
-  nightmare:
     bonusHealthPercent: 130
     bonusDamagePercent: 100
+  nightmare:
+    bonusHealthPercent: 160
+    bonusDamagePercent: 125
 --- !u!1 &8620457369009950218
 GameObject:
   m_ObjectHideFlags: 0
