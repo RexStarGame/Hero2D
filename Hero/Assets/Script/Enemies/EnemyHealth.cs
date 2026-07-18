@@ -60,7 +60,7 @@ public class EnemyHealth : MonoBehaviour
         // Giv XP til spilleren
         if (player != null)
         {
-            player.AddXP(xpReward);
+            player.AddKillXP(xpReward);
         }
 
         // Giv alle death listeners besked én gang (coins, quests osv.)

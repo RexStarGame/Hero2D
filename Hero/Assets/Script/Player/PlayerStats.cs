@@ -7,6 +7,8 @@ public class PlayerStats : MonoBehaviour
     [Header("UI")]
     [SerializeField] private TMP_Text statsText;
     [SerializeField] private TMP_Text defenseText;
+    [Tooltip("Separate, low-noise text field for XP gained from equipped gear.")]
+    [SerializeField] private TMP_Text experienceBonusText;
 
     [Header("References (auto-find if null)")]
     [SerializeField] private PlayerXP playerXP;
@@ -105,6 +107,12 @@ public class PlayerStats : MonoBehaviour
             var go = GameObject.Find("UpgradeMenu");
              if (go != null) upgradeMenu = go;
         }
+
+        if (experienceBonusText == null)
+        {
+            GameObject go = GameObject.Find("ExperienceBonusText");
+            if (go != null) experienceBonusText = go.GetComponent<TMP_Text>();
+        }
     }
     public void ResumeGame()
     {
@@ -126,6 +134,7 @@ public class PlayerStats : MonoBehaviour
     private void ForceUpdate()
     {
         UpdateDefenseText();
+        UpdateExperienceBonusText();
 
         if (statsText == null) return;
 
@@ -242,6 +251,20 @@ public class PlayerStats : MonoBehaviour
         defenseText.text = defense > 0f
             ? Row("Defense", BonusOnly(defense, "0"))
             : Row("Defense", Soft("0"));
+    }
+
+    private void UpdateExperienceBonusText()
+    {
+        if (experienceBonusText == null)
+            return;
+
+        float bonusPercent = equipment != null
+            ? Mathf.Max(0f, equipment.GetExperienceGainBonus()) * 100f
+            : 0f;
+
+        experienceBonusText.text = bonusPercent > 0f
+            ? Row("Kill XP Bonus", $"{Color($"+{bonusPercent:0.##}%", goodColor)} {Soft("per kill")}")
+            : Row("Kill XP Bonus", $"{Soft("0% per kill")}");
     }
 
     // ---------- Formatting helpers ----------

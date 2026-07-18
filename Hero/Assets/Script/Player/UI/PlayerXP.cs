@@ -7,8 +7,24 @@ public class PlayerXP : MonoBehaviour
     public int xpToNextLevel = 100;
     public int abilityPoints = 0;
 
+    [Header("Equipment XP Bonus")]
+    [Tooltip("Auto-finds the player's equipment if empty. Only equipped item modifiers affect kill XP.")]
+    [SerializeField] private PlayerEquipment equipment;
+
+    private float fractionalKillXp;
+
+    public float EquipmentKillXpBonus
+    {
+        get
+        {
+            AutoFindEquipment();
+            return equipment != null ? Mathf.Max(0f, equipment.GetExperienceGainBonus()) : 0f;
+        }
+    }
+
     private void Awake()
     {
+        AutoFindEquipment();
         RestoreBossCheckpoint();
     }
 
@@ -32,13 +48,46 @@ public class PlayerXP : MonoBehaviour
 
     public void AddXP(int amount)
     {
+        if (amount <= 0)
+            return;
+
         xp += amount;
+
+        ProcessLevelUps();
+    }
+
+    /// <summary>
+    /// Awards XP for a defeated enemy and applies only the currently equipped
+    /// gear bonus. Fractions are retained so small percentage bonuses are not
+    /// lost to integer rounding over multiple kills.
+    /// </summary>
+    public void AddKillXP(int baseAmount)
+    {
+        if (baseAmount <= 0)
+            return;
+
+        float total = baseAmount * (1f + EquipmentKillXpBonus) + fractionalKillXp;
+        int awardedXp = Mathf.FloorToInt(total);
+        fractionalKillXp = total - awardedXp;
+        xp += awardedXp;
+
+        ProcessLevelUps();
+    }
+
+    private void ProcessLevelUps()
+    {
 
         while (xp >= xpToNextLevel)
         {
             xp -= xpToNextLevel;
             LevelUp();
         }
+    }
+
+    private void AutoFindEquipment()
+    {
+        if (equipment == null)
+            equipment = FindAnyObjectByType<PlayerEquipment>();
     }
 
     void LevelUp()

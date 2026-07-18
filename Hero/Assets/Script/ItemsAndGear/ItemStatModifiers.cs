@@ -12,6 +12,8 @@ public class ItemStatModifiers
     [Tooltip("Decimal: 0.02 means +2%.")] [SerializeField] private float criticalChance;
     [Tooltip("Decimal: 0.10 means +10%.")] [SerializeField] private float attackSpeed;
     [Tooltip("Decimal: 0.10 means +10%.")] [SerializeField] private float movementSpeed;
+    [Tooltip("Decimal: 0.10 means +10% XP from kills while this item is equipped.")]
+    [Min(0f)] [SerializeField] private float experienceGain;
 
     public float MaxHealth => maxHealth;
     public float Damage => damage;
@@ -21,6 +23,7 @@ public class ItemStatModifiers
     public float CriticalChance => criticalChance;
     public float AttackSpeed => attackSpeed;
     public float MovementSpeed => movementSpeed;
+    public float ExperienceGain => experienceGain;
 
     public static ItemStatModifiers operator +(ItemStatModifiers a, ItemStatModifiers b)
     {
@@ -33,7 +36,8 @@ public class ItemStatModifiers
             lifeSteal = a.lifeSteal + b.lifeSteal,
             criticalChance = a.criticalChance + b.criticalChance,
             attackSpeed = a.attackSpeed + b.attackSpeed,
-            movementSpeed = a.movementSpeed + b.movementSpeed
+            movementSpeed = a.movementSpeed + b.movementSpeed,
+            experienceGain = a.experienceGain + b.experienceGain
         };
     }
 }

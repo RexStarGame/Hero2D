@@ -12,11 +12,16 @@ public class BossHealth : MonoBehaviour
     [Header("Optional")]
     public bool destroyOnDeath = true;
 
+    [Header("Reward")]
+    [Tooltip("Base kill XP. Equipped Kill XP % gear is applied by PlayerXP.")]
+    [Min(0)] [SerializeField] private int xpReward = 100;
+
     [Header("Events")]
     public UnityEvent<float, float> onHealthChanged; // (current, max)
     public UnityEvent onDeath = new UnityEvent();
 
     private bool dead;
+    private PlayerXP playerXP;
 
     private void Awake()
     {
@@ -26,6 +31,7 @@ public class BossHealth : MonoBehaviour
 
         // If currentHealth was never set in Inspector, start full
         if (currentHealth <= 0f) currentHealth = maxHealth;
+        playerXP = FindAnyObjectByType<PlayerXP>();
     }
 
     private void Start()
@@ -86,6 +92,12 @@ public class BossHealth : MonoBehaviour
 
         currentHealth = 0f;
         NotifyHealthChanged();
+
+        if (xpReward > 0)
+        {
+            if (playerXP == null) playerXP = FindAnyObjectByType<PlayerXP>();
+            if (playerXP != null) playerXP.AddKillXP(xpReward);
+        }
 
         onDeath?.Invoke();
 
