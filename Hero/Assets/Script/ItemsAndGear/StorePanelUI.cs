@@ -26,6 +26,7 @@ public class StorePanelUI : MonoBehaviour
     [SerializeField] private TMP_Text balanceText;
     [SerializeField] private TMP_Text feedbackText;
     [SerializeField] private Button buyButton;
+    [SerializeField] private StoreCategoryFilterUI categoryFilterUI;
 
     [Header("Controls")]
     [SerializeField] private KeyCode openKey = KeyCode.B;
@@ -34,6 +35,7 @@ public class StorePanelUI : MonoBehaviour
     private readonly List<StoreItemSlotUI> spawned = new List<StoreItemSlotUI>();
     private readonly StringBuilder details = new StringBuilder(256);
     private StoreItemSlotUI selectedSlot;
+    private StoreCategory activeCategory = StoreCategory.All;
     private bool isOpen;
 
     public IReadOnlyList<ItemDefinition> Stock => stock;
@@ -42,6 +44,7 @@ public class StorePanelUI : MonoBehaviour
     {
         AutoFindPlayer();
         EnsureDetailsScrollArea();
+        EnsureCategoryFilters();
 
         if (buyButton != null)
         {
@@ -131,7 +134,7 @@ public class StorePanelUI : MonoBehaviour
 
         foreach (ItemDefinition item in stock)
         {
-            if (item == null)
+            if (item == null || !MatchesActiveCategory(item))
                 continue;
 
             StoreItemSlotUI slot = Instantiate(slotTemplate, gridRoot);
@@ -141,6 +144,13 @@ public class StorePanelUI : MonoBehaviour
         }
 
         RefreshBalance();
+    }
+
+    public void SetCategory(StoreCategory category)
+    {
+        activeCategory = category;
+        categoryFilterUI?.SetSelected(category);
+        Rebuild();
     }
 
     public void Select(StoreItemSlotUI slot)
@@ -329,6 +339,39 @@ public class StorePanelUI : MonoBehaviour
         detailsText.overflowMode = TextOverflowModes.Overflow;
         detailsText.raycastTarget = false;
         detailsText.margin = Vector4.zero;
+    }
+
+    private void EnsureCategoryFilters()
+    {
+        if (categoryFilterUI == null)
+            categoryFilterUI = GetComponentInChildren<StoreCategoryFilterUI>(true);
+
+        if (categoryFilterUI == null && gridRoot is RectTransform gridRect)
+            categoryFilterUI = StoreCategoryFilterUI.Create(this, gridRect);
+
+        categoryFilterUI?.Initialize(this, activeCategory);
+    }
+
+    private bool MatchesActiveCategory(ItemDefinition item)
+    {
+        switch (activeCategory)
+        {
+            case StoreCategory.Swords:
+                return item is WeaponDefinition weapon &&
+                    weapon.WeaponType == WeaponType.Sword;
+            case StoreCategory.Boots:
+                return item is BootsDefinition;
+            case StoreCategory.Helmets:
+                return item is HelmetDefinition;
+            case StoreCategory.Chests:
+                return item is ChestArmorDefinition;
+            case StoreCategory.Rings:
+                return item is RingDefinition;
+            case StoreCategory.Necklaces:
+                return item is NecklaceDefinition;
+            default:
+                return true;
+        }
     }
 
     private ScrollRect CreateDetailsScrollArea(TMP_Text text)
