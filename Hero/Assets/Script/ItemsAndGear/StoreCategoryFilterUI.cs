@@ -65,8 +65,6 @@ public class StoreCategoryFilterUI : MonoBehaviour
         RectTransform bar = barObject.GetComponent<RectTransform>();
         bar.SetParent(parent, false);
         bar.SetSiblingIndex(gridRoot.GetSiblingIndex() + 1);
-        bar.anchorMin = new Vector2(gridRoot.anchorMin.x, gridRoot.anchorMax.y + 0.005f);
-        bar.anchorMax = new Vector2(gridRoot.anchorMax.x, Mathf.Min(0.84f, gridRoot.anchorMax.y + 0.05f));
         bar.pivot = new Vector2(0.5f, 0.5f);
         bar.offsetMin = Vector2.zero;
         bar.offsetMax = Vector2.zero;
@@ -75,7 +73,6 @@ public class StoreCategoryFilterUI : MonoBehaviour
 
         HorizontalLayoutGroup layout = barObject.GetComponent<HorizontalLayoutGroup>();
         layout.padding = new RectOffset(0, 0, 0, 0);
-        layout.spacing = 3f;
         layout.childAlignment = TextAnchor.MiddleCenter;
         layout.childControlWidth = true;
         layout.childControlHeight = true;
@@ -94,7 +91,33 @@ public class StoreCategoryFilterUI : MonoBehaviour
         if (!built)
             BuildButtons();
 
+        ApplyLayout();
         SetSelected(selected);
+    }
+
+    public void ApplyLayout()
+    {
+        if (store == null)
+            return;
+
+        RectTransform bar = transform as RectTransform;
+        if (bar != null)
+        {
+            bar.anchorMin = store.CategoryBarAnchorMin;
+            bar.anchorMax = store.CategoryBarAnchorMax;
+            bar.offsetMin = Vector2.zero;
+            bar.offsetMax = Vector2.zero;
+        }
+
+        HorizontalLayoutGroup layout = GetComponent<HorizontalLayoutGroup>();
+        if (layout != null)
+            layout.spacing = store.CategoryButtonSpacing;
+
+        foreach (LayoutElement element in GetComponentsInChildren<LayoutElement>(true))
+        {
+            element.minWidth = store.CategoryButtonMinWidth;
+            element.minHeight = store.CategoryButtonMinHeight;
+        }
     }
 
     public void SetSelected(StoreCategory selected)
@@ -128,8 +151,8 @@ public class StoreCategoryFilterUI : MonoBehaviour
         buttonObject.layer = gameObject.layer;
 
         LayoutElement layoutElement = buttonObject.GetComponent<LayoutElement>();
-        layoutElement.minWidth = 58f;
-        layoutElement.minHeight = 24f;
+        layoutElement.minWidth = store == null ? 58f : store.CategoryButtonMinWidth;
+        layoutElement.minHeight = store == null ? 24f : store.CategoryButtonMinHeight;
         layoutElement.flexibleWidth = 1f;
         layoutElement.flexibleHeight = 1f;
 

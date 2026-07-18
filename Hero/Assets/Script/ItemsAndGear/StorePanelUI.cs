@@ -28,6 +28,15 @@ public class StorePanelUI : MonoBehaviour
     [SerializeField] private Button buyButton;
     [SerializeField] private StoreCategoryFilterUI categoryFilterUI;
 
+    [Header("Store Category Layout")]
+    [Tooltip("Bottom-left normalized anchor of the category bar inside StoreDynamicUI.")]
+    [SerializeField] private Vector2 categoryBarAnchorMin = new Vector2(0.055f, 0.795f);
+    [Tooltip("Top-right normalized anchor of the category bar inside StoreDynamicUI.")]
+    [SerializeField] private Vector2 categoryBarAnchorMax = new Vector2(0.60f, 0.84f);
+    [Min(0f)] [SerializeField] private float categoryButtonSpacing = 3f;
+    [Min(1f)] [SerializeField] private float categoryButtonMinWidth = 58f;
+    [Min(1f)] [SerializeField] private float categoryButtonMinHeight = 24f;
+
     [Header("Controls")]
     [SerializeField] private KeyCode openKey = KeyCode.B;
     [SerializeField] private bool pauseWhenOpen = true;
@@ -39,6 +48,11 @@ public class StorePanelUI : MonoBehaviour
     private bool isOpen;
 
     public IReadOnlyList<ItemDefinition> Stock => stock;
+    public Vector2 CategoryBarAnchorMin => categoryBarAnchorMin;
+    public Vector2 CategoryBarAnchorMax => categoryBarAnchorMax;
+    public float CategoryButtonSpacing => categoryButtonSpacing;
+    public float CategoryButtonMinWidth => categoryButtonMinWidth;
+    public float CategoryButtonMinHeight => categoryButtonMinHeight;
 
     private void Awake()
     {
@@ -539,5 +553,25 @@ public class StorePanelUI : MonoBehaviour
         if (wallet == null) wallet = FindObjectOfType<PlayerWallet>();
         if (playerXP == null) playerXP = FindObjectOfType<PlayerXP>();
 #endif
+    }
+
+    private void OnValidate()
+    {
+        categoryBarAnchorMin.x = Mathf.Clamp01(categoryBarAnchorMin.x);
+        categoryBarAnchorMin.y = Mathf.Clamp01(categoryBarAnchorMin.y);
+        categoryBarAnchorMax.x = Mathf.Clamp01(categoryBarAnchorMax.x);
+        categoryBarAnchorMax.y = Mathf.Clamp01(categoryBarAnchorMax.y);
+
+        if (categoryBarAnchorMax.x < categoryBarAnchorMin.x)
+            categoryBarAnchorMax.x = categoryBarAnchorMin.x;
+        if (categoryBarAnchorMax.y < categoryBarAnchorMin.y)
+            categoryBarAnchorMax.y = categoryBarAnchorMin.y;
+
+        categoryButtonSpacing = Mathf.Max(0f, categoryButtonSpacing);
+        categoryButtonMinWidth = Mathf.Max(1f, categoryButtonMinWidth);
+        categoryButtonMinHeight = Mathf.Max(1f, categoryButtonMinHeight);
+
+        if (Application.isPlaying && categoryFilterUI != null)
+            categoryFilterUI.ApplyLayout();
     }
 }
