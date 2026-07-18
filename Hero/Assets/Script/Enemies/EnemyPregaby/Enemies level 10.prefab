@@ -359,11 +359,11 @@ MonoBehaviour:
     bonusHealthPercent: 0
     bonusDamagePercent: 0
   normal:
-    bonusHealthPercent: 10
-    bonusDamagePercent: 5
+    bonusHealthPercent: 20
+    bonusDamagePercent: 10
   hard:
-    bonusHealthPercent: 30
-    bonusDamagePercent: 20
-  nightmare:
     bonusHealthPercent: 60
     bonusDamagePercent: 40
+  nightmare:
+    bonusHealthPercent: 90
+    bonusDamagePercent: 60
