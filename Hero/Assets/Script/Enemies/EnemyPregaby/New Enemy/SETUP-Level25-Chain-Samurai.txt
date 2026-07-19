@@ -1,0 +1,55 @@
+LEVEL 25 CHAIN SAMURAI SETUP
+
+Put these components on the ROOT of the new enemy prefab:
+
+1. SpriteRenderer
+2. Animator
+3. Rigidbody2D
+   - Body Type: Dynamic
+   - Gravity Scale: 0
+   - Freeze Rotation Z: enabled
+4. A non-trigger Collider2D fitted around the body
+5. EnemyHealth
+6. EnemyDifficultyProfile
+7. EnemyAggro2D
+8. ChainSamuraiLevel25
+
+Do not also add MageRed or EnemyAttack. ChainSamuraiLevel25 owns this enemy's
+movement and attacks; using the old scripts too would make two controllers fight.
+
+ENEMY HEALTH
+- Set Max Health and XP Reward for the level-25 enemy in EnemyHealth.
+- EnemyDifficultyProfile automatically scales health and both attacks for the
+  selected Easy / Normal / Hard / Extreme / Nightmare difficulty.
+
+ANIMATOR PARAMETERS
+- MoveX    (Float)
+- MoveY    (Float)
+- Speed    (Float)
+- Attack1  (Trigger) -- simple aimed chain slash
+- Attack2  (Trigger) -- circular chain AOE sweep
+
+The names are editable in ChainSamuraiLevel25 if your Animator uses other names.
+Use MoveX and MoveY for four-direction movement/idle blend trees. Attack1 and
+Attack2 should transition to the matching directional attack animations.
+
+PLAYER LAYERS
+- Set Player Layers to the layer containing the Player and its hit colliders.
+- Leaving it as Everything works, but a dedicated Player layer is more efficient.
+
+ATTACK FEEDBACK
+- The script automatically creates a child LineRenderer at runtime if Warning
+  Line is empty.
+- Yellow cone: Attack 1 danger area.
+- Red circle: Attack 2 AOE danger area.
+- Damage happens only after the warning/windup completes.
+
+SAFE ZONES AND FUTURE CO-OP
+- EnemyAggro2D drops protected players automatically.
+- PlayerHealth rejects damage while inside a SafeZone.
+- Every player caught by the AOE is damaged once, while authority remains routed
+  through EnemyAggro2D for future host/server control.
+
+SPAWNING
+- Add the completed prefab to EnemySpawn's Enemy Pool with Min Level 25.
+- This is a normal enemy, so it will use the existing off-screen spawn rules.
