@@ -33,9 +33,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7154457967706642060}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -1013.87, y: -773.99, z: 15.965406}
-  m_LocalScale: {x: 1.085093, y: 1.085093, z: 1.085093}
+  m_LocalScale: {x: 8.211487, y: 8.211487, z: 8.211487}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -83,13 +83,13 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 4
+  m_SortingOrder: 30
   m_Sprite: {fileID: -8309083796938325149, guid: e98abb1c564d7324788dd65f688a2529, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.23, y: 0.19}
+  m_Size: {x: 0.23, y: 0.18}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -132,48 +132,20 @@ PolygonCollider2D:
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.30434778, y: -2.222222}
+    pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 0.23, y: 0.18}
-    newSize: {x: 0.23, y: 0.19}
+    newSize: {x: 0.23, y: 0.18}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: 0.125, y: -0.295}
-      - {x: 0.125, y: -0.42499998}
-      - {x: 0.235, y: -0.465}
-      - {x: 0.475, y: -0.42499998}
-      - {x: 0.475, y: -0.24499999}
-      - {x: 0.415, y: -0.16499999}
-      - {x: 0.475, y: -0.065}
-      - {x: 0.475, y: 0.265}
-      - {x: 0.42499998, y: 0.48499998}
-      - {x: 0.45499998, y: 0.98499995}
-      - {x: 0.39499998, y: 1.405}
-      - {x: 0.36499998, y: 1.415}
-      - {x: 0.315, y: 1.415}
-      - {x: 0.285, y: 1.375}
-      - {x: 0.085, y: 1.385}
-      - {x: -0.035, y: 1.3349999}
-      - {x: -0.105, y: 1.255}
-      - {x: -0.205, y: 1.105}
-      - {x: -0.295, y: 0.955}
-      - {x: -0.325, y: 0.715}
-      - {x: -0.33499998, y: 0.53499997}
-      - {x: -0.275, y: 0.355}
-      - {x: -0.33499998, y: 0.265}
-      - {x: -0.375, y: 0.145}
-      - {x: -0.375, y: -0.074999996}
-      - {x: -0.255, y: -0.255}
-      - {x: -0.275, y: -0.525}
-      - {x: -0.145, y: -0.635}
-      - {x: -0.085, y: -0.685}
-      - {x: 0.085, y: -0.685}
-      - {x: 0.155, y: -0.615}
-      - {x: 0.145, y: -0.49499997}
-      - {x: 0.085, y: -0.42499998}
+    - - {x: -0.114999995, y: 0.089999996}
+      - {x: -0.114999995, y: -0.089999996}
+      - {x: 0.085, y: -0.089999996}
+      - {x: 0.114999995, y: -0.06}
+      - {x: 0.114999995, y: 0.089999996}
   m_UseDelaunayMesh: 0
 --- !u!50 &4777484702557429001
 Rigidbody2D:
@@ -214,11 +186,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12ad796373a86fb46af69ae35cfd02b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
-  xpReward: 25
+  maxHealth: 260
+  xpReward: 500
   onDeath:
     m_PersistentCalls:
       m_Calls: []
+  deathDestroyDelay: 0
 --- !u!114 &7895973543236935348
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -231,8 +204,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c516f67d042846f1bf8afee24a3fbb47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detectionRange: 6
-  giveUpRange: 10
+  detectionRange: 8
+  giveUpRange: 12
   scanInterval: 0.15
 --- !u!114 &272076441986008889
 MonoBehaviour:
@@ -254,12 +227,12 @@ MonoBehaviour:
   routeValidationInterval: 0.2
   slashRange: 2.25
   slashHalfAngle: 62.9
-  slashDamage: 18
+  slashDamage: 35
   slashWindup: 0.28
   slashRecovery: 0.28
   slashCooldown: 1.4
-  sweepRange: 3.8
-  sweepDamage: 28
+  sweepRange: 4
+  sweepDamage: 45
   sweepWindup: 0.85
   sweepRecovery: 0.55
   sweepCooldown: 5.5
@@ -272,11 +245,17 @@ MonoBehaviour:
   warningLineWidth: 0.07
   warningSegments: 51
   warningLine: {fileID: 5772614560235955794}
+  useHorizontalSpriteFlipping: 1
+  sourceSpriteFacesRight: 1
+  facingSprite: {fileID: 0}
   moveXParameter: MoveX
   moveYParameter: MoveY
   speedParameter: Speed
   slashTrigger: Attack1
   sweepTrigger: Attack2
+  hurtTrigger: Hurt
+  deathTrigger: Die
+  hurtLockDuration: 0.4
   drawRanges: 1
 --- !u!120 &5772614560235955794
 LineRenderer:
@@ -404,7 +383,7 @@ Animator:
   m_GameObject: {fileID: 7154457967706642060}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: -8554641442668012064, guid: e98abb1c564d7324788dd65f688a2529, type: 3}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
