@@ -64,6 +64,10 @@ public sealed class ChainSamuraiLevel25 : MonoBehaviour
     [SerializeField] private string hurtTrigger = "Hurt";
     [SerializeField] private string deathTrigger = "Die";
 
+    [Header("Hit reaction")]
+    [Tooltip("The supplied Hurt clip is 4 frames at 0.1 seconds per frame.")]
+    [Min(0f)] [SerializeField] private float hurtLockDuration = 0.4f;
+
     [Header("Scene debug")]
     [SerializeField] private bool drawRanges = true;
 
@@ -76,6 +80,7 @@ public sealed class ChainSamuraiLevel25 : MonoBehaviour
     private EnemyManager enemyManager;
     private Material runtimeWarningMaterial;
     private Coroutine attackRoutine;
+    private Coroutine hurtRoutine;
     private Coroutine patrolWaitRoutine;
     private Vector2 patrolTarget;
     private Vector2 lastFacing = Vector2.down;
@@ -86,6 +91,7 @@ public sealed class ChainSamuraiLevel25 : MonoBehaviour
     private bool dead;
 
     public bool IsAttacking => attackRoutine != null;
+    public bool IsHurt => hurtRoutine != null;
     public float SlashRange => slashRange;
     public float SweepRange => sweepRange;
 
@@ -131,6 +137,12 @@ public sealed class ChainSamuraiLevel25 : MonoBehaviour
         if (dead || aggro == null || !aggro.HasAuthority())
             return;
 
+        if (IsHurt)
+        {
+            UpdateMovementAnimation(lastFacing, false);
+            return;
+        }
+
         Transform target = aggro.CurrentTarget;
         if (target != null && SafeZone2D.IsPlayerProtected(target.position))
         {
@@ -154,7 +166,7 @@ public sealed class ChainSamuraiLevel25 : MonoBehaviour
         if (dead || body == null || aggro == null || !aggro.HasAuthority())
             return;
 
-        if (IsAttacking)
+        if (IsAttacking || IsHurt)
         {
             body.linearVelocity = Vector2.zero;
             return;
@@ -483,6 +495,15 @@ public sealed class ChainSamuraiLevel25 : MonoBehaviour
             animator.SetTrigger(parameterName);
     }
 
+    private void ResetAnimatorTrigger(string parameterName)
+    {
+        if (animator != null && !string.IsNullOrWhiteSpace(parameterName) &&
+            HasAnimatorParameter(parameterName, AnimatorControllerParameterType.Trigger))
+        {
+            animator.ResetTrigger(parameterName);
+        }
+    }
+
     private bool HasAnimatorParameter(string parameterName, AnimatorControllerParameterType type)
     {
         AnimatorControllerParameter[] parameters = animator.parameters;
@@ -497,8 +518,36 @@ public sealed class ChainSamuraiLevel25 : MonoBehaviour
 
     private void HandleDamaged()
     {
-        if (!dead && !IsAttacking)
-            SetAnimatorTrigger(hurtTrigger);
+        if (dead)
+            return;
+
+        // A visible hit reaction must also interrupt the gameplay attack;
+        // otherwise the animation says "hurt" while invisible damage still lands.
+        if (attackRoutine != null)
+        {
+            StopCoroutine(attackRoutine);
+            attackRoutine = null;
+        }
+
+        HideWarning();
+        if (body != null)
+            body.linearVelocity = Vector2.zero;
+
+        ResetAnimatorTrigger(slashTrigger);
+        ResetAnimatorTrigger(sweepTrigger);
+        SetAnimatorFloat(speedParameter, 0f);
+
+        if (hurtRoutine != null)
+            StopCoroutine(hurtRoutine);
+
+        hurtRoutine = StartCoroutine(PlayHurtReaction());
+    }
+
+    private IEnumerator PlayHurtReaction()
+    {
+        SetAnimatorTrigger(hurtTrigger);
+        yield return new WaitForSeconds(hurtLockDuration);
+        hurtRoutine = null;
     }
 
     private void HandleDied()
@@ -513,6 +562,12 @@ public sealed class ChainSamuraiLevel25 : MonoBehaviour
         {
             StopCoroutine(attackRoutine);
             attackRoutine = null;
+        }
+
+        if (hurtRoutine != null)
+        {
+            StopCoroutine(hurtRoutine);
+            hurtRoutine = null;
         }
 
         if (patrolWaitRoutine != null)
@@ -532,6 +587,7 @@ public sealed class ChainSamuraiLevel25 : MonoBehaviour
             bodyCollider.enabled = false;
 
         SetAnimatorFloat(speedParameter, 0f);
+        ResetAnimatorTrigger(hurtTrigger);
         SetAnimatorTrigger(deathTrigger);
     }
 
@@ -547,6 +603,12 @@ public sealed class ChainSamuraiLevel25 : MonoBehaviour
         {
             StopCoroutine(attackRoutine);
             attackRoutine = null;
+        }
+
+        if (hurtRoutine != null)
+        {
+            StopCoroutine(hurtRoutine);
+            hurtRoutine = null;
         }
 
         if (patrolWaitRoutine != null)

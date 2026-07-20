@@ -195,6 +195,7 @@ public static class Level25OrcSetupEditor
             Set(enemySettings, "sweepTrigger", "Attack2");
             Set(enemySettings, "hurtTrigger", "Hurt");
             Set(enemySettings, "deathTrigger", "Die");
+            Set(enemySettings, "hurtLockDuration", 0.40f);
             Set(enemySettings, "slashWindup", 0.30f);
             Set(enemySettings, "slashRecovery", 0.30f);
             Set(enemySettings, "sweepWindup", 0.30f);
