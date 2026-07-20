@@ -12,14 +12,15 @@ using UnityEngine;
 public static class Level25OrcSetupEditor
 {
     private const string Root = "Assets/Script/Enemies/EnemyPregaby/New Enemy";
-    private const string OrcAsset = Root + "/Tiny RPG Character Asset Pack 01 v2 1.0 -Free Soldier&Orc/Aseprite file/Orc.aseprite";
+    private const string OrcPngRoot = Root + "/Tiny RPG Character Asset Pack 01 v2 1.0 -Free Soldier&Orc/Characters(100x100 split)/Orc/Orc";
+    private const string GeneratedClipsFolder = Root + "/Generated Orc Animations";
     private const string PrefabPath = Root + "/Chain Enemy.prefab";
     private const string ControllerPath = Root + "/Level25 Orc.controller";
 
     [MenuItem("Hero2D/Enemies/Setup Level 25 Orc")]
     public static void Setup()
     {
-        Dictionary<string, AnimationClip> clips = LoadClips();
+        Dictionary<string, AnimationClip> clips = CreateClipsFromPngStrips();
         string[] required = { "Idle", "Walk", "Attack01", "Attack02", "Hurt", "Death" };
         List<string> missing = new List<string>();
 
@@ -33,9 +34,9 @@ public static class Level25OrcSetupEditor
         {
             EditorUtility.DisplayDialog(
                 "Level 25 Orc setup stopped",
-                "Unity could not find these tagged clips in Orc.aseprite:\n\n" +
+                "Unity could not build these clips from the Orc PNG strips:\n\n" +
                 string.Join(", ", missing) +
-                "\n\nSelect Orc.aseprite, let Unity finish importing it, then run this menu item again.",
+                "\n\nConfirm that the split Orc PNG files are still inside the imported asset pack, then run this menu item again.",
                 "OK");
             return;
         }
@@ -60,19 +61,133 @@ public static class Level25OrcSetupEditor
             "OK");
     }
 
-    private static Dictionary<string, AnimationClip> LoadClips()
+    private static Dictionary<string, AnimationClip> CreateClipsFromPngStrips()
     {
-        AssetDatabase.ImportAsset(OrcAsset, ImportAssetOptions.ForceUpdate);
-        UnityEngine.Object[] assets = AssetDatabase.LoadAllAssetsAtPath(OrcAsset);
         Dictionary<string, AnimationClip> clips = new Dictionary<string, AnimationClip>(StringComparer.OrdinalIgnoreCase);
+        EnsureFolder(GeneratedClipsFolder);
 
-        foreach (UnityEngine.Object asset in assets)
+        CreateClip(clips, "Idle", "Orc_Idle.png", 6, true);
+        CreateClip(clips, "Walk", "Orc_Walk.png", 8, true);
+        CreateClip(clips, "Attack01", "Orc_Attack01.png", 6, false);
+        CreateClip(clips, "Attack02", "Orc_Attack02.png", 6, false);
+        CreateClip(clips, "Hurt", "Orc_Hurt.png", 4, false);
+        CreateClip(clips, "Death", "Orc_Death.png", 4, false);
+        return clips;
+    }
+
+    private static void CreateClip(
+        Dictionary<string, AnimationClip> clips,
+        string clipName,
+        string pngName,
+        int frameCount,
+        bool loop)
+    {
+        string pngPath = OrcPngRoot + "/" + pngName;
+        if (AssetDatabase.LoadAssetAtPath<Texture2D>(pngPath) == null)
+            return;
+
+        ConfigurePngStrip(pngPath, clipName, frameCount);
+        List<Sprite> frames = new List<Sprite>();
+        foreach (UnityEngine.Object asset in AssetDatabase.LoadAllAssetsAtPath(pngPath))
         {
-            if (asset is AnimationClip clip && !clip.name.StartsWith("__preview__", StringComparison.OrdinalIgnoreCase))
-                clips[clip.name] = clip;
+            if (asset is Sprite sprite)
+                frames.Add(sprite);
         }
 
-        return clips;
+        frames.Sort((left, right) => ExtractFrameNumber(left.name).CompareTo(ExtractFrameNumber(right.name)));
+        if (frames.Count < frameCount)
+            return;
+
+        string clipPath = GeneratedClipsFolder + "/" + clipName + ".anim";
+        AssetDatabase.DeleteAsset(clipPath);
+
+        AnimationClip clip = new AnimationClip
+        {
+            name = clipName,
+            frameRate = 10f
+        };
+
+        ObjectReferenceKeyframe[] keys = new ObjectReferenceKeyframe[frameCount + 1];
+        for (int i = 0; i < frameCount; i++)
+        {
+            keys[i] = new ObjectReferenceKeyframe
+            {
+                time = i / 10f,
+                value = frames[i]
+            };
+        }
+
+        // Duplicate the last sprite one frame later so every source frame is
+        // displayed for a full 0.1 seconds.
+        keys[frameCount] = new ObjectReferenceKeyframe
+        {
+            time = frameCount / 10f,
+            value = frames[frameCount - 1]
+        };
+
+        EditorCurveBinding binding = new EditorCurveBinding
+        {
+            path = string.Empty,
+            type = typeof(SpriteRenderer),
+            propertyName = "m_Sprite"
+        };
+        AnimationUtility.SetObjectReferenceCurve(clip, binding, keys);
+
+        AnimationClipSettings settings = AnimationUtility.GetAnimationClipSettings(clip);
+        settings.loopTime = loop;
+        AnimationUtility.SetAnimationClipSettings(clip, settings);
+        AssetDatabase.CreateAsset(clip, clipPath);
+        clips[clipName] = clip;
+    }
+
+    private static void ConfigurePngStrip(string pngPath, string clipName, int frameCount)
+    {
+        TextureImporter importer = AssetImporter.GetAtPath(pngPath) as TextureImporter;
+        if (importer == null)
+            return;
+
+        importer.textureType = TextureImporterType.Sprite;
+        importer.spriteImportMode = SpriteImportMode.Multiple;
+        importer.spritePixelsPerUnit = 100f;
+        importer.mipmapEnabled = false;
+        importer.filterMode = FilterMode.Point;
+        importer.textureCompression = TextureImporterCompression.Uncompressed;
+
+#pragma warning disable 0618
+        SpriteMetaData[] slices = new SpriteMetaData[frameCount];
+        for (int i = 0; i < frameCount; i++)
+        {
+            slices[i] = new SpriteMetaData
+            {
+                name = clipName + "_" + i,
+                rect = new Rect(i * 100f, 0f, 100f, 100f),
+                alignment = (int)SpriteAlignment.Center,
+                pivot = new Vector2(0.5f, 0.5f)
+            };
+        }
+        importer.spritesheet = slices;
+#pragma warning restore 0618
+        importer.SaveAndReimport();
+    }
+
+    private static int ExtractFrameNumber(string spriteName)
+    {
+        int underscore = spriteName.LastIndexOf('_');
+        return underscore >= 0 && int.TryParse(spriteName.Substring(underscore + 1), out int frame)
+            ? frame
+            : int.MaxValue;
+    }
+
+    private static void EnsureFolder(string folderPath)
+    {
+        if (AssetDatabase.IsValidFolder(folderPath))
+            return;
+
+        int slash = folderPath.LastIndexOf('/');
+        string parent = folderPath.Substring(0, slash);
+        string folder = folderPath.Substring(slash + 1);
+        EnsureFolder(parent);
+        AssetDatabase.CreateFolder(parent, folder);
     }
 
     private static AnimatorController BuildController(Dictionary<string, AnimationClip> clips)
@@ -185,6 +300,8 @@ public static class Level25OrcSetupEditor
             GetOrAdd<HitFeedback>(root);
             ChainSamuraiLevel25 enemy = GetOrAdd<ChainSamuraiLevel25>(root);
             SpriteRenderer sprite = root.GetComponentInChildren<SpriteRenderer>(true);
+            if (sprite != null)
+                sprite.sprite = LoadFirstSprite(OrcPngRoot + "/Orc_Idle.png");
 
             SerializedObject enemySettings = new SerializedObject(enemy);
             Set(enemySettings, "useHorizontalSpriteFlipping", true);
@@ -219,6 +336,17 @@ public static class Level25OrcSetupEditor
     {
         T component = target.GetComponent<T>();
         return component != null ? component : target.AddComponent<T>();
+    }
+
+    private static Sprite LoadFirstSprite(string assetPath)
+    {
+        foreach (UnityEngine.Object asset in AssetDatabase.LoadAllAssetsAtPath(assetPath))
+        {
+            if (asset is Sprite sprite && ExtractFrameNumber(sprite.name) == 0)
+                return sprite;
+        }
+
+        return null;
     }
 
     private static void Set(SerializedObject target, string propertyName, bool value)

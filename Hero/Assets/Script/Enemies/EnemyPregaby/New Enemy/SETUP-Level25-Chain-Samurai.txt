@@ -2,7 +2,7 @@ LEVEL 25 ORC / CHAIN ENEMY SETUP
 
 AUTOMATIC SETUP (RECOMMENDED)
 
-1. Let Unity finish importing the project and the Orc.aseprite file.
+1. Let Unity finish importing the project and the split Orc PNG files.
 2. In Unity's top menu choose:
    Hero2D > Enemies > Setup Level 25 Orc
 3. The tool configures the existing "Chain Enemy" prefab. It does not add an
@@ -11,7 +11,8 @@ AUTOMATIC SETUP (RECOMMENDED)
 
 WHAT THE TOOL CONFIGURES
 
-- Builds Level25 Orc.controller from the real Aseprite tags:
+- Builds normal standalone .anim files and Level25 Orc.controller from the
+  100x100 Orc PNG strips:
   Idle (6), Walk (8), Attack01 (6), Attack02 (6), Hurt (4), Death (4).
 - Assigns that Animator Controller to Chain Enemy.prefab.
 - Uses horizontal sprite flipping because this art is side-facing, not a
@@ -49,3 +50,11 @@ Select Chain Enemy.prefab and edit ChainSamuraiLevel25 in the Inspector:
 
 EnemyHealth controls base health and XP. EnemyCoins controls the random minimum
 and maximum coin reward.
+
+WHY THE RAW ASEPRITE FILE IS OUTSIDE ASSETS
+
+The original Orc.aseprite source is preserved in Hero/SourceArt, outside Unity's
+Assets folder. Some Unity/Aseprite importer combinations cannot read its format.
+Keeping it outside Assets prevents import errors and stops Unity from rebuilding
+and erasing Animator transitions. The game uses ordinary PNG sprites, .anim
+clips and a standalone Animator Controller instead.
