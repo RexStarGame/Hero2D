@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -13,6 +14,13 @@ public class EnemyHealth : MonoBehaviour
 
     [Header("Events")]
     public UnityEvent onDeath = new UnityEvent();
+
+    [Header("Death presentation")]
+    [Tooltip("Keeps the enemy object alive briefly so a death animation can finish. Existing enemies keep the default value of 0.")]
+    [Min(0f)] [SerializeField] private float deathDestroyDelay;
+
+    public event Action Damaged;
+    public event Action Died;
 
     private PlayerXP player;
     private bool dead;
@@ -68,10 +76,13 @@ public class EnemyHealth : MonoBehaviour
             feedback.PlayHitFeedback();
         }
 
-        // 2. Tjek om fjenden skal dø
         if (currentHealth <= 0)
         {
             Die();
+        }
+        else
+        {
+            Damaged?.Invoke();
         }
     }
 
@@ -113,6 +124,8 @@ public class EnemyHealth : MonoBehaviour
         dead = true;
         Debug.Log(gameObject.name + " er død!");
 
+        Died?.Invoke();
+
         // Giv XP til spilleren
         if (player != null)
         {
@@ -123,7 +136,7 @@ public class EnemyHealth : MonoBehaviour
         onDeath?.Invoke();
 
         // Fjern fjenden fra spillet
-        Destroy(gameObject);
+        Destroy(gameObject, deathDestroyDelay);
     }
 
     // TEST FUNKTION: 

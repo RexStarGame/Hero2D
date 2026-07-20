@@ -1,55 +1,51 @@
-LEVEL 25 CHAIN SAMURAI SETUP
+LEVEL 25 ORC / CHAIN ENEMY SETUP
 
-Put these components on the ROOT of the new enemy prefab:
+AUTOMATIC SETUP (RECOMMENDED)
 
-1. SpriteRenderer
-2. Animator
-3. Rigidbody2D
-   - Body Type: Dynamic
-   - Gravity Scale: 0
-   - Freeze Rotation Z: enabled
-4. A non-trigger Collider2D fitted around the body
-5. EnemyHealth
-6. EnemyDifficultyProfile
-7. EnemyAggro2D
-8. ChainSamuraiLevel25
+1. Let Unity finish importing the project and the Orc.aseprite file.
+2. In Unity's top menu choose:
+   Hero2D > Enemies > Setup Level 25 Orc
+3. The tool configures the existing "Chain Enemy" prefab. It does not add an
+   enemy to the open scene.
+4. Add "Chain Enemy" to EnemySpawn's Enemy Pool with Min Level 25.
 
-Do not also add MageRed or EnemyAttack. ChainSamuraiLevel25 owns this enemy's
-movement and attacks; using the old scripts too would make two controllers fight.
+WHAT THE TOOL CONFIGURES
 
-ENEMY HEALTH
-- Set Max Health and XP Reward for the level-25 enemy in EnemyHealth.
-- EnemyDifficultyProfile automatically scales health and both attacks for the
-  selected Easy / Normal / Hard / Extreme / Nightmare difficulty.
+- Builds Level25 Orc.controller from the real Aseprite tags:
+  Idle (6), Walk (8), Attack01 (6), Attack02 (6), Hurt (4), Death (4).
+- Assigns that Animator Controller to Chain Enemy.prefab.
+- Uses horizontal sprite flipping because this art is side-facing, not a
+  four-direction sprite set.
+- Sets Rigidbody2D Gravity Scale to 0, interpolation on and rotation frozen.
+- Replaces the weapon-shaped PolygonCollider2D with one stable body-only
+  CapsuleCollider2D. The weapon drawn in the animation is visual only.
+- Connects Attack01 to the aimed slash and Attack02 to the larger circular AOE.
+- Keeps the enemy alive briefly after death so the Death animation can finish.
+- Ensures EnemyCoins and HitFeedback are present.
 
-ANIMATOR PARAMETERS
-- MoveX    (Float)
-- MoveY    (Float)
-- Speed    (Float)
-- Attack1  (Trigger) -- simple aimed chain slash
-- Attack2  (Trigger) -- circular chain AOE sweep
+IMPORTANT
 
-The names are editable in ChainSamuraiLevel25 if your Animator uses other names.
-Use MoveX and MoveY for four-direction movement/idle blend trees. Attack1 and
-Attack2 should transition to the matching directional attack animations.
+Do not also add MageRed or EnemyAttack. ChainSamuraiLevel25 owns movement and
+both attacks. Adding another movement/attack controller would make the scripts
+fight each other.
 
-PLAYER LAYERS
-- Set Player Layers to the layer containing the Player and its hit colliders.
-- Leaving it as Everything works, but a dedicated Player layer is more efficient.
+COMBAT
 
-ATTACK FEEDBACK
-- The script automatically creates a child LineRenderer at runtime if Warning
-  Line is empty.
-- Yellow cone: Attack 1 danger area.
-- Red circle: Attack 2 AOE danger area.
-- Damage happens only after the warning/windup completes.
+- Attack 1: short aimed chain slash. Yellow warning cone.
+- Attack 2: larger circular chain AOE. Red warning circle.
+- Damage occurs after the warning/windup and is scaled by the selected game
+  difficulty through EnemyDifficultyProfile.
+- SafeZone protection and EnemyAggro2D authority remain shared with the other
+  enemies and future co-op preparation.
 
-SAFE ZONES AND FUTURE CO-OP
-- EnemyAggro2D drops protected players automatically.
-- PlayerHealth rejects damage while inside a SafeZone.
-- Every player caught by the AOE is damaged once, while authority remains routed
-  through EnemyAggro2D for future host/server control.
+TUNING
 
-SPAWNING
-- Add the completed prefab to EnemySpawn's Enemy Pool with Min Level 25.
-- This is a normal enemy, so it will use the existing off-screen spawn rules.
+Select Chain Enemy.prefab and edit ChainSamuraiLevel25 in the Inspector:
+- detection/give-up range
+- movement speed
+- slash/AOE range and damage
+- cooldown and AOE chance
+- warning colours and widths
+
+EnemyHealth controls base health and XP. EnemyCoins controls the random minimum
+and maximum coin reward.

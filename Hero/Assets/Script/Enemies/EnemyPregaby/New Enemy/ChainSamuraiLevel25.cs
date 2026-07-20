@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Level-25 chain samurai controller.
+/// Level-25 dual-attack enemy controller.
 ///
 /// Attack 1 is a short, aimed chain slash.
 /// Attack 2 is a slower, clearly telegraphed circular chain sweep.
@@ -52,17 +52,24 @@ public sealed class ChainSamuraiLevel25 : MonoBehaviour
     [SerializeField] private LineRenderer warningLine;
 
     [Header("Animator parameter names")]
+    [Tooltip("The supplied Orc art faces right and uses horizontal flipping instead of four directional clips.")]
+    [SerializeField] private bool useHorizontalSpriteFlipping = true;
+    [SerializeField] private bool sourceSpriteFacesRight = true;
+    [SerializeField] private SpriteRenderer facingSprite;
     [SerializeField] private string moveXParameter = "MoveX";
     [SerializeField] private string moveYParameter = "MoveY";
     [SerializeField] private string speedParameter = "Speed";
     [SerializeField] private string slashTrigger = "Attack1";
     [SerializeField] private string sweepTrigger = "Attack2";
+    [SerializeField] private string hurtTrigger = "Hurt";
+    [SerializeField] private string deathTrigger = "Die";
 
     [Header("Scene debug")]
     [SerializeField] private bool drawRanges = true;
 
     private readonly HashSet<PlayerHealth> damagedPlayers = new HashSet<PlayerHealth>();
     private Rigidbody2D body;
+    private EnemyHealth health;
     private Animator animator;
     private EnemyAggro2D aggro;
     private EnemyDifficultyProfile difficultyProfile;
@@ -76,6 +83,7 @@ public sealed class ChainSamuraiLevel25 : MonoBehaviour
     private float nextSweepTime;
     private float nextRouteValidationTime;
     private bool patrolActive;
+    private bool dead;
 
     public bool IsAttacking => attackRoutine != null;
     public float SlashRange => slashRange;
@@ -84,9 +92,12 @@ public sealed class ChainSamuraiLevel25 : MonoBehaviour
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
+        health = GetComponent<EnemyHealth>();
         animator = GetComponent<Animator>();
         aggro = GetComponent<EnemyAggro2D>();
         difficultyProfile = GetComponent<EnemyDifficultyProfile>();
+        if (facingSprite == null)
+            facingSprite = GetComponentInChildren<SpriteRenderer>(true);
 
         if (difficultyProfile == null)
             difficultyProfile = gameObject.AddComponent<EnemyDifficultyProfile>();
@@ -97,6 +108,18 @@ public sealed class ChainSamuraiLevel25 : MonoBehaviour
         HideWarning();
     }
 
+    private void OnEnable()
+    {
+        if (health == null)
+            health = GetComponent<EnemyHealth>();
+
+        if (health != null)
+        {
+            health.Damaged += HandleDamaged;
+            health.Died += HandleDied;
+        }
+    }
+
     private void Start()
     {
         enemyManager = FindAny<EnemyManager>();
@@ -105,7 +128,7 @@ public sealed class ChainSamuraiLevel25 : MonoBehaviour
 
     private void Update()
     {
-        if (aggro == null || !aggro.HasAuthority())
+        if (dead || aggro == null || !aggro.HasAuthority())
             return;
 
         Transform target = aggro.CurrentTarget;
@@ -128,7 +151,7 @@ public sealed class ChainSamuraiLevel25 : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (body == null || aggro == null || !aggro.HasAuthority())
+        if (dead || body == null || aggro == null || !aggro.HasAuthority())
             return;
 
         if (IsAttacking)
@@ -430,8 +453,19 @@ public sealed class ChainSamuraiLevel25 : MonoBehaviour
 
         if (direction.sqrMagnitude > 0.0001f)
         {
-            SetAnimatorFloat(moveXParameter, direction.x);
-            SetAnimatorFloat(moveYParameter, direction.y);
+            if (useHorizontalSpriteFlipping)
+            {
+                if (facingSprite != null && Mathf.Abs(direction.x) > 0.05f)
+                {
+                    bool lookingRight = direction.x > 0f;
+                    facingSprite.flipX = sourceSpriteFacesRight ? !lookingRight : lookingRight;
+                }
+            }
+            else
+            {
+                SetAnimatorFloat(moveXParameter, direction.x);
+                SetAnimatorFloat(moveYParameter, direction.y);
+            }
         }
 
         SetAnimatorFloat(speedParameter, moving ? 1f : 0f);
@@ -461,8 +495,54 @@ public sealed class ChainSamuraiLevel25 : MonoBehaviour
         return false;
     }
 
+    private void HandleDamaged()
+    {
+        if (!dead && !IsAttacking)
+            SetAnimatorTrigger(hurtTrigger);
+    }
+
+    private void HandleDied()
+    {
+        if (dead)
+            return;
+
+        dead = true;
+        HideWarning();
+
+        if (attackRoutine != null)
+        {
+            StopCoroutine(attackRoutine);
+            attackRoutine = null;
+        }
+
+        if (patrolWaitRoutine != null)
+        {
+            StopCoroutine(patrolWaitRoutine);
+            patrolWaitRoutine = null;
+        }
+
+        if (body != null)
+            body.linearVelocity = Vector2.zero;
+
+        if (aggro != null)
+            aggro.ClearTarget();
+
+        Collider2D bodyCollider = GetComponent<Collider2D>();
+        if (bodyCollider != null)
+            bodyCollider.enabled = false;
+
+        SetAnimatorFloat(speedParameter, 0f);
+        SetAnimatorTrigger(deathTrigger);
+    }
+
     private void OnDisable()
     {
+        if (health != null)
+        {
+            health.Damaged -= HandleDamaged;
+            health.Died -= HandleDied;
+        }
+
         if (attackRoutine != null)
         {
             StopCoroutine(attackRoutine);
