@@ -1,19 +1,28 @@
 fileFormatVersion: 2
-guid: 87b273e4e7a2c3a4088b586dcd3e09b0
+guid: 1547de860d597da409a70d5f4049cc0d
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -834737827249987490
-    second: download (45)_0
+      213: -6634240400177418082
+    second: Orc_Death_0
   - first:
-      213: -8281952020341327870
-    second: download (45)_1
+      213: 370393475637858559
+    second: Orc_Death_1
   - first:
-      213: -3046162774979751791
-    second: download (45)_2
+      213: -9080859390935191118
+    second: Orc_Death_2
   - first:
-      213: -8178968065338792844
-    second: download (45)_3
+      213: 8470104493075811987
+    second: Orc_Death_3
+  - first:
+      213: -8082230524833895754
+    second: Orc_Death_4
+  - first:
+      213: 9064599263267570789
+    second: Orc_Death_5
+  - first:
+      213: -805332053335619196
+    second: Orc_Death_6
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -161,89 +170,155 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: download (45)_0
+      name: Orc_Death_0
       rect:
         serializedVersion: 2
-        x: 7
-        y: 389
-        width: 339
-        height: 219
+        x: 42
+        y: 39
+        width: 25
+        height: 20
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e50ee266e5a6a64f0800000000000000
-      internalID: -834737827249987490
+      spriteID: e9031e871817ee3a0800000000000000
+      internalID: -6634240400177418082
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: download (45)_1
+      name: Orc_Death_1
       rect:
         serializedVersion: 2
-        x: 4
-        y: 3
-        width: 315
-        height: 285
+        x: 139
+        y: 39
+        width: 28
+        height: 21
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 208f9b46488901d80800000000000000
-      internalID: -8281952020341327870
+      spriteID: ff0548657e6e32500800000000000000
+      internalID: 370393475637858559
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: download (45)_2
+      name: Orc_Death_2
       rect:
         serializedVersion: 2
-        x: 371
-        y: 5
-        width: 230
-        height: 280
+        x: 236
+        y: 47
+        width: 17
+        height: 15
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 190505d681bd9b5d0800000000000000
-      internalID: -3046162774979751791
+      spriteID: 2b1b9041f7e4af180800000000000000
+      internalID: -9080859390935191118
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: download (45)_3
+      name: Orc_Death_3
       rect:
         serializedVersion: 2
-        x: 426
-        y: 328
-        width: 218
-        height: 299
+        x: 254
+        y: 41
+        width: 12
+        height: 14
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 474a73ce0e77e7e80800000000000000
-      internalID: -8178968065338792844
+      spriteID: 39e4930f82bdb8570800000000000000
+      internalID: 8470104493075811987
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Orc_Death_4
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 39
+        width: 17
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6bae47eb82626df80800000000000000
+      internalID: -8082230524833895754
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Orc_Death_5
+      rect:
+        serializedVersion: 2
+        x: 354
+        y: 41
+        width: 12
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 564c45ee00debcd70800000000000000
+      internalID: 9064599263267570789
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Orc_Death_6
+      rect:
+        serializedVersion: 2
+        x: 238
+        y: 39
+        width: 15
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 489c1baa3c2e2d4f0800000000000000
+      internalID: -805332053335619196
       vertices: []
       indices: 
       edges: []
@@ -252,7 +327,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: cc925cbf77c277845ac7b719749319de
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -261,11 +336,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      download (45)_0: -834737827249987490
-      download (45)_1: -8281952020341327870
-      download (45)_2: -3046162774979751791
-      download (45)_3: -8178968065338792844
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

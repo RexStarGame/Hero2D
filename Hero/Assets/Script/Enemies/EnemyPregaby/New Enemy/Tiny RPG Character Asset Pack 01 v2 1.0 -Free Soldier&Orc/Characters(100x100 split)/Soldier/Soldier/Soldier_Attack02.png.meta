@@ -1,55 +1,31 @@
 fileFormatVersion: 2
-guid: e5749c3bd3924a74c8f4d9e07db32e18
+guid: 70a382d2f0f35a7418b998e33c710764
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7864057837626286052
-    second: download (49)_0
+      213: -4099682557227360808
+    second: Soldier_Attack02_0
   - first:
-      213: -1069705143257978937
-    second: download (49)_1
+      213: 8225495098055431740
+    second: Soldier_Attack02_1
   - first:
-      213: -7695862139083222916
-    second: download (49)_2
+      213: -2676785311167784858
+    second: Soldier_Attack02_2
   - first:
-      213: 2764582497567887271
-    second: download (49)_3
+      213: -485474084187396021
+    second: Soldier_Attack02_3
   - first:
-      213: -8329181376693956056
-    second: download (49)_4
+      213: 919828676230503111
+    second: Soldier_Attack02_4
   - first:
-      213: 2037924055722292596
-    second: download (49)_5
+      213: 7541349493881095492
+    second: Soldier_Attack02_5
   - first:
-      213: -999736040075678521
-    second: download (49)_6
+      213: -9156718690140692374
+    second: Soldier_Attack02_6
   - first:
-      213: 3067891308577414440
-    second: download (49)_7
-  - first:
-      213: -2309041881093221129
-    second: download (49)_8
-  - first:
-      213: -7051219016206911918
-    second: download (49)_9
-  - first:
-      213: 2379039939947456233
-    second: download (49)_10
-  - first:
-      213: 2904260755019824051
-    second: download (49)_11
-  - first:
-      213: -1796865002357618810
-    second: download (49)_12
-  - first:
-      213: -2364106384499154576
-    second: download (49)_13
-  - first:
-      213: 8669023127907454299
-    second: download (49)_14
-  - first:
-      213: -8172531627731583209
-    second: download (49)_15
+      213: -120481755975448847
+    second: Soldier_Attack02_7
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -197,13 +173,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: download (49)_0
+      name: Soldier_Attack02_0
       rect:
         serializedVersion: 2
-        x: 22
-        y: 515
-        width: 128
-        height: 108
+        x: 40
+        y: 39
+        width: 19
+        height: 23
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -212,20 +188,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 4ef57d010feb22d60800000000000000
-      internalID: 7864057837626286052
+      spriteID: 8dd199c6f600b17c0800000000000000
+      internalID: -4099682557227360808
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: download (49)_1
+      name: Soldier_Attack02_1
       rect:
         serializedVersion: 2
-        x: 189
-        y: 524
-        width: 84
-        height: 99
+        x: 140
+        y: 46
+        width: 21
+        height: 24
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -234,20 +210,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7c723b9f6d4a721f0800000000000000
-      internalID: -1069705143257978937
+      spriteID: c369f4d0634d62270800000000000000
+      internalID: 8225495098055431740
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: download (49)_2
+      name: Soldier_Attack02_2
       rect:
         serializedVersion: 2
-        x: 345
-        y: 506
-        width: 89
-        height: 139
+        x: 242
+        y: 47
+        width: 20
+        height: 22
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -256,20 +232,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: c70119fa82ec23590800000000000000
-      internalID: -7695862139083222916
+      spriteID: 6685cd311f52adad0800000000000000
+      internalID: -2676785311167784858
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: download (49)_3
+      name: Soldier_Attack02_3
       rect:
         serializedVersion: 2
-        x: 493
-        y: 524
-        width: 123
-        height: 120
+        x: 341
+        y: 39
+        width: 30
+        height: 26
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -278,20 +254,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7afcbc75225cd5620800000000000000
-      internalID: 2764582497567887271
+      spriteID: b482a5084ef3349f0800000000000000
+      internalID: -485474084187396021
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: download (49)_4
+      name: Soldier_Attack02_4
       rect:
         serializedVersion: 2
-        x: 16
-        y: 370
-        width: 144
-        height: 74
+        x: 441
+        y: 39
+        width: 30
+        height: 20
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -300,20 +276,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 8229b54faadc86c80800000000000000
-      internalID: -8329181376693956056
+      spriteID: 7cadfecbe43e3cc00800000000000000
+      internalID: 919828676230503111
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: download (49)_5
+      name: Soldier_Attack02_5
       rect:
         serializedVersion: 2
-        x: 195
-        y: 320
-        width: 111
-        height: 124
+        x: 541
+        y: 39
+        width: 30
+        height: 21
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -322,20 +298,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 475fc8c9129284c10800000000000000
-      internalID: 2037924055722292596
+      spriteID: 445cadda86148a860800000000000000
+      internalID: 7541349493881095492
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: download (49)_6
+      name: Soldier_Attack02_6
       rect:
         serializedVersion: 2
-        x: 348
-        y: 362
-        width: 86
-        height: 105
+        x: 143
+        y: 39
+        width: 15
+        height: 7
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -344,20 +320,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7cc222e4e593022f0800000000000000
-      internalID: -999736040075678521
+      spriteID: a60ebfd9ddccce080800000000000000
+      internalID: -9156718690140692374
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: download (49)_7
+      name: Soldier_Attack02_7
       rect:
         serializedVersion: 2
-        x: 500
-        y: 370
-        width: 112
-        height: 107
+        x: 245
+        y: 39
+        width: 15
+        height: 7
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -366,184 +342,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 82dd34904e6539a20800000000000000
-      internalID: 3067891308577414440
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: download (49)_8
-      rect:
-        serializedVersion: 2
-        x: 12
-        y: 134
-        width: 149
-        height: 148
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 7f450f994a2a4ffd0800000000000000
-      internalID: -2309041881093221129
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: download (49)_9
-      rect:
-        serializedVersion: 2
-        x: 190
-        y: 205
-        width: 78
-        height: 75
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 256f189e9a9052e90800000000000000
-      internalID: -7051219016206911918
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: download (49)_10
-      rect:
-        serializedVersion: 2
-        x: 345
-        y: 183
-        width: 104
-        height: 102
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 9e6e80f783c040120800000000000000
-      internalID: 2379039939947456233
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: download (49)_11
-      rect:
-        serializedVersion: 2
-        x: 496
-        y: 162
-        width: 122
-        height: 157
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 3bb701ee4c10e4820800000000000000
-      internalID: 2904260755019824051
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: download (49)_12
-      rect:
-        serializedVersion: 2
-        x: 55
-        y: 3
-        width: 101
-        height: 138
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 6878421fcc04017e0800000000000000
-      internalID: -1796865002357618810
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: download (49)_13
-      rect:
-        serializedVersion: 2
-        x: 200
-        y: 26
-        width: 106
-        height: 113
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 071e1b4d4c1013fd0800000000000000
-      internalID: -2364106384499154576
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: download (49)_14
-      rect:
-        serializedVersion: 2
-        x: 339
-        y: 13
-        width: 115
-        height: 119
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: b5dc198ba9e8e4870800000000000000
-      internalID: 8669023127907454299
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: download (49)_15
-      rect:
-        serializedVersion: 2
-        x: 508
-        y: 48
-        width: 70
-        height: 84
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 71ff965d8c5559e80800000000000000
-      internalID: -8172531627731583209
+      spriteID: 1f60b253b76f35ef0800000000000000
+      internalID: -120481755975448847
       vertices: []
       indices: 
       edges: []
