@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -19,8 +18,8 @@ public class EnemyHealth : MonoBehaviour
     [Tooltip("Keeps the enemy object alive briefly so a death animation can finish. Existing enemies keep the default value of 0.")]
     [Min(0f)] [SerializeField] private float deathDestroyDelay;
 
-    public event Action Damaged;
-    public event Action Died;
+    public event System.Action Damaged;
+    public event System.Action Died;
 
     private PlayerXP player;
     private bool dead;
