@@ -99,7 +99,10 @@ public class BossGrabHandler : MonoBehaviour
     private SpriteRenderer ringSR;
     private LineRenderer ringLR;
     private Material ringMat;
+    private float lastDrawnRadius = float.NaN;
+    private int lastDrawnSegments = -1;
     private static readonly int ColorProp = Shader.PropertyToID("_Color");
+    private static readonly int BaseColorProp = Shader.PropertyToID("_BaseColor");
 
     private void Awake()
     {
@@ -370,7 +373,7 @@ public class BossGrabHandler : MonoBehaviour
             ringLR.useWorldSpace = false;
 
             // Ensure we draw a circle if prefab is line-based
-            DrawCircleOnLineRenderer(ringLR, grabRadius, warningLineSegments);
+            RedrawRingIfNeeded();
 
             // Avoid scaling affecting line points
             ring.transform.localScale = Vector3.one;
@@ -399,9 +402,7 @@ public class BossGrabHandler : MonoBehaviour
         }
         else
         {
-            // If radius changed at runtime, redraw
-            // (cheap enough) - optional: only redraw if value changed
-            DrawCircleOnLineRenderer(ringLR, grabRadius, warningLineSegments);
+            RedrawRingIfNeeded();
         }
     }
 
@@ -455,18 +456,37 @@ public class BossGrabHandler : MonoBehaviour
 
         if (ringLR != null)
         {
-            Gradient g = new Gradient();
-            g.SetKeys(
-                new[] { new GradientColorKey(c, 0f), new GradientColorKey(c, 1f) },
-                new[] { new GradientAlphaKey(c.a, 0f), new GradientAlphaKey(c.a, 1f) }
-            );
-            ringLR.colorGradient = g;
+            ringLR.startColor = c;
+            ringLR.endColor = c;
 
             if (ringMat != null)
             {
                 if (ringMat.HasProperty(ColorProp)) ringMat.SetColor(ColorProp, c);
-                else if (ringMat.HasProperty("_BaseColor")) ringMat.SetColor("_BaseColor", c);
+                else if (ringMat.HasProperty(BaseColorProp)) ringMat.SetColor(BaseColorProp, c);
             }
+        }
+    }
+
+    private void RedrawRingIfNeeded()
+    {
+        if (ringLR == null)
+            return;
+
+        int segments = Mathf.Max(8, warningLineSegments);
+        if (Mathf.Approximately(lastDrawnRadius, grabRadius) && lastDrawnSegments == segments)
+            return;
+
+        DrawCircleOnLineRenderer(ringLR, grabRadius, segments);
+        lastDrawnRadius = grabRadius;
+        lastDrawnSegments = segments;
+    }
+
+    private void OnDestroy()
+    {
+        if (ringMat != null)
+        {
+            Destroy(ringMat);
+            ringMat = null;
         }
     }
 
