@@ -25467,13 +25467,13 @@ MonoBehaviour:
   coinText: {fileID: 29144735}
   coinImage: {fileID: 2071273455}
   gainText: {fileID: 1700367619}
-  prefix: 'Coins: '
+  prefix: 
   gainPrefix: +
   gainSuffix: ' Coins'
   gainFontSize: 32
   gainColor: {r: 1, g: 0.82, b: 0.2, a: 1}
   feedbackDuration: 1
-  gainStartOffset: {x: 0, y: -55}
+  gainStartOffset: {x: -125, y: -65}
   gainTravel: {x: 0, y: 34}
   shakeDuration: 0.35
   shakeStrength: 7
