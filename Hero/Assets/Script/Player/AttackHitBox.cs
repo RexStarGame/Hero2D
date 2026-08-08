@@ -35,8 +35,9 @@ public class AttackHitbox : MonoBehaviour
 
         // Crit
         int finalDamage = baseDamage;
+        bool isCritical = false;
         if (ownerAttack != null)
-            finalDamage = ownerAttack.GetDamageForHit(baseDamage);
+            finalDamage = ownerAttack.GetDamageForHit(baseDamage, out isCritical);
 
         bool didHit = false;
 
@@ -58,6 +59,9 @@ public class AttackHitbox : MonoBehaviour
 
         // Lifesteal uses final damage (after crit)
         if (didHit && ownerAttack != null)
+        {
             ownerAttack.OnSuccessfulHit(finalDamage);
+            ownerAttack.ShowDamageNumber(finalDamage, isCritical);
+        }
     }
 }

@@ -72,6 +72,7 @@ public class PlayerAttack : MonoBehaviour
     private Vector2 lastFacingDirection = Vector2.down;
     private Coroutine attackRoutine;
     private bool trailPlayedThisAttack;
+    private PlayerDamageNumberWorld damageNumberWorld;
 
     [SerializeField] private DamageUpgrade damageUpgrade;
     public DamageUpgrade DamageUpgrade => damageUpgrade;
@@ -96,6 +97,10 @@ public class PlayerAttack : MonoBehaviour
 
         if (damageUpgrade == null)
             damageUpgrade = GetComponent<DamageUpgrade>();
+
+        damageNumberWorld = GetComponent<PlayerDamageNumberWorld>();
+        if (damageNumberWorld == null)
+            damageNumberWorld = gameObject.AddComponent<PlayerDamageNumberWorld>();
 
         // Start as ready
         AttackReadyTime = Time.time;
@@ -214,13 +219,31 @@ public class PlayerAttack : MonoBehaviour
     // ---------- Crit: compute damage for a hit ----------
     public int GetDamageForHit(int baseDamage)
     {
+        return GetDamageForHit(baseDamage, out _);
+    }
+
+    public int GetDamageForHit(int baseDamage, out bool isCritical)
+    {
+        isCritical = false;
         if (baseDamage <= 0) return 0;
 
-        bool isCrit = Random.value < CritChance;
-        if (!isCrit) return baseDamage;
+        isCritical = Random.value < CritChance;
+        if (!isCritical) return baseDamage;
 
         int critDamage = Mathf.RoundToInt(baseDamage * critMultiplier);
         return Mathf.Max(baseDamage, critDamage);
+    }
+
+    public void ShowDamageNumber(int damage, bool isCritical)
+    {
+        if (damage <= 0)
+            return;
+
+        if (damageNumberWorld == null)
+            damageNumberWorld = GetComponent<PlayerDamageNumberWorld>();
+
+        if (damageNumberWorld != null)
+            damageNumberWorld.Show(damage, isCritical);
     }
 
     // ---------- Life Steal: heal on real hit ----------
