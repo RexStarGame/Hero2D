@@ -37727,7 +37727,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07b46dada7d9bf64e8ba85d7e27d8ebd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 15
+  minimumDamage: 15
+  maximumDamage: 15
   damageLevel: 0
   maxDamageLevel: 15
   damagePerLevel: 5
@@ -58774,7 +58775,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ownerAttack: {fileID: 239307042}
   damageUpgrade: {fileID: 1048377964}
-  damage: 10
+  minimumDamage: 10
+  maximumDamage: 10
 --- !u!4 &1642540755
 Transform:
   m_ObjectHideFlags: 0
@@ -76309,14 +76311,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9a8f5c821eb45db9be8a7fc9c2a01cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  localStartOffset: {x: 1, y: 25}
+  localStartOffset: {x: -10, y: 25}
   horizontalSpacing: 22
   lifetime: 1.15
   riseDistance: 80
   normalColor: {r: 1, g: 0.95, b: 0.82, a: 1}
   criticalColor: {r: 1, g: 0.55, b: 0.08, a: 1}
   normalFontSize: 10
-  criticalFontSize: 15
+  criticalFontSize: 12
   criticalPrefix: 'CRIT '
   damageSuffix: '!'
   worldScale: 0.01
