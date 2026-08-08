@@ -99,14 +99,77 @@ GUID 6242f085b186e894b83f42d36ba5f246 -> Hero/Assets/Script/Enemies/EnemyPregaby
 GUID c431d5bfaee7cf242863ae6110025c32 -> Hero/Assets/Script/Enemies/EnemyPregaby/Enemies level 5.prefab
 GUID cc1175b0a56f8204d9a362b86c83c482 -> Hero/Assets/Script/Enemies/EnemyPregaby/Enemies-Level 1.prefab
 
-Matching block count: 2
+### classID=1 fileID=1615476166
+--- !u!1 &1615476166
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1615476168}
+  - component: {fileID: 1615476167}
+  m_Layer: 0
+  m_Name: RegionalSpawnDirector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+
+### classID=114 fileID=1615476167
+--- !u!114 &1615476167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1615476166}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e054ba2f378401ba135e5b0e6edb8be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  authorityProvider: {fileID: 0}
+  easyMaximum: 12
+  normalMaximum: 15
+  hardMaximum: 18
+  extremeMaximum: 20
+  nightmareMaximum: 22
+  logRejectedAuthorityProvider: 1
+GUID 9e054ba2f378401ba135e5b0e6edb8be -> Hero/Assets/Script/Enemies/RegionalSpawning/RegionalSpawnDirector.cs
+
+Matching block count: 4
 
 === Direct occurrence contexts ===
 ## EnemyLevel-1Zone: 0 occurrence(s)
 
 ## ArmyEnemyZones: 0 occurrence(s)
 
-## RegionalSpawnDirector: 0 occurrence(s)
+## RegionalSpawnDirector: 1 occurrence(s)
+-- lines 57312-57332 --
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1615476168}
+  - component: {fileID: 1615476167}
+  m_Layer: 0
+  m_Name: RegionalSpawnDirector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1615476167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
 
 ## dynamicEnemiesRoot: 0 occurrence(s)
 
@@ -174,7 +237,29 @@ GameObject:
 
 ## a29ad8ce999b4f2e9ddd114f7fd7e705: 0 occurrence(s)
 
-## 9e054ba2f378401ba135e5b0e6edb8be: 0 occurrence(s)
+## 9e054ba2f378401ba135e5b0e6edb8be: 1 occurrence(s)
+-- lines 57327-57347 --
+  m_IsActive: 1
+--- !u!114 &1615476167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1615476166}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e054ba2f378401ba135e5b0e6edb8be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  authorityProvider: {fileID: 0}
+  easyMaximum: 12
+  normalMaximum: 15
+  hardMaximum: 18
+  extremeMaximum: 20
+  nightmareMaximum: 22
+  logRejectedAuthorityProvider: 1
+--- !u!4 &1615476168
 
 === Relevant GUID mappings ===
 cc1175b0a56f8204d9a362b86c83c482 -> Hero/Assets/Script/Enemies/EnemyPregaby/Enemies-Level 1.prefab
@@ -185,6 +270,7 @@ a2f931d6dfe64e10ace9d52383feda96 -> Hero/Assets/Script/Enemies/RegionalSpawning
 3215bdce295d4616a0ab0da903545fa8 -> Hero/Assets/Script/Enemies/RegionalSpawning/EnemyRegionProfile.cs
 a29ad8ce999b4f2e9ddd114f7fd7e705 -> Hero/Assets/Script/Enemies/RegionalSpawning/EnemySpawnZone2D.cs
 afcbd3d94c78456881e80a6508a61093 -> Hero/Assets/Script/Enemies/RegionalSpawning/IRegionalSpawnAuthority.cs
+ec5db68b9ed73ea4082f12a8d0a92ffa -> Hero/Assets/Script/Enemies/RegionalSpawning/Level 1 Enemie Region.asset
 bff55ee31cbb4d5aae70d5de001503e6 -> Hero/Assets/Script/Enemies/RegionalSpawning/REGIONAL_SPAWNING_SETUP.md
 9e054ba2f378401ba135e5b0e6edb8be -> Hero/Assets/Script/Enemies/RegionalSpawning/RegionalSpawnDirector.cs
 3dbae8e55af34f798ffedf9bd12ba6bc -> Hero/Assets/Script/Enemies/RegionalSpawning/SpawnedEnemyRegionLink.cs
