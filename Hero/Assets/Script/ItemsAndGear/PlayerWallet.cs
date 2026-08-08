@@ -7,6 +7,7 @@ public class PlayerWallet : MonoBehaviour
 
     public int Gold { get; private set; }
     public event Action GoldChanged;
+    public event Action<int> GoldAdded;
 
     private void Awake()
     {
@@ -33,6 +34,7 @@ public class PlayerWallet : MonoBehaviour
 
         Gold += amount;
         GoldChanged?.Invoke();
+        GoldAdded?.Invoke(amount);
     }
 
     public void RestoreGold(int amount)

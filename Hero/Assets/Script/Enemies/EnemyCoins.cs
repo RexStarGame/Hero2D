@@ -44,10 +44,6 @@ public class EnemyCoins : MonoBehaviour
 
     public void AwardCoins()
     {
-        if (rewarded)
-            return;
-
-        rewarded = true;
         FindWallet();
 
         if (wallet == null)
@@ -62,8 +58,19 @@ public class EnemyCoins : MonoBehaviour
         int safeMaximum = Mathf.Max(safeMinimum, maxCoins);
         int reward = Random.Range(safeMinimum, safeMaximum + 1);
 
-        wallet.AddGold(reward);
-        Debug.Log($"{gameObject.name} rewarded {reward} coins.");
+        AwardApprovedCoins(wallet, reward);
+    }
+
+    // A future authoritative multiplayer layer can call this with the owning
+    // player's wallet and a server-approved reward. Presentation stays local.
+    public void AwardApprovedCoins(PlayerWallet recipient, int approvedReward)
+    {
+        if (rewarded || recipient == null || approvedReward <= 0)
+            return;
+
+        rewarded = true;
+        recipient.AddGold(approvedReward);
+        Debug.Log($"{gameObject.name} rewarded {approvedReward} coins.");
     }
 
     private void FindDeathSource()
