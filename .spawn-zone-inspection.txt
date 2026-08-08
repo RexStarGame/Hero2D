@@ -1,0 +1,183 @@
+TEMP UNITY SPAWN ZONE INSPECTION
+Scene: Hero/Assets/Scenes/SampleScene.unity
+
+=== Named GameObjects ===
+{
+  "Player": [
+    {
+      "name": "Player",
+      "layer": "6",
+      "tag": "Player",
+      "components": [
+        "239307040",
+        "239307046",
+        "239307045",
+        "239307044",
+        "239307043",
+        "239307042",
+        "239307041",
+        "239307047",
+        "239307048",
+        "239307049",
+        "239307050",
+        "239307051",
+        "239307054",
+        "239307053",
+        "239307052",
+        "239307055"
+      ],
+      "fileID": "239307039",
+      "component_details": [
+        {
+          "fileID": "239307040",
+          "classID": 4
+        },
+        {
+          "fileID": "239307046",
+          "classID": 212
+        },
+        {
+          "fileID": "239307045",
+          "classID": 60
+        },
+        {
+          "fileID": "239307044",
+          "classID": 114,
+          "script_guid": "fd22f51ac4e674944a9b8240f2c100e6",
+          "script_path": "Hero/Assets/Script/Player/PlayerMovement.cs"
+        },
+        {
+          "fileID": "239307043",
+          "classID": 50
+        },
+        {
+          "fileID": "239307042",
+          "classID": 114,
+          "script_guid": "be673688339bf384795c88ece26407dd",
+          "script_path": "Hero/Assets/Script/Player/PlayerAttack.cs"
+        },
+        {
+          "fileID": "239307041",
+          "classID": 95
+        },
+        {
+          "fileID": "239307047",
+          "classID": 114,
+          "script_guid": "e2fac69efb373fb4bb6efff7588cbe95",
+          "script_path": "Hero/Assets/Script/Player/PlayerHealth.cs"
+        },
+        {
+          "fileID": "239307048",
+          "classID": 114,
+          "script_guid": "45ff44667e1383d4a93a2fd9106aded0",
+          "script_path": "Hero/Assets/Script/Player/DashDoge.cs"
+        },
+        {
+          "fileID": "239307049",
+          "classID": 114,
+          "script_guid": "e2e4f9d374ad1594598c31b241f12a1e",
+          "script_path": "Hero/Assets/Script/Player/MapBoundaries.cs"
+        },
+        {
+          "fileID": "239307050",
+          "classID": 114,
+          "script_guid": "7e571abc1eef54d43ba9f35cd7d8821c",
+          "script_path": "Hero/Assets/Script/Player/UI/PlayerXP.cs"
+        },
+        {
+          "fileID": "239307051",
+          "classID": 114,
+          "script_guid": "363c47038570c47419e37a161037015e",
+          "script_path": "Hero/Assets/Script/Player/GotHitFeedback.cs"
+        },
+        {
+          "fileID": "239307054",
+          "classID": 114,
+          "script_guid": "c5b214ce9942f334784d449b36eab20a",
+          "script_path": "Hero/Assets/Script/ItemsAndGear/PlayerEquipment.cs"
+        },
+        {
+          "fileID": "239307053",
+          "classID": 114,
+          "script_guid": "ed15bfeeaf65e0b44a9bfce4fbdbd8e7",
+          "script_path": "Hero/Assets/Script/ItemsAndGear/PlayerInventory.cs"
+        },
+        {
+          "fileID": "239307052",
+          "classID": 114,
+          "script_guid": "43a53f13219ae0e4d8dd2b60f2fbfc5a",
+          "script_path": "Hero/Assets/Script/ItemsAndGear/InventorySaveSystem.cs"
+        },
+        {
+          "fileID": "239307055",
+          "classID": 114,
+          "script_guid": "66afde7ac8354fc2a818f9d1ec4d49ab",
+          "script_path": "Hero/Assets/Script/ItemsAndGear/PlayerWallet.cs"
+        }
+      ]
+    }
+  ],
+  "Main Camera": [
+    {
+      "name": "Main Camera",
+      "layer": "0",
+      "tag": "MainCamera",
+      "components": [
+        "519420032",
+        "519420031",
+        "519420029",
+        "519420030",
+        "519420033"
+      ],
+      "fileID": "519420028",
+      "component_details": [
+        {
+          "fileID": "519420032",
+          "classID": 4
+        },
+        {
+          "fileID": "519420031",
+          "classID": 20
+        },
+        {
+          "fileID": "519420029",
+          "classID": 81
+        },
+        {
+          "fileID": "519420030",
+          "classID": 114,
+          "script_guid": "a79441f348de89743a2939f4d699eac1",
+          "script_path": null
+        },
+        {
+          "fileID": "519420033",
+          "classID": 114,
+          "script_guid": "72ece51f2901e7445ab60da3685d6b5f",
+          "script_path": null
+        }
+      ]
+    }
+  ]
+}
+
+=== EnemySpawnZone2D MonoBehaviours ===
+=== RegionalSpawnDirector MonoBehaviours ===
+=== WorldStreamingTarget MonoBehaviours ===
+=== Player MonoBehaviours ===
+componentFileID=239307042 script=Hero/Assets/Script/Player/PlayerAttack.cs guid=be673688339bf384795c88ece26407dd
+componentFileID=239307044 script=Hero/Assets/Script/Player/PlayerMovement.cs guid=fd22f51ac4e674944a9b8240f2c100e6
+componentFileID=239307047 script=Hero/Assets/Script/Player/PlayerHealth.cs guid=e2fac69efb373fb4bb6efff7588cbe95
+componentFileID=239307048 script=Hero/Assets/Script/Player/DashDoge.cs guid=45ff44667e1383d4a93a2fd9106aded0
+componentFileID=239307049 script=Hero/Assets/Script/Player/MapBoundaries.cs guid=e2e4f9d374ad1594598c31b241f12a1e
+componentFileID=239307050 script=Hero/Assets/Script/Player/UI/PlayerXP.cs guid=7e571abc1eef54d43ba9f35cd7d8821c
+componentFileID=239307051 script=Hero/Assets/Script/Player/GotHitFeedback.cs guid=363c47038570c47419e37a161037015e
+componentFileID=239307052 script=Hero/Assets/Script/ItemsAndGear/InventorySaveSystem.cs guid=43a53f13219ae0e4d8dd2b60f2fbfc5a
+componentFileID=239307053 script=Hero/Assets/Script/ItemsAndGear/PlayerInventory.cs guid=ed15bfeeaf65e0b44a9bfce4fbdbd8e7
+componentFileID=239307054 script=Hero/Assets/Script/ItemsAndGear/PlayerEquipment.cs guid=c5b214ce9942f334784d449b36eab20a
+componentFileID=239307055 script=Hero/Assets/Script/ItemsAndGear/PlayerWallet.cs guid=66afde7ac8354fc2a818f9d1ec4d49ab
+
+=== Source files containing WorldStreamingTarget ===
+Hero/Assets/Script/WorldStreaming/WorldChunkStreamer.cs
+Hero/Assets/Script/WorldStreaming/WorldStreamingTarget.cs
+Hero/Assets/Script/WorldStreaming/Editor/WorldStreamingSetupEditor.cs
+Hero/Assets/Script/Enemies/RegionalSpawning/EnemySpawnZone2D.cs
