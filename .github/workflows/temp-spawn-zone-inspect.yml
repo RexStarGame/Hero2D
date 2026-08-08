@@ -18,7 +18,7 @@ jobs:
           ref: fix/enemy-spawn-zone-setup
           fetch-depth: 1
 
-      - name: Inspect Unity scene setup
+      - name: Inspect Unity scene and prefab overrides
         shell: bash
         run: |
           python3 - <<'PY'
@@ -29,127 +29,89 @@ jobs:
           scene_path = root / 'Hero/Assets/Scenes/SampleScene.unity'
           text = scene_path.read_text(encoding='utf-8')
 
-          # Map MonoBehaviour script GUIDs back to source paths.
-          guid_to_script = {}
-          for meta in (root / 'Hero/Assets').rglob('*.cs.meta'):
+          # Resolve any Unity GUID to its repository asset path.
+          guid_to_path = {}
+          for meta in (root / 'Hero/Assets').rglob('*.meta'):
               try:
                   mt = meta.read_text(encoding='utf-8', errors='ignore')
               except Exception:
                   continue
               m = re.search(r'^guid:\s*([0-9a-f]+)', mt, re.M)
               if m:
-                  guid_to_script[m.group(1)] = str(meta)[:-5]
+                  guid_to_path[m.group(1)] = str(meta)[:-5]
 
+          marker = re.compile(r'^--- !u!(\d+) &(-?\d+)(?: stripped)?\s*$', re.M)
+          matches = list(marker.finditer(text))
           blocks = []
-          pattern = re.compile(r'^--- !u!(\d+) &(-?\d+)\s*$', re.M)
-          matches = list(pattern.finditer(text))
           for i, m in enumerate(matches):
-              start = m.start()
               end = matches[i+1].start() if i + 1 < len(matches) else len(text)
-              blocks.append({
-                  'class': int(m.group(1)),
-                  'id': m.group(2),
-                  'text': text[start:end].rstrip()
-              })
+              blocks.append((int(m.group(1)), m.group(2), text[m.start():end].rstrip()))
 
-          by_id = {b['id']: b for b in blocks}
-
-          def field(block_text, key):
-              m = re.search(r'^\s*' + re.escape(key) + r':\s*(.*)$', block_text, re.M)
-              return m.group(1).strip() if m else None
-
-          def ref_id(value):
-              if not value:
-                  return None
-              m = re.search(r'fileID:\s*(-?\d+)', value)
-              return m.group(1) if m else None
-
-          gameobjects = {}
-          for b in blocks:
-              if b['class'] != 1:
-                  continue
-              name = field(b['text'], 'm_Name')
-              layer = field(b['text'], 'm_Layer')
-              tag = field(b['text'], 'm_TagString')
-              comps = re.findall(r'- component: \{fileID: (-?\d+)\}', b['text'])
-              gameobjects[b['id']] = {'name': name, 'layer': layer, 'tag': tag, 'components': comps}
-
-          monobehaviours = []
-          for b in blocks:
-              if b['class'] != 114:
-                  continue
-              go = ref_id(field(b['text'], 'm_GameObject'))
-              sm = re.search(r'm_Script:\s*\{fileID:\s*\d+,\s*guid:\s*([0-9a-f]+)', b['text'])
-              guid = sm.group(1) if sm else None
-              monobehaviours.append({
-                  'id': b['id'], 'go': go, 'go_name': gameobjects.get(go, {}).get('name'),
-                  'script_guid': guid, 'script_path': guid_to_script.get(guid), 'raw': b['text']
-              })
-
-          # Find all relevant objects/components.
-          zone_mbs = [m for m in monobehaviours if m['script_path'] and m['script_path'].endswith('/EnemySpawnZone2D.cs')]
-          director_mbs = [m for m in monobehaviours if m['script_path'] and m['script_path'].endswith('/RegionalSpawnDirector.cs')]
-          streaming_mbs = [m for m in monobehaviours if m['script_path'] and 'WorldStreamingTarget' in Path(m['script_path']).name]
-          player_mbs = [m for m in monobehaviours if (m['go_name'] or '').lower() == 'player']
-
-          # Components attached to named objects, with Unity class IDs and source paths when possible.
-          def describe_go(go_id):
-              go = gameobjects.get(go_id)
-              if not go:
-                  return None
-              out = dict(go)
-              out['fileID'] = go_id
-              out['component_details'] = []
-              for cid in go['components']:
-                  cb = by_id.get(cid)
-                  item = {'fileID': cid, 'classID': cb['class'] if cb else None}
-                  if cb and cb['class'] == 114:
-                      sm = re.search(r'm_Script:\s*\{fileID:\s*\d+,\s*guid:\s*([0-9a-f]+)', cb['text'])
-                      guid = sm.group(1) if sm else None
-                      item['script_guid'] = guid
-                      item['script_path'] = guid_to_script.get(guid)
-                  out['component_details'].append(item)
-              return out
-
-          named = {}
-          for go_id, go in gameobjects.items():
-              if go['name'] in {'Player','Main Camera','RegionalSpawnDirector','EnemyLevel-1Zone','ArmyEnemyZones','DynamicEnemies'} or (go['name'] and 'DynamicEnemies' in go['name']):
-                  named.setdefault(go['name'], []).append(describe_go(go_id))
+          terms = [
+              'EnemyLevel-1Zone', 'ArmyEnemyZones', 'RegionalSpawnDirector',
+              'dynamicEnemiesRoot', 'localObserverCamera', 'regionProfile',
+              'desiredPopulation', 'minimumDistanceFromPlayers',
+              'maximumDistanceFromPlayers', 'requireAllowedGround',
+              'allowedGroundLayers', 'blockedEnvironmentLayers',
+              'spawnPointSearchAttempts',
+              'a29ad8ce999b4f2e9ddd114f7fd7e705', # EnemySpawnZone2D.cs
+              '9e054ba2f378401ba135e5b0e6edb8be', # RegionalSpawnDirector.cs
+          ]
 
           report = []
-          report.append('TEMP UNITY SPAWN ZONE INSPECTION')
+          report.append('TEMP UNITY SPAWN ZONE INSPECTION V2')
           report.append('Scene: Hero/Assets/Scenes/SampleScene.unity')
           report.append('')
-          report.append('=== Named GameObjects ===')
-          report.append(json.dumps(named, indent=2, ensure_ascii=False))
+
+          report.append('=== Matching scene YAML blocks ===')
+          found = 0
+          for class_id, file_id, block in blocks:
+              if any(t in block for t in terms):
+                  found += 1
+                  report.append(f'### classID={class_id} fileID={file_id}')
+                  report.append(block)
+                  # Resolve every guid mentioned in the block.
+                  for g in sorted(set(re.findall(r'guid:\s*([0-9a-f]+)', block))):
+                      report.append(f'GUID {g} -> {guid_to_path.get(g)}')
+                  report.append('')
+          report.append(f'Matching block count: {found}')
           report.append('')
-          report.append('=== EnemySpawnZone2D MonoBehaviours ===')
-          for m in zone_mbs:
-              report.append(f"GO={m['go_name']} componentFileID={m['id']} script={m['script_path']}")
-              report.append(m['raw'])
+
+          # Find direct occurrences with nearby line context too.
+          lines = text.splitlines()
+          report.append('=== Direct occurrence contexts ===')
+          for term in terms:
+              indices = [i for i, line in enumerate(lines) if term in line]
+              report.append(f'## {term}: {len(indices)} occurrence(s)')
+              for i in indices[:20]:
+                  lo = max(0, i - 10)
+                  hi = min(len(lines), i + 11)
+                  report.append(f'-- lines {lo+1}-{hi} --')
+                  report.extend(lines[lo:hi])
               report.append('')
-          report.append('=== RegionalSpawnDirector MonoBehaviours ===')
-          for m in director_mbs:
-              report.append(f"GO={m['go_name']} componentFileID={m['id']} script={m['script_path']}")
-              report.append(m['raw'])
-              report.append('')
-          report.append('=== WorldStreamingTarget MonoBehaviours ===')
-          for m in streaming_mbs:
-              report.append(f"GO={m['go_name']} componentFileID={m['id']} script={m['script_path']}")
-              report.append(m['raw'])
-              report.append('')
-          report.append('=== Player MonoBehaviours ===')
-          for m in player_mbs:
-              report.append(f"componentFileID={m['id']} script={m['script_path']} guid={m['script_guid']}")
+
+          # List assets whose path names are relevant and their GUIDs.
+          report.append('=== Relevant GUID mappings ===')
+          for g, p in sorted(guid_to_path.items(), key=lambda kv: kv[1].lower()):
+              pl = p.lower()
+              if any(k in pl for k in ['regionalspawning', 'enemyspawn', 'enemies-level 1', 'enemies-level1', 'worldstreamingtarget', 'forst.asset']):
+                  report.append(f'{g} -> {p}')
+
+          # Source files that define/mention WorldStreamingTarget, plus its meta GUID.
           report.append('')
-          report.append('=== Source files containing WorldStreamingTarget ===')
+          report.append('=== WorldStreamingTarget sources ===')
           for cs in (root / 'Hero/Assets').rglob('*.cs'):
               try:
                   s = cs.read_text(encoding='utf-8', errors='ignore')
               except Exception:
                   continue
               if 'WorldStreamingTarget' in s:
-                  report.append(str(cs))
+                  meta = Path(str(cs) + '.meta')
+                  guid = None
+                  if meta.exists():
+                      mm = re.search(r'^guid:\s*([0-9a-f]+)', meta.read_text(encoding='utf-8', errors='ignore'), re.M)
+                      guid = mm.group(1) if mm else None
+                  report.append(f'{cs} guid={guid}')
 
           Path('.spawn-zone-inspection.txt').write_text('\n'.join(report), encoding='utf-8')
           PY
@@ -160,5 +122,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .spawn-zone-inspection.txt
-          git commit -m "chore: inspect EnemySpawnZone2D scene setup" || exit 0
+          git commit -m "chore: expand EnemySpawnZone2D scene inspection" || exit 0
           git push origin HEAD:fix/enemy-spawn-zone-setup
