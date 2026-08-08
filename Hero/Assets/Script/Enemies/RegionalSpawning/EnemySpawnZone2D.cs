@@ -159,7 +159,7 @@ public sealed class EnemySpawnZone2D : MonoBehaviour
         if (link == null) link = spawned.AddComponent<SpawnedEnemyRegionLink>();
 
         entry.livingCount++;
-        link.Initialize(this, index, director);
+        link.Initialize(this, index, director, entry.spawnArea);
         entry.nextSpawnTime = entry.livingCount >= desired
             ? float.PositiveInfinity
             : Time.time + GetRespawnDelay(entry);
