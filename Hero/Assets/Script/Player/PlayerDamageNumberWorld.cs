@@ -6,17 +6,39 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerAttack))]
 public sealed class PlayerDamageNumberWorld : MonoBehaviour
 {
-    [Header("Motion")]
-    [Min(0.1f)] [SerializeField] private float lifetime = 1.15f;
-    [Min(0f)] [SerializeField] private float riseDistance = 80f;
+    [Header("Spawn Position")]
+    [Tooltip("Where each number starts, measured in Canvas units. X moves it left/right and Y moves it up/down relative to the player.")]
     [SerializeField] private Vector2 localStartOffset = new Vector2(0f, 120f);
+    [Tooltip("Separates consecutive damage numbers horizontally so rapid hits remain readable.")]
     [Min(0f)] [SerializeField] private float horizontalSpacing = 22f;
 
-    [Header("Appearance")]
+    [Header("Motion And Timing")]
+    [Tooltip("How many seconds the number remains visible.")]
+    [Min(0.1f)] [SerializeField] private float lifetime = 1.15f;
+    [Tooltip("How far the number travels upward before disappearing, measured in Canvas units.")]
+    [Min(0f)] [SerializeField] private float riseDistance = 80f;
+
+    [Header("Text Appearance")]
     [SerializeField] private Color normalColor = new Color(1f, 0.95f, 0.82f, 1f);
     [SerializeField] private Color criticalColor = new Color(1f, 0.55f, 0.08f, 1f);
+    [Tooltip("Font size used by normal damage numbers.")]
     [Min(1f)] [SerializeField] private float normalFontSize = 34f;
+    [Tooltip("Font size used by critical-hit damage numbers.")]
     [Min(1f)] [SerializeField] private float criticalFontSize = 42f;
+    [Tooltip("Text placed before critical damage. Include a trailing space if desired.")]
+    [SerializeField] private string criticalPrefix = "CRIT ";
+    [Tooltip("Text placed after every damage value. Set this to empty to remove it.")]
+    [SerializeField] private string damageSuffix = "!";
+
+    [Header("World Space Canvas")]
+    [Tooltip("Overall world-space size of the complete effect. Lower values make all text and movement smaller on screen.")]
+    [Min(0.0001f)] [SerializeField] private float worldScale = 0.01f;
+    [Tooltip("Internal size of the generated World Space Canvas.")]
+    [SerializeField] private Vector2 canvasSize = new Vector2(400f, 300f);
+    [Tooltip("Size available to each TMP damage label. Increase this only if long values are clipped.")]
+    [SerializeField] private Vector2 textBoxSize = new Vector2(280f, 70f);
+    [Tooltip("Render priority for the damage-number Canvas.")]
+    [SerializeField] private int sortingOrder = 100;
 
     [Header("Pooling")]
     [Min(1)] [SerializeField] private int initialPoolSize = 10;
@@ -83,7 +105,9 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         number.StartPosition = localStartOffset + Vector2.right * horizontalOffset;
         number.Elapsed = 0f;
         number.RectTransform.anchoredPosition = number.StartPosition;
-        number.Text.text = isCritical ? $"CRIT {damage}!" : $"{damage}!";
+        number.Text.text = isCritical
+            ? $"{criticalPrefix}{damage}{damageSuffix}"
+            : $"{damage}{damageSuffix}";
         number.Text.fontSize = isCritical ? criticalFontSize : normalFontSize;
         number.Text.color = isCritical ? criticalColor : normalColor;
         number.GameObject.SetActive(true);
@@ -103,13 +127,13 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         canvasRect = canvasObject.GetComponent<RectTransform>();
         canvasRect.localPosition = Vector3.zero;
         canvasRect.localRotation = Quaternion.identity;
-        canvasRect.localScale = Vector3.one * 0.01f;
-        canvasRect.sizeDelta = new Vector2(400f, 300f);
+        canvasRect.localScale = Vector3.one * worldScale;
+        canvasRect.sizeDelta = canvasSize;
 
         Canvas canvas = canvasObject.GetComponent<Canvas>();
         canvas.renderMode = RenderMode.WorldSpace;
         canvas.overrideSorting = true;
-        canvas.sortingOrder = 100;
+        canvas.sortingOrder = sortingOrder;
     }
 
     private DamageNumber CreateDamageNumber()
@@ -126,7 +150,7 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         rect.anchorMin = new Vector2(0.5f, 0.5f);
         rect.anchorMax = new Vector2(0.5f, 0.5f);
         rect.pivot = new Vector2(0.5f, 0.5f);
-        rect.sizeDelta = new Vector2(280f, 70f);
+        rect.sizeDelta = textBoxSize;
 
         TextMeshProUGUI text = textObject.GetComponent<TextMeshProUGUI>();
         text.alignment = TextAlignmentOptions.Center;
@@ -171,6 +195,11 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         horizontalSpacing = Mathf.Max(0f, horizontalSpacing);
         normalFontSize = Mathf.Max(1f, normalFontSize);
         criticalFontSize = Mathf.Max(1f, criticalFontSize);
+        worldScale = Mathf.Max(0.0001f, worldScale);
+        canvasSize.x = Mathf.Max(1f, canvasSize.x);
+        canvasSize.y = Mathf.Max(1f, canvasSize.y);
+        textBoxSize.x = Mathf.Max(1f, textBoxSize.x);
+        textBoxSize.y = Mathf.Max(1f, textBoxSize.y);
         initialPoolSize = Mathf.Max(1, initialPoolSize);
     }
 }
