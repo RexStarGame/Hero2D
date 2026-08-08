@@ -1,0 +1,105 @@
+name: Temporary Spawn Zone Inspector
+
+on:
+  push:
+    branches:
+      - fix/enemy-spawn-zone-config
+
+permissions:
+  contents: write
+
+jobs:
+  inspect:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/enemy-spawn-zone-config
+          fetch-depth: 1
+
+      - name: Inspect Unity scene and prefab overrides
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, json
+
+          root = Path('.')
+          scene_path = root / 'Hero/Assets/Scenes/SampleScene.unity'
+          text = scene_path.read_text(encoding='utf-8')
+
+          guid_to_path = {}
+          for meta in (root / 'Hero/Assets').rglob('*.meta'):
+              try:
+                  mt = meta.read_text(encoding='utf-8', errors='ignore')
+              except Exception:
+                  continue
+              m = re.search(r'^guid:\s*([0-9a-f]+)', mt, re.M)
+              if m:
+                  guid_to_path[m.group(1)] = str(meta)[:-5]
+
+          marker = re.compile(r'^--- !u!(\d+) &(-?\d+)(?: stripped)?\s*$', re.M)
+          matches = list(marker.finditer(text))
+          blocks = []
+          for i, m in enumerate(matches):
+              end = matches[i+1].start() if i + 1 < len(matches) else len(text)
+              blocks.append((int(m.group(1)), m.group(2), text[m.start():end].rstrip()))
+
+          terms = [
+              'EnemyLevel-1Zone', 'ArmyEnemyZones', 'RegionalSpawnDirector',
+              'dynamicEnemiesRoot', 'localObserverCamera', 'regionProfile',
+              'desiredPopulation', 'minimumDistanceFromPlayers',
+              'maximumDistanceFromPlayers', 'requireAllowedGround',
+              'allowedGroundLayers', 'blockedEnvironmentLayers',
+              'spawnPointSearchAttempts', '6534396e58c446c88ad4049e0a59b7cf',
+              'a29ad8ce999b4f2e9ddd114f7fd7e705',
+              '9e054ba2f378401ba135e5b0e6edb8be',
+          ]
+
+          report = []
+          report.append('TEMP UNITY SPAWN ZONE INSPECTION CURRENT')
+          report.append('Scene: Hero/Assets/Scenes/SampleScene.unity')
+          report.append('')
+          report.append('=== Matching scene YAML blocks ===')
+          found = 0
+          for class_id, file_id, block in blocks:
+              if any(t in block for t in terms):
+                  found += 1
+                  report.append(f'### classID={class_id} fileID={file_id}')
+                  report.append(block)
+                  for g in sorted(set(re.findall(r'guid:\s*([0-9a-f]+)', block))):
+                      report.append(f'GUID {g} -> {guid_to_path.get(g)}')
+                  report.append('')
+          report.append(f'Matching block count: {found}')
+          report.append('')
+
+          lines = text.splitlines()
+          report.append('=== Direct occurrence contexts ===')
+          for term in terms:
+              indices = [i for i, line in enumerate(lines) if term in line]
+              report.append(f'## {term}: {len(indices)} occurrence(s)')
+              for i in indices[:20]:
+                  lo = max(0, i - 12)
+                  hi = min(len(lines), i + 20)
+                  report.append(f'-- lines {lo+1}-{hi} --')
+                  report.extend(lines[lo:hi])
+              report.append('')
+
+          report.append('=== Relevant GUID mappings ===')
+          for g, p in sorted(guid_to_path.items(), key=lambda kv: kv[1].lower()):
+              pl = p.lower()
+              if any(k in pl for k in ['regionalspawning', 'enemyspawn', 'enemies-level 1', 'enemies-level1', 'worldstreamingtarget', 'forst.asset']):
+                  report.append(f'{g} -> {p}')
+
+          Path('.spawn-zone-inspection.txt').write_text('\n'.join(report), encoding='utf-8')
+          PY
+
+      - name: Commit temporary inspection report
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .spawn-zone-inspection.txt
+          git commit -m "chore: inspect current EnemySpawnZone2D scene setup" || exit 0
+          git push origin HEAD:fix/enemy-spawn-zone-config
