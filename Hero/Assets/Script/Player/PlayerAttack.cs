@@ -72,7 +72,8 @@ public class PlayerAttack : MonoBehaviour
     private Vector2 lastFacingDirection = Vector2.down;
     private Coroutine attackRoutine;
     private bool trailPlayedThisAttack;
-    private PlayerDamageNumberWorld damageNumberWorld;\n    private SafeZoneFeedbackUI safeZoneFeedback;
+    private PlayerDamageNumberWorld damageNumberWorld;
+    private SafeZoneFeedbackUI safeZoneFeedback;
 
     [SerializeField] private DamageUpgrade damageUpgrade;
     public DamageUpgrade DamageUpgrade => damageUpgrade;
