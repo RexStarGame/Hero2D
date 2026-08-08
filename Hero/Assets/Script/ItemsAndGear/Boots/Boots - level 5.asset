@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77628aadd0e33ab41882f4f5537db51c, type: 3}
+  m_Name: Boots - level 5
+  m_EditorClassIdentifier: 
+  itemID: '#fksncmkc342i234ock34532Cs90u'
+  itemName: Mossbound Ronin Boots
+  description: Fur-lined leather boots wrapped in sturdy straps and tinted with worn
+    green tones. Marked with a subtle warrior symbol from the ronin age, they offer
+    warmth, grip, and a more seasoned look for adventurers who have already survived
+    their first battles.
+  rarity: 0
+  requiredLevel: 5
+  goldValue: 250
+  icon: {fileID: -5912831820287851600, guid: f024a5ab94caf0045b459f1dd44b5794, type: 3}
+  worldPrefab: {fileID: 0}
+  equipmentSlot: 5
+  statModifiers:
+    maxHealth: 8
+    minimumDamage: 0
+    maximumDamage: 0
+    defense: 4.7
+    regeneration: 0
+    lifeSteal: 0
+    criticalChance: 0
+    attackSpeed: 0
+    movementSpeed: 0.05
+    experienceGain: 0
+  armorRating: 0
