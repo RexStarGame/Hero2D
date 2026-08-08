@@ -20,6 +20,7 @@ public class EnemyHealth : MonoBehaviour
 
     public event System.Action Damaged;
     public event System.Action Died;
+    public event System.Action<int, int> HealthChanged;
 
     private PlayerXP player;
     private bool dead;
@@ -36,6 +37,12 @@ public class EnemyHealth : MonoBehaviour
         difficultyProfile = GetComponentInParent<EnemyDifficultyProfile>();
         if (difficultyProfile == null)
             difficultyProfile = gameObject.AddComponent<EnemyDifficultyProfile>();
+
+        // Every normal enemy gets the same lightweight, event-driven world bar.
+        // Keeping this here also covers future and runtime-spawned enemy prefabs.
+        if (GetComponent<BossHealth>() == null &&
+            GetComponentInChildren<EnemyHealthBarWorld>(true) == null)
+            gameObject.AddComponent<EnemyHealthBarWorld>();
     }
 
     private void OnEnable()
@@ -54,6 +61,7 @@ public class EnemyHealth : MonoBehaviour
         ApplyDifficultyHealth(false);
         currentHealth = difficultyMaxHealth;
         healthInitialized = true;
+        NotifyHealthChanged();
 
         // Find referencer
         player = Object.FindAnyObjectByType<PlayerXP>();
@@ -68,6 +76,7 @@ public class EnemyHealth : MonoBehaviour
 
         currentHealth -= damage;
         Debug.Log(gameObject.name + " tog " + damage + " skade! Liv tilbage: " + currentHealth);
+        NotifyHealthChanged();
 
         // 1. Vis visuelt feedback (Blink rød)
         if (feedback != null)
@@ -88,6 +97,7 @@ public class EnemyHealth : MonoBehaviour
     private void OnDifficultyChanged(GameDifficulty difficulty)
     {
         ApplyDifficultyHealth(healthInitialized);
+        NotifyHealthChanged();
     }
 
     private void ApplyDifficultyHealth(bool preserveHealthPercentage)
@@ -113,6 +123,11 @@ public class EnemyHealth : MonoBehaviour
     private void OnValidate()
     {
         maxHealth = Mathf.Max(1, maxHealth);
+    }
+
+    private void NotifyHealthChanged()
+    {
+        HealthChanged?.Invoke(Mathf.Max(0, currentHealth), Mathf.Max(1, difficultyMaxHealth));
     }
 
     void Die()
