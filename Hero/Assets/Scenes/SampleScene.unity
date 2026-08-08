@@ -10052,8 +10052,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: be673688339bf384795c88ece26407dd, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   attackCooldown: 1
   hitboxStartDelay: 0.1
   hitboxActiveTime: 0.1
@@ -63371,95 +63371,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 50.03686, y: 16.202986}
   m_EdgeRadius: 0
---- !u!114 &2200000000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1759172894}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a29ad8ce999b4f2e9ddd114f7fd7e705, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  regionProfile: {fileID: 11400000, guid: ec5db68b9ed73ea4082f12a8d0a92ffa, type: 2}
-  director: {fileID: 1615476167}
-  dynamicEnemiesRoot: {fileID: 2200000002}
-  localObserverCamera: {fileID: 519420031}
-  enemies:
-  - displayName: Level 1 Enemy
-    enemyPrefab: {fileID: 0}
-    spawnArea: {fileID: 1759172896}
-    desiredPopulation: 3
-    initialSpawnDelay: 0.5
-    minimumRespawnTime: 8
-    maximumRespawnTime: 14
-    failedPointRetryTime: 1.5
-    minimumDistanceFromPlayers: 7
-    maximumDistanceFromPlayers: 28
-    requireOffscreen: 1
-    offscreenPadding: 1.25
-    requireAllowedGround: 0
-    allowedGroundLayers:
-      serializedVersion: 2
-      m_Bits: 0
-    allowTriggerGround: 1
-    blockedEnvironmentLayers:
-      serializedVersion: 2
-      m_Bits: 128
-    blockedTags: []
-    enemyClearanceRadius: 0.5
-    blockedTriggersCount: 0
-    spawnPointSearchAttempts: 32
-  evaluationInterval: 0.25
-  drawSpawnAreas: 1
-  logConfigurationProblems: 1
---- !u!1 &2200000001
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2200000002}
-  m_Layer: 0
-  m_Name: DynamicEnemies
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2200000002
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2200000001}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1759172895}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2200000003
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 239307039}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6534396e58c446c88ad4049e0a59b7cf, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  affectsPresentation: 1
-  affectsSimulation: 1
 --- !u!1 &1760408952
 GameObject:
   m_ObjectHideFlags: 0
@@ -76140,6 +76051,95 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &2200000000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1759172894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a29ad8ce999b4f2e9ddd114f7fd7e705, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  regionProfile: {fileID: 11400000, guid: ec5db68b9ed73ea4082f12a8d0a92ffa, type: 2}
+  director: {fileID: 1615476167}
+  dynamicEnemiesRoot: {fileID: 2200000002}
+  localObserverCamera: {fileID: 519420031}
+  enemies:
+  - displayName: Level 1 Enemy
+    enemyPrefab: {fileID: 8233854846743954295, guid: cc1175b0a56f8204d9a362b86c83c482, type: 3}
+    spawnArea: {fileID: 1759172896}
+    desiredPopulation: 3
+    initialSpawnDelay: 0.5
+    minimumRespawnTime: 2
+    maximumRespawnTime: 14
+    failedPointRetryTime: 1.5
+    minimumDistanceFromPlayers: 7
+    maximumDistanceFromPlayers: 28
+    requireOffscreen: 1
+    offscreenPadding: 1.25
+    requireAllowedGround: 0
+    allowedGroundLayers:
+      serializedVersion: 2
+      m_Bits: 0
+    allowTriggerGround: 1
+    blockedEnvironmentLayers:
+      serializedVersion: 2
+      m_Bits: 128
+    blockedTags: []
+    enemyClearanceRadius: 0.5
+    blockedTriggersCount: 0
+    spawnPointSearchAttempts: 32
+  evaluationInterval: 0.25
+  drawSpawnAreas: 1
+  logConfigurationProblems: 1
+--- !u!1 &2200000001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2200000002}
+  m_Layer: 0
+  m_Name: DynamicEnemies
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2200000002
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2200000001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1759172895}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2200000003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 239307039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6534396e58c446c88ad4049e0a59b7cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  affectsPresentation: 1
+  affectsSimulation: 1
 --- !u!4 &112732568475948090 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6430937212238586514, guid: 8343e1d44689c3d4abe8279afc2f6942, type: 3}
