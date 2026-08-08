@@ -24,7 +24,8 @@ MonoBehaviour:
   equipmentSlot: 1
   statModifiers:
     maxHealth: 0
-    damage: 47.3
+    minimumDamage: 47.3
+    maximumDamage: 47.3
     defense: 0
     regeneration: 0
     lifeSteal: 0.08
@@ -32,5 +33,6 @@ MonoBehaviour:
     attackSpeed: 0.12
     movementSpeed: -0.02
   weaponType: 0
-  baseDamage: 0
+  minimumBaseDamage: 0
+  maximumBaseDamage: 0
   attackRange: 1
