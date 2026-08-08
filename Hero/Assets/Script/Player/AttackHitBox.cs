@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 public class AttackHitbox : MonoBehaviour
 {
@@ -9,8 +10,11 @@ public class AttackHitbox : MonoBehaviour
     [Tooltip("Drag the player's DamageUpgrade here (recommended). If empty, we auto-find in parent.")]
     [SerializeField] private DamageUpgrade damageUpgrade;
 
-    [Tooltip("Default damage if DamageUpgrade is missing (should match DamageUpgrade 'damage').")]
-    [SerializeField] private int damage = 10; // <-- keep this so you always have a default
+    [Tooltip("Minimum fallback damage if DamageUpgrade is missing.")]
+    [FormerlySerializedAs("damage")]
+    [Min(0)] [SerializeField] private int minimumDamage = 10;
+    [Tooltip("Maximum fallback damage if DamageUpgrade is missing (inclusive).")]
+    [Min(0)] [SerializeField] private int maximumDamage = 10;
 
     private void Awake()
     {
@@ -19,6 +23,11 @@ public class AttackHitbox : MonoBehaviour
 
         if (damageUpgrade == null)
             damageUpgrade = GetComponentInParent<DamageUpgrade>();
+    }
+
+    private void OnValidate()
+    {
+        maximumDamage = Mathf.Max(minimumDamage, maximumDamage);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -31,7 +40,14 @@ public class AttackHitbox : MonoBehaviour
         if (SafeZone2D.IsPlayerAttackBlocked(attackerPosition))
             return;
 
-        int baseDamage = (damageUpgrade != null) ? damageUpgrade.Damage : damage;
+        BossHealth boss = collision.GetComponentInParent<BossHealth>();
+        EnemyHealth enemy = boss == null ? collision.GetComponentInParent<EnemyHealth>() : null;
+        if (boss == null && enemy == null)
+            return;
+
+        int baseDamage = damageUpgrade != null
+            ? damageUpgrade.RollDamage()
+            : Random.Range(minimumDamage, Mathf.Max(minimumDamage, maximumDamage) + 1);
 
         // Crit
         int finalDamage = baseDamage;
@@ -41,7 +57,6 @@ public class AttackHitbox : MonoBehaviour
 
         bool didHit = false;
 
-        BossHealth boss = collision.GetComponentInParent<BossHealth>();
         if (boss != null)
         {
             boss.TakeDamage(finalDamage);
@@ -49,7 +64,6 @@ public class AttackHitbox : MonoBehaviour
         }
         else
         {
-            EnemyHealth enemy = collision.GetComponentInParent<EnemyHealth>();
             if (enemy != null)
             {
                 enemy.TakeDamage(finalDamage);

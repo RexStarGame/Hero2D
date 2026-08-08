@@ -92,12 +92,21 @@ public class PlayerEquipment : MonoBehaviour
     }
 
     public float GetHealthBonus() => GetCombinedModifiers().MaxHealth;
-    public float GetDamageBonus()
+    public float GetMinimumDamageBonus()
     {
-        float total = GetCombinedModifiers().Damage;
-        foreach (EquippedSlot slot in slots) if (slot.item is WeaponDefinition weapon) total += weapon.BaseDamage;
+        float total = GetCombinedModifiers().MinimumDamage;
+        foreach (EquippedSlot slot in slots)
+            if (slot.item is WeaponDefinition weapon) total += weapon.MinimumBaseDamage;
         return total;
     }
+    public float GetMaximumDamageBonus()
+    {
+        float total = GetCombinedModifiers().MaximumDamage;
+        foreach (EquippedSlot slot in slots)
+            if (slot.item is WeaponDefinition weapon) total += weapon.MaximumBaseDamage;
+        return total;
+    }
+    public float GetDamageBonus() => GetMaximumDamageBonus();
     public float GetDefenseBonus()
     {
         float total = GetCombinedModifiers().Defense;

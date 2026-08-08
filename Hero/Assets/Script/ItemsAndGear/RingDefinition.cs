@@ -6,7 +6,9 @@ public class RingDefinition : EquippableItemDefinition
     // Ring-specific effects can be added here later. Shared bonuses live in
     // EquippableItemDefinition so every equipment category is calculated alike.
     public float HealthBonus => StatModifiers.MaxHealth;
-    public float DamageBonus => StatModifiers.Damage;
+    public float MinimumDamageBonus => StatModifiers.MinimumDamage;
+    public float MaximumDamageBonus => StatModifiers.MaximumDamage;
+    public float DamageBonus => MaximumDamageBonus;
     public float DefenseBonus => StatModifiers.Defense;
     public float RegenerationBonus => StatModifiers.Regeneration;
     public float LifeStealBonus => StatModifiers.LifeSteal;

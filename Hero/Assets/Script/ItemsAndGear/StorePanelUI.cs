@@ -245,7 +245,7 @@ public class StorePanelUI : MonoBehaviour
             ItemStatModifiers stats = gear.StatModifiers;
             details.Append("\n\n<color=#C7D2FE>STAT BONUSES</color>");
             AppendStat("Max Health", stats.MaxHealth);
-            AppendStat("Damage", stats.Damage);
+            AppendDamageRange("Damage", stats.MinimumDamage, stats.MaximumDamage, true);
             AppendStat("Defense", stats.Defense);
             AppendStat("Regeneration", stats.Regeneration, "/s");
             AppendStat("Life Steal", stats.LifeSteal * 100f, "%");
@@ -253,6 +253,9 @@ public class StorePanelUI : MonoBehaviour
             AppendStat("Attack Speed", stats.AttackSpeed * 100f, "%");
             AppendStat("Movement Speed", stats.MovementSpeed * 100f, "%");
         }
+
+        if (item is WeaponDefinition weapon)
+            AppendDamageRange("Base damage", weapon.MinimumBaseDamage, weapon.MaximumBaseDamage, false);
 
         if (detailsText != null)
         {
@@ -278,6 +281,20 @@ public class StorePanelUI : MonoBehaviour
         string color = value > 0f ? "#22C55E" : "#EF4444";
         details.Append("\n").Append(label).Append(": <color=").Append(color).Append(">")
             .Append(sign).Append(value.ToString("0.##")).Append(suffix).Append("</color>");
+    }
+
+    private void AppendDamageRange(string label, float minimum, float maximum, bool signed)
+    {
+        maximum = Mathf.Max(minimum, maximum);
+        if (Mathf.Approximately(minimum, 0f) && Mathf.Approximately(maximum, 0f))
+            return;
+
+        string color = maximum > 0f ? "#22C55E" : "#EF4444";
+        string minSign = signed && minimum > 0f ? "+" : string.Empty;
+        string maxSign = signed && maximum > 0f ? "+" : string.Empty;
+        details.Append("\n").Append(label).Append(": <color=").Append(color).Append(">")
+            .Append(minSign).Append(minimum.ToString("0.##")).Append("–")
+            .Append(maxSign).Append(maximum.ToString("0.##")).Append("</color>");
     }
 
     private void ClearSelection()

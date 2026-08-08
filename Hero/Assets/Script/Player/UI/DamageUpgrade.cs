@@ -1,12 +1,16 @@
 ﻿using UnityEngine;
 using TMPro;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
-public class DamageUpgrade : MonoBehaviour
+public class DamageUpgrade : MonoBehaviour, ISerializationCallbackReceiver
 {
     [Header("Damage Stats")]
-    [Tooltip("Default player damage at level 0.")]
-    [SerializeField] private int damage = 10;              // <-- DEFAULT DAMAGE (what you want)
+    [Tooltip("Minimum player damage at level 0.")]
+    [FormerlySerializedAs("damage")]
+    [Min(0)] [SerializeField] private int minimumDamage = 10;
+    [Tooltip("Maximum player damage at level 0 (inclusive).")]
+    [Min(0)] [SerializeField] private int maximumDamage = 10;
     [SerializeField] private int damageLevel = 0;
     [SerializeField] private int maxDamageLevel = 10;
     [SerializeField] private int damagePerLevel = 5;
@@ -23,8 +27,10 @@ public class DamageUpgrade : MonoBehaviour
     public UnityEvent<int> onDamageChanged; // sends new Damage value
 
     // ✅ This is the REAL damage used by the player
-    public int BaseAndAbilityDamage => damage + (damageLevel * damagePerLevel);
-    public int EquipmentDamageBonus
+    public int MinimumBaseAndAbilityDamage => minimumDamage + (damageLevel * damagePerLevel);
+    public int MaximumBaseAndAbilityDamage => Mathf.Max(minimumDamage, maximumDamage) + (damageLevel * damagePerLevel);
+    public int BaseAndAbilityDamage => MaximumBaseAndAbilityDamage;
+    public int MinimumEquipmentDamageBonus
     {
         get
         {
@@ -32,12 +38,28 @@ public class DamageUpgrade : MonoBehaviour
             // which can be inactive at startup. Resolve gameplay references on
             // demand so equipped-item damage never depends on opening that UI.
             ResolveReferences();
-            return equipment == null ? 0 : Mathf.RoundToInt(equipment.GetDamageBonus());
+            return equipment == null ? 0 : Mathf.RoundToInt(equipment.GetMinimumDamageBonus());
         }
     }
-    public int Damage => BaseAndAbilityDamage + EquipmentDamageBonus;
+    public int MaximumEquipmentDamageBonus
+    {
+        get
+        {
+            ResolveReferences();
+            return equipment == null ? 0 : Mathf.RoundToInt(equipment.GetMaximumDamageBonus());
+        }
+    }
+    public int EquipmentDamageBonus => MaximumEquipmentDamageBonus;
+    public int MinimumDamage => Mathf.Max(0, MinimumBaseAndAbilityDamage + MinimumEquipmentDamageBonus);
+    public int MaximumDamage => Mathf.Max(MinimumDamage, MaximumBaseAndAbilityDamage + MaximumEquipmentDamageBonus);
+    public int Damage => MaximumDamage;
 
     public int DamageLevel => damageLevel;
+
+    public int RollDamage()
+    {
+        return Random.Range(MinimumDamage, MaximumDamage + 1);
+    }
 
     private void Awake()
     {
@@ -130,5 +152,15 @@ public class DamageUpgrade : MonoBehaviour
     {
         if (levelText != null)
             levelText.text = "+"; // ✅ LIVE damage display
+    }
+
+    public void OnBeforeSerialize()
+    {
+        if (maximumDamage < minimumDamage) maximumDamage = minimumDamage;
+    }
+
+    public void OnAfterDeserialize()
+    {
+        if (maximumDamage < minimumDamage) maximumDamage = minimumDamage;
     }
 }
