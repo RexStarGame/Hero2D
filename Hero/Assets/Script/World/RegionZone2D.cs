@@ -1,7 +1,6 @@
 using UnityEngine;
 
 [DisallowMultipleComponent]
-[RequireComponent(typeof(Collider2D))]
 public sealed class RegionZone2D : MonoBehaviour
 {
     [Header("Region")]
@@ -19,7 +18,8 @@ public sealed class RegionZone2D : MonoBehaviour
     private void Reset()
     {
         Collider2D zoneCollider = GetComponent<Collider2D>();
-        zoneCollider.isTrigger = true;
+        if (zoneCollider != null)
+            zoneCollider.isTrigger = true;
     }
 
     private void OnTriggerEnter2D(Collider2D other)
