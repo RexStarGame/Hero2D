@@ -30,6 +30,14 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        if (MenuLock.IsGameplayInputBlocked)
+        {
+            movement = Vector2.zero;
+            if (animator != null)
+                animator.SetBool("IsMoving", false);
+            return;
+        }
+
         // Read input
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
@@ -77,6 +85,12 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (MenuLock.IsGameplayInputBlocked)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
+
         rb.linearVelocity = movement * EffectiveMoveSpeed;
     }
 }
