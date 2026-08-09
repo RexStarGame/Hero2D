@@ -115,6 +115,9 @@ public class PlayerAttack : MonoBehaviour
 
     void Update()
     {
+        if (MenuLock.IsGameplayInputBlocked)
+            return;
+
         UpdateDirection();
 
         // Only start attack if allowed
