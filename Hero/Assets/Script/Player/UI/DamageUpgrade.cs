@@ -64,6 +64,7 @@ public class DamageUpgrade : MonoBehaviour, ISerializationCallbackReceiver
     private void Awake()
     {
         ResolveReferences();
+        PlayerProgressSave.RestoreDamageUpgrade(this);
 
         UpdateLevelText();
         onDamageChanged?.Invoke(Damage);
@@ -146,6 +147,12 @@ public class DamageUpgrade : MonoBehaviour, ISerializationCallbackReceiver
 
         UpdateLevelText();
         onDamageChanged?.Invoke(Damage);
+        PlayerProgressSave.SaveDamageUpgrade(this, playerXP);
+    }
+
+    public void RestoreDamageLevel(int savedLevel)
+    {
+        damageLevel = Mathf.Clamp(savedLevel, 0, maxDamageLevel);
     }
 
     private void UpdateLevelText()
