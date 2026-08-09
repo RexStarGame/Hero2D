@@ -44,6 +44,7 @@ public class CriticalDamage : MonoBehaviour
 
         playerXP.abilityPoints -= cost;
         playerAttack.UpgradeCritChance(critChancePerLevel);
+        PlayerProgressSave.SaveAttackUpgrades(playerAttack, playerXP);
 
         UpdateText();
     }
