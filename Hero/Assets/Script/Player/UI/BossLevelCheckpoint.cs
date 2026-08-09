@@ -1,8 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// Persists only the highest level secured by defeating a milestone boss.
-/// Run XP and chosen ability upgrades are deliberately not saved here.
+/// Persists the highest level secured by a milestone boss and triggers the
+/// broader player progression autosave after every boss defeat.
 /// </summary>
 public static class BossLevelCheckpoint
 {
