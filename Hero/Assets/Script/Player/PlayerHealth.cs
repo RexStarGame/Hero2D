@@ -39,6 +39,7 @@ public class PlayerHealth : MonoBehaviour
         if (equipment == null) equipment = GetComponent<PlayerEquipment>();
         if (equipment != null) equipment.EquipmentChanged += OnEquipmentChanged;
         dashDoge = GetComponent<DashDoge>();
+        PlayerProgressSave.RestoreHealthUpgrades(this);
 
         // Start fuld HP
         health = MaxHealth;
@@ -94,6 +95,16 @@ public class PlayerHealth : MonoBehaviour
         Debug.Log("Max Health upgraded! New max: " + maxHealth);
     }
 
+    public void RestoreUpgradeProgress(
+        int savedMaxHealthLevel,
+        int savedRegenLevel,
+        float savedMaxHealth)
+    {
+        maxHealthLevel = Mathf.Clamp(savedMaxHealthLevel, 0, maxHealthUpgradeMaxLevel);
+        regenLevel = Mathf.Max(0, savedRegenLevel);
+        maxHealth = Mathf.Max(1f, savedMaxHealth);
+    }
+
     public void TakeDamage(float damage)
     {
         // Central check covers projectiles, boss attacks, AoE and future damage sources.
@@ -135,6 +146,10 @@ public class PlayerHealth : MonoBehaviour
     void Die()
     {
         Debug.Log("Player died!");
+
+        PlayerXP playerXP = GetComponent<PlayerXP>();
+        if (playerXP != null)
+            playerXP.ApplyDeathPenaltyAndSave();
 
         if (gameOverManager != null)
             gameOverManager.TriggerGameOver();
