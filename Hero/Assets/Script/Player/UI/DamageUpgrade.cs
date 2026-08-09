@@ -55,7 +55,6 @@ public class DamageUpgrade : MonoBehaviour, ISerializationCallbackReceiver
     public int Damage => MaximumDamage;
 
     public int DamageLevel => damageLevel;
-    public int UpgradeCost => Mathf.Max(0, cost);
 
     public int RollDamage()
     {
