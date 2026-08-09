@@ -189,7 +189,7 @@ MonoBehaviour:
     m_Bits: 64
   fuseTime: 1
   explosionRadius: 0.5
-  explosionDamage: 120
+  explosionDamage: 192
   explosionVfx: {fileID: 8382735912724396506, guid: 0b7943d4e26ffa44dbb8f1bcca7759d0, type: 3}
   damageLayers:
     serializedVersion: 2
