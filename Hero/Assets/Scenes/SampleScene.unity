@@ -25238,7 +25238,7 @@ MonoBehaviour:
       - m_Target: {fileID: 316605505}
         m_TargetAssemblyTypeName: NavigationSettingsBridge, Assembly-CSharp
         m_MethodName: SetHUDDirectionArrow
-        m_Mode: 6
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -30611,7 +30611,7 @@ MonoBehaviour:
       - m_Target: {fileID: 316605505}
         m_TargetAssemblyTypeName: NavigationSettingsBridge, Assembly-CSharp
         m_MethodName: SetWaypointOnMap
-        m_Mode: 6
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
