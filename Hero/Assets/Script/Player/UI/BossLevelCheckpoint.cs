@@ -17,18 +17,22 @@ public static class BossLevelCheckpoint
     public static bool TryUnlock(int checkpointLevel)
     {
         checkpointLevel = Mathf.Max(1, checkpointLevel);
-        if (checkpointLevel <= Level)
-            return false;
+        bool unlockedNewCheckpoint = checkpointLevel > Level;
 
-        PlayerPrefs.SetInt(PlayerPrefsKey, checkpointLevel);
-        PlayerPrefs.Save();
+        if (unlockedNewCheckpoint)
+        {
+            PlayerPrefs.SetInt(PlayerPrefsKey, checkpointLevel);
+            PlayerPrefs.Save();
+            Debug.Log($"Boss checkpoint unlocked: Level {checkpointLevel}");
+        }
 
+        // A boss defeat is always an autosave trigger, even when replaying an
+        // already secured milestone.
         PlayerXP playerXP = Object.FindAnyObjectByType<PlayerXP>();
         if (playerXP != null)
             playerXP.SaveProgress();
 
-        Debug.Log($"Boss checkpoint unlocked: Level {checkpointLevel}");
-        return true;
+        return unlockedNewCheckpoint;
     }
 
     /// <summary>
