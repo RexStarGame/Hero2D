@@ -40,8 +40,8 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
     [Tooltip("Leave empty to keep using the current generated triangle.")]
     [SerializeField] private Sprite customDirectionArrowSprite;
     [SerializeField] private Color directionArrowColor = new Color(0.1f, 0.9f, 1f, 1f);
-    [SerializeField] private Vector2 directionArrowSize = new Vector2(28f, 28f);
-    [SerializeField] private Vector2 directionArrowScreenAnchor = new Vector2(0.5f, 0f);
+    [SerializeField] private Vector2 directionArrowSize = new Vector2(40f, 40f);
+    [SerializeField] private Vector2 directionArrowScreenAnchor = new Vector2(0.5f, 0.05f);
     [Tooltip("Moves the complete waypoint guidance group on the screen. This affects both the arrow and distance text.")]
     [SerializeField] private Vector2 directionArrowScreenPosition = new Vector2(0f, 42f);
     [Tooltip("Moves only the HUD arrow inside its guidance group, without moving the distance text.")]
