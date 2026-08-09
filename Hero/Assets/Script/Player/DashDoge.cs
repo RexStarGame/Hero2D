@@ -47,7 +47,10 @@ public class DashDoge : MonoBehaviour
 
     void Update()
     {
-        // Gem sidste bev�gelsesretning (så dash virker selv når du slipper taster)
+        if (MenuLock.IsGameplayInputBlocked)
+            return;
+
+        // Gem sidste bevægelsesretning (så dash virker selv når du slipper taster)
         float moveX = Input.GetAxisRaw("Horizontal");
         float moveY = Input.GetAxisRaw("Vertical");
         Vector2 inputDir = new Vector2(moveX, moveY);
