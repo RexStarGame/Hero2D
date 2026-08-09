@@ -23,6 +23,10 @@ public static class BossLevelCheckpoint
         PlayerPrefs.SetInt(PlayerPrefsKey, checkpointLevel);
         PlayerPrefs.Save();
 
+        PlayerXP playerXP = Object.FindAnyObjectByType<PlayerXP>();
+        if (playerXP != null)
+            playerXP.SaveProgress();
+
         Debug.Log($"Boss checkpoint unlocked: Level {checkpointLevel}");
         return true;
     }
