@@ -39,7 +39,6 @@ public class StorePanelUI : MonoBehaviour
 
     [Header("Controls")]
     [SerializeField] private KeyCode openKey = KeyCode.B;
-    [SerializeField] private bool pauseWhenOpen = true;
 
     private readonly List<StoreItemSlotUI> spawned = new List<StoreItemSlotUI>();
     private readonly StringBuilder details = new StringBuilder(256);
@@ -111,8 +110,6 @@ public class StorePanelUI : MonoBehaviour
         Rebuild();
         SetVisible(true);
 
-        if (pauseWhenOpen)
-            Time.timeScale = 0f;
     }
 
     public void Close()
@@ -125,8 +122,6 @@ public class StorePanelUI : MonoBehaviour
         SetVisible(false);
         MenuLock.Clear(MenuOwner.Store);
 
-        if (pauseWhenOpen)
-            Time.timeScale = 1f;
     }
 
     public void Rebuild()
