@@ -445,7 +445,7 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
         directionIndicator.gameObject.SetActive(true);
         distanceText.text = Mathf.CeilToInt(distance) + " m";
         directionArrow.rectTransform.localRotation =
-            Quaternion.Euler(0f, 0f, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f);
+            Quaternion.Euler(0f, 0f, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + 90f);
     }
 
     private void RefreshWaypointMarker()
