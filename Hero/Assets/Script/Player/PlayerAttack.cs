@@ -69,6 +69,7 @@ public class PlayerAttack : MonoBehaviour
     private string animationBoolName = "IsAttackingBool";
 
     private bool canAttack = true;
+    private float levelZeroAttackCooldown;
     private Vector2 lastFacingDirection = Vector2.down;
     private Coroutine attackRoutine;
     private bool trailPlayedThisAttack;
@@ -80,6 +81,7 @@ public class PlayerAttack : MonoBehaviour
 
     private void Awake()
     {
+        levelZeroAttackCooldown = Mathf.Max(0.01f, attackCooldown);
         if (attackHitbox != null) attackHitbox.enabled = false;
         if (animator == null) animator = GetComponentInChildren<Animator>();
 
@@ -294,6 +296,17 @@ public class PlayerAttack : MonoBehaviour
         lifeStealPercent = Mathf.Max(0f, savedLifeStealPercent);
         critLevel = Mathf.Max(0, savedCritLevel);
         critChance = Mathf.Clamp01(savedCritChance);
+    }
+
+    public void ResetAbilityUpgradeProgress()
+    {
+        attackSpeedLevel = 0;
+        attackCooldown = Mathf.Max(0.01f, levelZeroAttackCooldown);
+        lifeStealLevel = 0;
+        lifeStealPercent = 0f;
+        critLevel = 0;
+        critChance = 0f;
+        AttackReadyTime = Time.time;
     }
 
     // ---------- Attack speed upgrade ----------
