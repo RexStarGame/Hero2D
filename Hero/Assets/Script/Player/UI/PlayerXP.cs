@@ -135,7 +135,7 @@ public class PlayerXP : MonoBehaviour
     {
         level++;
         abilityPoints++;
-        xpToNextLevel += 50;
+        xpToNextLevel += 125;
 
         Debug.Log("Leveled up! Level " + level +
                   " | Ability Points: " + abilityPoints);

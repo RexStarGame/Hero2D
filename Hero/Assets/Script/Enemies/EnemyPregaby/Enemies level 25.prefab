@@ -261,7 +261,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 245
-  xpReward: 500
+  xpReward: 150
   onDeath:
     m_PersistentCalls:
       m_Calls: []
