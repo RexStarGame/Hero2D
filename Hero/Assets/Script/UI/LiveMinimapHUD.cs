@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -45,6 +46,17 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
     [Tooltip("Adjust this if a custom sprite's pointed end uses a different default direction.")]
     [SerializeField] private float directionArrowRotationOffset = 90f;
 
+    [Header("Waypoint Distance Text")]
+    [Tooltip("Leave empty to use TextMeshPro's default font asset.")]
+    [SerializeField] private TMP_FontAsset waypointDistanceFont;
+    [Min(1f)] [SerializeField] private float waypointDistanceFontSize = 22f;
+    [SerializeField] private Color waypointDistanceTextColor = Color.white;
+    [SerializeField] private Vector2 waypointDistanceTextSize = new Vector2(220f, 38f);
+    [SerializeField] private Vector2 waypointDistanceTextPosition = Vector2.zero;
+    [SerializeField] private TextAlignmentOptions waypointDistanceTextAlignment = TextAlignmentOptions.Bottom;
+    [Tooltip("Use {0} where the rounded distance should appear, for example: {0} m.")]
+    [SerializeField] private string waypointDistanceFormat = "{0} m";
+
     [Header("Appearance")]
     [SerializeField] private Color backgroundColor = new Color(0.035f, 0.055f, 0.075f, 0.88f);
     [SerializeField] private Color borderColor = new Color(0.72f, 0.58f, 0.28f, 0.95f);
@@ -69,7 +81,7 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
     private Image waypointMarker;
     private RectTransform directionIndicator;
     private Image directionArrow;
-    private Text distanceText;
+    private TextMeshProUGUI distanceText;
     private Text waypointHelpText;
     private bool hasWaypoint;
     private Vector2 waypointPosition;
@@ -379,11 +391,18 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
             Mathf.Max(1f, directionArrowSize.x),
             Mathf.Max(1f, directionArrowSize.y));
 
-        distanceText = CreateText("Waypoint Distance", directionIndicator, 22, TextAnchor.LowerCenter);
-        distanceText.rectTransform.anchorMin = Vector2.zero;
-        distanceText.rectTransform.anchorMax = Vector2.one;
-        distanceText.rectTransform.offsetMin = Vector2.zero;
-        distanceText.rectTransform.offsetMax = new Vector2(0f, -32f);
+        distanceText = CreateTMPText("Waypoint Distance", directionIndicator);
+        distanceText.font = waypointDistanceFont != null ? waypointDistanceFont : TMP_Settings.defaultFontAsset;
+        distanceText.fontSize = Mathf.Max(1f, waypointDistanceFontSize);
+        distanceText.color = waypointDistanceTextColor;
+        distanceText.alignment = waypointDistanceTextAlignment;
+        distanceText.rectTransform.anchorMin = new Vector2(0.5f, 0f);
+        distanceText.rectTransform.anchorMax = new Vector2(0.5f, 0f);
+        distanceText.rectTransform.pivot = new Vector2(0.5f, 0f);
+        distanceText.rectTransform.anchoredPosition = waypointDistanceTextPosition;
+        distanceText.rectTransform.sizeDelta = new Vector2(
+            Mathf.Max(1f, waypointDistanceTextSize.x),
+            Mathf.Max(1f, waypointDistanceTextSize.y));
 
         waypointHelpText = CreateText("Waypoint Help", transform, 18, TextAnchor.MiddleCenter);
         waypointHelpText.text = "Left click: Set waypoint   Right click / Delete: Remove";
@@ -461,7 +480,10 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
         }
 
         directionIndicator.gameObject.SetActive(true);
-        distanceText.text = Mathf.CeilToInt(distance) + " m";
+        int roundedDistance = Mathf.CeilToInt(distance);
+        distanceText.text = string.IsNullOrEmpty(waypointDistanceFormat)
+            ? roundedDistance.ToString()
+            : waypointDistanceFormat.Replace("{0}", roundedDistance.ToString());
         directionArrow.rectTransform.localRotation =
             Quaternion.Euler(
                 0f,
@@ -550,6 +572,16 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
         }
 
         RefreshMarkers();
+    }
+
+    private static TextMeshProUGUI CreateTMPText(string objectName, Transform parent)
+    {
+        GameObject textObject = new GameObject(objectName, typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
+        textObject.transform.SetParent(parent, false);
+        TextMeshProUGUI text = textObject.GetComponent<TextMeshProUGUI>();
+        text.raycastTarget = false;
+        text.enableWordWrapping = false;
+        return text;
     }
 
     private static Text CreateText(string objectName, Transform parent, int fontSize, TextAnchor alignment)
