@@ -11,6 +11,19 @@ public class PlayerMovement : MonoBehaviour
     private Animator animator;
     private Vector2 movement;
     private SpriteRenderer sr;
+    private float preserveExternalVelocityUntil;
+
+    /// <summary>
+    /// Prevents player input from immediately overwriting an externally applied
+    /// Rigidbody velocity, for example after a boss throw or knockback.
+    /// </summary>
+    public void PreserveExternalVelocity(float duration)
+    {
+        preserveExternalVelocityUntil = Mathf.Max(
+            preserveExternalVelocityUntil,
+            Time.time + Mathf.Max(0f, duration));
+        movement = Vector2.zero;
+    }
 
     private void Awake()
     {
@@ -85,6 +98,9 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (Time.time < preserveExternalVelocityUntil)
+            return;
+
         if (MenuLock.IsGameplayInputBlocked)
         {
             rb.linearVelocity = Vector2.zero;
