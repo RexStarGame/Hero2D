@@ -23406,6 +23406,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8578e2a38f0741e469911b8d101cc79e, type: 2}
   - {fileID: 11400000, guid: 38190034bad56f647abd4d387ae45ac6, type: 2}
   - {fileID: 11400000, guid: d52c6ea1d135bcb4cbb682c095c5de0c, type: 2}
+  - {fileID: 11400000, guid: 7797c5ec45c5fa84599c81b8834ca295, type: 2}
   inventory: {fileID: 239307053}
   wallet: {fileID: 239307055}
   playerXP: {fileID: 239307050}
@@ -61934,6 +61935,7 @@ Transform:
   - {fileID: 7948396431391205772}
   - {fileID: 6090724278834478751}
   - {fileID: 3635757023592911326}
+  - {fileID: 4319025719567389021}
   - {fileID: 9010574823252024314}
   - {fileID: 840477492}
   m_Father: {fileID: 0}
@@ -77182,6 +77184,67 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7781856481739447556, guid: a0acb62a23c3a9842993680f01212b4a, type: 3}
   m_PrefabInstance: {fileID: 423002043029768503}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1123340165220093002
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1705830961}
+    m_Modifications:
+    - target: {fileID: 4176076291772436778, guid: 58450fef15526164bbc54970868b0d5b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -1011.16
+      objectReference: {fileID: 0}
+    - target: {fileID: 4176076291772436778, guid: 58450fef15526164bbc54970868b0d5b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -773.664
+      objectReference: {fileID: 0}
+    - target: {fileID: 4176076291772436778, guid: 58450fef15526164bbc54970868b0d5b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 15.965406
+      objectReference: {fileID: 0}
+    - target: {fileID: 4176076291772436778, guid: 58450fef15526164bbc54970868b0d5b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4176076291772436778, guid: 58450fef15526164bbc54970868b0d5b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4176076291772436778, guid: 58450fef15526164bbc54970868b0d5b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4176076291772436778, guid: 58450fef15526164bbc54970868b0d5b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4176076291772436778, guid: 58450fef15526164bbc54970868b0d5b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4176076291772436778, guid: 58450fef15526164bbc54970868b0d5b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4176076291772436778, guid: 58450fef15526164bbc54970868b0d5b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4452784338159096076, guid: 58450fef15526164bbc54970868b0d5b, type: 3}
+      propertyPath: m_Name
+      value: Necklace - level 10 UC
+      objectReference: {fileID: 0}
+    - target: {fileID: 4452784338159096076, guid: 58450fef15526164bbc54970868b0d5b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 58450fef15526164bbc54970868b0d5b, type: 3}
 --- !u!1001 &1602638500262996779
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -77890,6 +77953,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 65ea661f365f41c47b73ece37c7443c1, type: 3}
+--- !u!4 &4319025719567389021 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4176076291772436778, guid: 58450fef15526164bbc54970868b0d5b, type: 3}
+  m_PrefabInstance: {fileID: 1123340165220093002}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4524523432213261083
 PrefabInstance:
   m_ObjectHideFlags: 0
