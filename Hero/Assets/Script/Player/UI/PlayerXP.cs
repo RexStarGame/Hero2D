@@ -7,6 +7,11 @@ public class PlayerXP : MonoBehaviour
     public int xpToNextLevel = 100;
     public int abilityPoints = 0;
 
+    [Header("Death Penalty")]
+    [Tooltip("Percentage of current-level XP lost on death. Completed levels are never lost.")]
+    [Range(0f, 100f)]
+    [SerializeField] private float deathXpLossPercent = 10f;
+
     [Header("Equipment XP Bonus")]
     [Tooltip("Auto-finds the player's equipment if empty. Only equipped item modifiers affect kill XP.")]
     [SerializeField] private PlayerEquipment equipment;
@@ -63,16 +68,18 @@ public class PlayerXP : MonoBehaviour
     }
 
     /// <summary>
-    /// Removes 10% of only the XP collected toward the next level. Completed
-    /// levels are never touched. The loss rounds up so 1-9 XP still has a cost.
+    /// Removes the configured percentage of only the XP collected toward the
+    /// next level. Fractional XP loss rounds down and completed levels are never
+    /// touched.
     /// </summary>
     public int ApplyDeathPenaltyAndSave()
     {
-        int lostXp = Mathf.Min(xp, Mathf.CeilToInt(xp * 0.10f));
+        float lossPercent = Mathf.Clamp(deathXpLossPercent, 0f, 100f);
+        int lostXp = Mathf.FloorToInt(xp * (lossPercent / 100f));
         xp -= lostXp;
         SaveProgress();
 
-        Debug.Log($"Death penalty: lost {lostXp} current-level XP. " +
+        Debug.Log($"Death penalty ({lossPercent:0.##}%): lost {lostXp} current-level XP. " +
                   $"Level {level} remains secured with {xp}/{xpToNextLevel} XP.");
         return lostXp;
     }
