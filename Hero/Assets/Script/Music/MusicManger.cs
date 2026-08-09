@@ -40,7 +40,7 @@ public class MusicManager : MonoBehaviour
             }
             else
             {
-                // Block opening pause if Upgrade menu is open
+                // Block opening this menu while another local menu owns input
                 if (!MenuLock.CanOpen(MenuOwner.Pause))
                     return;
 
@@ -54,7 +54,6 @@ public class MusicManager : MonoBehaviour
         if (pauseMenuUI != null)
         {
             pauseMenuUI.SetActive(true);
-            Time.timeScale = 0f;
             isGamePaused = true;
 
             MenuLock.Set(MenuOwner.Pause);
@@ -66,7 +65,6 @@ public class MusicManager : MonoBehaviour
         if (pauseMenuUI != null)
         {
             pauseMenuUI.SetActive(false);
-            Time.timeScale = 1f;
             isGamePaused = false;
 
             MenuLock.Clear(MenuOwner.Pause);
@@ -78,7 +76,6 @@ public class MusicManager : MonoBehaviour
         if (isGamePaused)
         {
             MenuLock.Clear(MenuOwner.Pause);
-            Time.timeScale = 1f;
         }
     }
 
