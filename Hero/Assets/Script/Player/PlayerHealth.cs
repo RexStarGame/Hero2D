@@ -33,9 +33,11 @@ public class PlayerHealth : MonoBehaviour
     public int maxHealthUpgradeMaxLevel = 10;
 
     private DashDoge dashDoge;
+    private float levelZeroMaxHealth;
 
     void Start()
     {
+        levelZeroMaxHealth = Mathf.Max(1f, maxHealth);
         if (equipment == null) equipment = GetComponent<PlayerEquipment>();
         if (equipment != null) equipment.EquipmentChanged += OnEquipmentChanged;
         dashDoge = GetComponent<DashDoge>();
@@ -103,6 +105,15 @@ public class PlayerHealth : MonoBehaviour
         maxHealthLevel = Mathf.Clamp(savedMaxHealthLevel, 0, maxHealthUpgradeMaxLevel);
         regenLevel = Mathf.Max(0, savedRegenLevel);
         maxHealth = Mathf.Max(1f, savedMaxHealth);
+    }
+
+    public void ResetAbilityUpgradeProgress()
+    {
+        maxHealthLevel = 0;
+        regenLevel = 0;
+        maxHealth = Mathf.Max(1f, levelZeroMaxHealth);
+        health = Mathf.Min(health, MaxHealth);
+        UpdateHealthUI(true);
     }
 
     public void TakeDamage(float damage)
