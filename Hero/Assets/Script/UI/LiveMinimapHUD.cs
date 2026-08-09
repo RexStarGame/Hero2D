@@ -35,6 +35,16 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
     [SerializeField] private Color waypointColor = new Color(0.1f, 0.9f, 1f, 1f);
     [SerializeField] private KeyCode removeWaypointKey = KeyCode.Delete;
 
+    [Header("Waypoint Direction Arrow")]
+    [Tooltip("Leave empty to keep using the current generated triangle.")]
+    [SerializeField] private Sprite customDirectionArrowSprite;
+    [SerializeField] private Color directionArrowColor = new Color(0.1f, 0.9f, 1f, 1f);
+    [SerializeField] private Vector2 directionArrowSize = new Vector2(28f, 28f);
+    [SerializeField] private Vector2 directionArrowScreenAnchor = new Vector2(0.5f, 0f);
+    [SerializeField] private Vector2 directionArrowScreenPosition = new Vector2(0f, 42f);
+    [Tooltip("Adjust this if a custom sprite's pointed end uses a different default direction.")]
+    [SerializeField] private float directionArrowRotationOffset = 90f;
+
     [Header("Appearance")]
     [SerializeField] private Color backgroundColor = new Color(0.035f, 0.055f, 0.075f, 0.88f);
     [SerializeField] private Color borderColor = new Color(0.72f, 0.58f, 0.28f, 0.95f);
@@ -347,19 +357,27 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
         GameObject indicatorObject = new GameObject("Waypoint Direction", typeof(RectTransform));
         indicatorObject.transform.SetParent(transform, false);
         directionIndicator = indicatorObject.GetComponent<RectTransform>();
-        directionIndicator.anchorMin = new Vector2(0.5f, 0f);
-        directionIndicator.anchorMax = new Vector2(0.5f, 0f);
-        directionIndicator.pivot = new Vector2(0.5f, 0f);
-        directionIndicator.anchoredPosition = new Vector2(0f, 42f);
+        directionIndicator.anchorMin = directionArrowScreenAnchor;
+        directionIndicator.anchorMax = directionArrowScreenAnchor;
+        directionIndicator.pivot = directionArrowScreenAnchor;
+        directionIndicator.anchoredPosition = directionArrowScreenPosition;
         directionIndicator.sizeDelta = new Vector2(220f, 70f);
 
-        arrowSprite = CreateArrowSprite(32, out arrowTexture);
-        directionArrow = CreateImage("Direction Arrow", directionIndicator, waypointColor, arrowSprite);
+        Sprite displayedArrowSprite = customDirectionArrowSprite;
+        if (displayedArrowSprite == null)
+        {
+            arrowSprite = CreateArrowSprite(32, out arrowTexture);
+            displayedArrowSprite = arrowSprite;
+        }
+
+        directionArrow = CreateImage("Direction Arrow", directionIndicator, directionArrowColor, displayedArrowSprite);
         directionArrow.rectTransform.anchorMin = new Vector2(0.5f, 1f);
         directionArrow.rectTransform.anchorMax = new Vector2(0.5f, 1f);
         directionArrow.rectTransform.pivot = new Vector2(0.5f, 0.5f);
         directionArrow.rectTransform.anchoredPosition = new Vector2(0f, -16f);
-        directionArrow.rectTransform.sizeDelta = new Vector2(28f, 28f);
+        directionArrow.rectTransform.sizeDelta = new Vector2(
+            Mathf.Max(1f, directionArrowSize.x),
+            Mathf.Max(1f, directionArrowSize.y));
 
         distanceText = CreateText("Waypoint Distance", directionIndicator, 22, TextAnchor.LowerCenter);
         distanceText.rectTransform.anchorMin = Vector2.zero;
@@ -445,7 +463,10 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
         directionIndicator.gameObject.SetActive(true);
         distanceText.text = Mathf.CeilToInt(distance) + " m";
         directionArrow.rectTransform.localRotation =
-            Quaternion.Euler(0f, 0f, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + 90f);
+            Quaternion.Euler(
+                0f,
+                0f,
+                Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + directionArrowRotationOffset);
     }
 
     private void RefreshWaypointMarker()
