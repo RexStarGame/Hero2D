@@ -12,6 +12,11 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 movement;
     private SpriteRenderer sr;
 
+    private void Awake()
+    {
+        MinimapTarget2D.Ensure(gameObject, MinimapTargetKind.Player);
+    }
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();

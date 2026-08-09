@@ -10001,6 +10001,7 @@ GameObject:
   - component: {fileID: 2200000003}
   - component: {fileID: 2200000004}
   - component: {fileID: 2200000005}
+  - component: {fileID: 2200000006}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -76996,6 +76997,63 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   announcementUI: {fileID: 1347232791}
+--- !u!114 &2200000006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 239307039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4aeeaf8d381d4c22844f2c367518838a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  safeBadge: {fileID: 0}
+  badgeBackground: {fileID: 0}
+  safeIcon: {fileID: 0}
+  safeLabel: {fileID: 0}
+  notificationGroup: {fileID: 0}
+  notificationText: {fileID: 0}
+  createAutomaticHud: 1
+  canvasSortingOrder: 50
+  referenceResolution: {x: 1920, y: 1080}
+  badgeAnchor: {x: 1, y: 1}
+  badgePivot: {x: 1, y: 1}
+  badgePosition: {x: -69, y: -270}
+  badgeSize: {x: 150, y: 46}
+  badgeBackgroundColor: {r: 0.04, g: 0.24, b: 0.2, a: 0.88}
+  showBadgeBackground: 1
+  safeIconSprite: {fileID: 0}
+  safeIconColor: {r: 0.75, g: 1, b: 0.88, a: 1}
+  showSafeIcon: 1
+  iconPosition: {x: 14, y: 0}
+  iconSize: {x: 28, y: 28}
+  safeLabelText: Safe Zone
+  safeLabelFont: {fileID: 0}
+  safeLabelFontSize: 24
+  safeLabelFontStyle: 1
+  safeLabelColor: {r: 0.75, g: 1, b: 0.88, a: 1}
+  showSafeLabel: 1
+  labelOffset: {x: 0, y: 0}
+  notificationAnchor: {x: 0.5, y: 1}
+  notificationPivot: {x: 0.5, y: 1}
+  notificationPosition: {x: 0, y: -105}
+  notificationSize: {x: 620, y: 100}
+  notificationFont: {fileID: 0}
+  notificationFontSize: 30
+  notificationFontStyle: 1
+  notificationColor: {r: 0.82, g: 1, b: 0.92, a: 1}
+  statusCheckInterval: 0.15
+  fadeInDuration: 0.2
+  visibleDuration: 1.6
+  fadeOutDuration: 0.65
+  blockedMessageCooldown: 1.5
+  enteredMessage: 'SAFE ZONE
+
+    Combat is disabled'
+  exitedMessage: COMBAT ENABLED
+  blockedMessage: Combat is disabled here
 --- !u!4 &112732568475948090 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6430937212238586514, guid: 8343e1d44689c3d4abe8279afc2f6942, type: 3}
