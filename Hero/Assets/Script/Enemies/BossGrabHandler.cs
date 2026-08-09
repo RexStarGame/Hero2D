@@ -75,6 +75,8 @@ public class BossGrabHandler : MonoBehaviour
 
     private Transform player;
     private Rigidbody2D playerRb;
+    private Transform activeGrabbedPlayer;
+    private Rigidbody2D activeGrabbedRb;
     private BossBehaviorController bossController;
 
     private bool playerInGrabZone;
@@ -187,11 +189,28 @@ public class BossGrabHandler : MonoBehaviour
     // Called from GrabZone2D
     public void SetPlayerInGrabZone(Collider2D col, bool inZone)
     {
-        if (col != null && col.CompareTag(playerTag))
-        {
-            CachePlayer(col.transform);
-            playerInGrabZone = inZone;
-        }
+        if (col == null)
+            return;
+
+        Transform target = null;
+        PlayerHealth health = col.GetComponentInParent<PlayerHealth>();
+        if (health != null)
+            target = health.transform;
+        else if (col.CompareTag(playerTag))
+            target = col.transform;
+        else if (col.transform.root != null && col.transform.root.CompareTag(playerTag))
+            target = col.transform.root;
+
+        if (target == null)
+            return;
+
+        CachePlayer(target);
+        playerInGrabZone = inZone;
+    }
+
+    public void ClearGrabZone()
+    {
+        playerInGrabZone = false;
     }
 
     private void EnsurePlayer()
@@ -276,6 +295,8 @@ public class BossGrabHandler : MonoBehaviour
         Rigidbody2D grabbedRb = grabbedPlayer != null
             ? grabbedPlayer.GetComponent<Rigidbody2D>()
             : null;
+        activeGrabbedPlayer = grabbedPlayer;
+        activeGrabbedRb = grabbedRb;
         bool completedThrow = false;
 
         try
@@ -424,6 +445,9 @@ public class BossGrabHandler : MonoBehaviour
         Rigidbody2D grabbedRb,
         bool preserveThrowVelocity)
     {
+        if (!grabbing && disabledScriptStates.Count == 0)
+            return;
+
         if (grabbedPlayer != null)
         {
             if (grabbedPlayer.parent == grabPoint)
@@ -451,6 +475,8 @@ public class BossGrabHandler : MonoBehaviour
         RestorePlayerControls();
         grabbing = false;
         grabRoutine = null;
+        activeGrabbedPlayer = null;
+        activeGrabbedRb = null;
     }
 
     private static Vector2 GetVelocity(Rigidbody2D body)
@@ -624,7 +650,7 @@ public class BossGrabHandler : MonoBehaviour
             grabRoutine = null;
         }
 
-        CleanupGrab(player, playerRb, false);
+        CleanupGrab(activeGrabbedPlayer, activeGrabbedRb, false);
 
         if (ring != null)
             ring.SetActive(false);
