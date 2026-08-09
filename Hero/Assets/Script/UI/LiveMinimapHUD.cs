@@ -1,14 +1,17 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 [DisallowMultipleComponent]
-public sealed class LiveMinimapHUD : MonoBehaviour
+public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
 {
     [Header("Layout")]
     [Min(120f)] [SerializeField] private float mapSize = 220f;
     [Min(1f)] [SerializeField] private float worldRadius = 28f;
     [SerializeField] private Vector2 topRightMargin = new Vector2(24f, 24f);
+    [Min(240f)] [SerializeField] private float expandedMapSize = 700f;
+    [Min(1f)] [SerializeField] private float expandedWorldRadius = 75f;
 
     [Header("World View")]
     [SerializeField] private bool showWorld = true;
@@ -37,7 +40,11 @@ public sealed class LiveMinimapHUD : MonoBehaviour
 
     private readonly List<Image> markerPool = new List<Image>(32);
     private RectTransform mapArea;
+    private RectTransform panelRect;
+    private RectTransform horizontalGrid;
+    private RectTransform verticalGrid;
     private GameObject panel;
+    private bool isExpanded;
     private Sprite circleSprite;
     private Texture2D circleTexture;
     private Transform localPlayer;
@@ -85,7 +92,7 @@ public sealed class LiveMinimapHUD : MonoBehaviour
     private void Update()
     {
         if (Input.GetKeyDown(toggleKey))
-            panel.SetActive(!panel.activeSelf);
+            ToggleExpanded();
 
         bool shouldRenderWorld = showWorld && panel.activeSelf;
         if (minimapCamera != null)
@@ -105,7 +112,7 @@ public sealed class LiveMinimapHUD : MonoBehaviour
 
         Vector3 playerPosition = localPlayer.position;
         minimapCamera.transform.position = new Vector3(playerPosition.x, playerPosition.y, minimapCameraZ);
-        minimapCamera.orthographicSize = worldRadius;
+        minimapCamera.orthographicSize = CurrentWorldRadius;
     }
 
     private void ResolveLocalPlayer()
@@ -138,8 +145,10 @@ public sealed class LiveMinimapHUD : MonoBehaviour
         if (localPlayer != null)
         {
             IReadOnlyList<MinimapTarget2D> targets = MinimapTarget2D.ActiveTargets;
-            float pixelsPerWorldUnit = (mapSize * 0.5f - 10f) / Mathf.Max(1f, worldRadius);
-            float radiusSquared = worldRadius * worldRadius;
+            float currentMapSize = CurrentMapSize;
+            float currentWorldRadius = CurrentWorldRadius;
+            float pixelsPerWorldUnit = (currentMapSize * 0.5f - 10f) / Mathf.Max(1f, currentWorldRadius);
+            float radiusSquared = currentWorldRadius * currentWorldRadius;
 
             for (int i = 0; i < targets.Count; i++)
             {
@@ -220,7 +229,7 @@ public sealed class LiveMinimapHUD : MonoBehaviour
         gameObject.AddComponent<GraphicRaycaster>();
 
         panel = CreateImage("Minimap Panel", transform, backgroundColor, circleSprite).gameObject;
-        RectTransform panelRect = panel.GetComponent<RectTransform>();
+        panelRect = panel.GetComponent<RectTransform>();
         panelRect.anchorMin = Vector2.one;
         panelRect.anchorMax = Vector2.one;
         panelRect.pivot = Vector2.one;
@@ -246,8 +255,11 @@ public sealed class LiveMinimapHUD : MonoBehaviour
         if (showWorld)
             BuildWorldView();
 
-        CreateGridLine("Horizontal Grid", new Vector2(mapSize - 18f, 1f));
-        CreateGridLine("Vertical Grid", new Vector2(1f, mapSize - 18f));
+        horizontalGrid = CreateGridLine("Horizontal Grid", new Vector2(mapSize - 18f, 1f));
+        verticalGrid = CreateGridLine("Vertical Grid", new Vector2(1f, mapSize - 18f));
+
+        panel.GetComponent<Image>().raycastTarget = true;
+        ApplyMapState();
     }
 
     private void BuildWorldView()
@@ -291,7 +303,7 @@ public sealed class LiveMinimapHUD : MonoBehaviour
         worldImage.transform.SetAsFirstSibling();
     }
 
-    private void CreateGridLine(string objectName, Vector2 size)
+    private RectTransform CreateGridLine(string objectName, Vector2 size)
     {
         Image line = CreateImage(objectName, mapArea, gridColor, null);
         line.rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
@@ -299,6 +311,52 @@ public sealed class LiveMinimapHUD : MonoBehaviour
         line.rectTransform.pivot = new Vector2(0.5f, 0.5f);
         line.rectTransform.anchoredPosition = Vector2.zero;
         line.rectTransform.sizeDelta = size;
+        return line.rectTransform;
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Left)
+            ToggleExpanded();
+    }
+
+    private float CurrentMapSize => isExpanded ? Mathf.Max(mapSize, expandedMapSize) : mapSize;
+    private float CurrentWorldRadius => isExpanded ? Mathf.Max(worldRadius, expandedWorldRadius) : worldRadius;
+
+    private void ToggleExpanded()
+    {
+        isExpanded = !isExpanded;
+        ApplyMapState();
+    }
+
+    private void ApplyMapState()
+    {
+        if (panelRect == null)
+            return;
+
+        float currentSize = CurrentMapSize;
+        if (isExpanded)
+        {
+            panelRect.anchorMin = new Vector2(0.5f, 0.5f);
+            panelRect.anchorMax = new Vector2(0.5f, 0.5f);
+            panelRect.pivot = new Vector2(0.5f, 0.5f);
+            panelRect.anchoredPosition = Vector2.zero;
+        }
+        else
+        {
+            panelRect.anchorMin = Vector2.one;
+            panelRect.anchorMax = Vector2.one;
+            panelRect.pivot = Vector2.one;
+            panelRect.anchoredPosition = new Vector2(-topRightMargin.x, -topRightMargin.y);
+        }
+
+        panelRect.sizeDelta = new Vector2(currentSize + 12f, currentSize + 12f);
+        if (horizontalGrid != null)
+            horizontalGrid.sizeDelta = new Vector2(currentSize - 18f, 1f);
+        if (verticalGrid != null)
+            verticalGrid.sizeDelta = new Vector2(1f, currentSize - 18f);
+
+        RefreshMarkers();
     }
 
     private static Image CreateImage(string objectName, Transform parent, Color color, Sprite sprite)
