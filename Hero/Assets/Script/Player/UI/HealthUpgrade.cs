@@ -31,6 +31,7 @@ public class HealthUpgrade : MonoBehaviour
 
         playerXP.abilityPoints -= cost;
         playerHealth.UpgradeMaxHealth();
+        PlayerProgressSave.SaveHealthUpgrades(playerHealth, playerXP);
 
         UpdateText();
     }
