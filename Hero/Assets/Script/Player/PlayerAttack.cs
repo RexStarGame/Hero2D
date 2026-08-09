@@ -107,6 +107,8 @@ public class PlayerAttack : MonoBehaviour
         if (safeZoneFeedback == null)
             safeZoneFeedback = gameObject.AddComponent<SafeZoneFeedbackUI>();
 
+        PlayerProgressSave.RestoreAttackUpgrades(this);
+
         // Start as ready
         AttackReadyTime = Time.time;
     }
@@ -273,6 +275,22 @@ public class PlayerAttack : MonoBehaviour
     {
         lifeStealLevel++;
         lifeStealPercent += addPercent;
+    }
+
+    public void RestoreUpgradeProgress(
+        int savedAttackSpeedLevel,
+        float savedAttackCooldown,
+        int savedLifeStealLevel,
+        float savedLifeStealPercent,
+        int savedCritLevel,
+        float savedCritChance)
+    {
+        attackSpeedLevel = Mathf.Max(0, savedAttackSpeedLevel);
+        attackCooldown = Mathf.Max(0.01f, savedAttackCooldown);
+        lifeStealLevel = Mathf.Max(0, savedLifeStealLevel);
+        lifeStealPercent = Mathf.Max(0f, savedLifeStealPercent);
+        critLevel = Mathf.Max(0, savedCritLevel);
+        critChance = Mathf.Clamp01(savedCritChance);
     }
 
     // ---------- Attack speed upgrade ----------
