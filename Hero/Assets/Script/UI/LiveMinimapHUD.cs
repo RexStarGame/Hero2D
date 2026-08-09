@@ -29,6 +29,12 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
     [SerializeField] private Color otherPlayerColor = new Color(0.2f, 0.62f, 1f, 1f);
     [SerializeField] private Color enemyColor = new Color(0.95f, 0.18f, 0.18f, 1f);
 
+    [Header("Waypoint")]
+    [Min(0.1f)] [SerializeField] private float waypointArrivalDistance = 2f;
+    [Min(6f)] [SerializeField] private float waypointMarkerSize = 18f;
+    [SerializeField] private Color waypointColor = new Color(0.1f, 0.9f, 1f, 1f);
+    [SerializeField] private KeyCode removeWaypointKey = KeyCode.Delete;
+
     [Header("Appearance")]
     [SerializeField] private Color backgroundColor = new Color(0.035f, 0.055f, 0.075f, 0.88f);
     [SerializeField] private Color borderColor = new Color(0.72f, 0.58f, 0.28f, 0.95f);
@@ -50,6 +56,15 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
     private Transform localPlayer;
     private Camera minimapCamera;
     private RenderTexture worldTexture;
+    private Image waypointMarker;
+    private RectTransform directionIndicator;
+    private Image directionArrow;
+    private Text distanceText;
+    private Text waypointHelpText;
+    private bool hasWaypoint;
+    private Vector2 waypointPosition;
+    private Sprite arrowSprite;
+    private Texture2D arrowTexture;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStatics()
@@ -94,6 +109,9 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
         if (Input.GetKeyDown(toggleKey))
             ToggleExpanded();
 
+        if (Input.GetKeyDown(removeWaypointKey))
+            ClearWaypoint();
+
         bool shouldRenderWorld = showWorld && panel.activeSelf;
         if (minimapCamera != null)
             minimapCamera.enabled = shouldRenderWorld;
@@ -102,6 +120,7 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
             return;
 
         ResolveLocalPlayer();
+        UpdateWaypoint();
         RefreshMarkers();
     }
 
@@ -171,6 +190,8 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
 
         for (int i = used; i < markerPool.Count; i++)
             markerPool[i].gameObject.SetActive(false);
+
+        RefreshWaypointMarker();
     }
 
     private Image GetMarker(int index)
@@ -257,6 +278,7 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
 
         horizontalGrid = CreateGridLine("Horizontal Grid", new Vector2(mapSize - 18f, 1f));
         verticalGrid = CreateGridLine("Vertical Grid", new Vector2(1f, mapSize - 18f));
+        BuildWaypointUI();
 
         panel.GetComponent<Image>().raycastTarget = true;
         ApplyMapState();
@@ -314,10 +336,155 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
         return line.rectTransform;
     }
 
+    private void BuildWaypointUI()
+    {
+        waypointMarker = CreateImage("Waypoint", mapArea, waypointColor, null);
+        waypointMarker.rectTransform.sizeDelta = new Vector2(waypointMarkerSize, waypointMarkerSize);
+        waypointMarker.rectTransform.localRotation = Quaternion.Euler(0f, 0f, 45f);
+        waypointMarker.raycastTarget = false;
+        waypointMarker.gameObject.SetActive(false);
+
+        GameObject indicatorObject = new GameObject("Waypoint Direction", typeof(RectTransform));
+        indicatorObject.transform.SetParent(transform, false);
+        directionIndicator = indicatorObject.GetComponent<RectTransform>();
+        directionIndicator.anchorMin = new Vector2(0.5f, 0f);
+        directionIndicator.anchorMax = new Vector2(0.5f, 0f);
+        directionIndicator.pivot = new Vector2(0.5f, 0f);
+        directionIndicator.anchoredPosition = new Vector2(0f, 42f);
+        directionIndicator.sizeDelta = new Vector2(220f, 70f);
+
+        arrowSprite = CreateArrowSprite(32, out arrowTexture);
+        directionArrow = CreateImage("Direction Arrow", directionIndicator, waypointColor, arrowSprite);
+        directionArrow.rectTransform.anchorMin = new Vector2(0.5f, 1f);
+        directionArrow.rectTransform.anchorMax = new Vector2(0.5f, 1f);
+        directionArrow.rectTransform.pivot = new Vector2(0.5f, 0.5f);
+        directionArrow.rectTransform.anchoredPosition = new Vector2(0f, -16f);
+        directionArrow.rectTransform.sizeDelta = new Vector2(28f, 28f);
+
+        distanceText = CreateText("Waypoint Distance", directionIndicator, 22, TextAnchor.LowerCenter);
+        distanceText.rectTransform.anchorMin = Vector2.zero;
+        distanceText.rectTransform.anchorMax = Vector2.one;
+        distanceText.rectTransform.offsetMin = Vector2.zero;
+        distanceText.rectTransform.offsetMax = new Vector2(0f, -32f);
+
+        waypointHelpText = CreateText("Waypoint Help", transform, 18, TextAnchor.MiddleCenter);
+        waypointHelpText.text = "Left click: Set waypoint   Right click / Delete: Remove";
+        waypointHelpText.rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
+        waypointHelpText.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        waypointHelpText.rectTransform.pivot = new Vector2(0.5f, 1f);
+        waypointHelpText.rectTransform.anchoredPosition = new Vector2(0f, -(expandedMapSize * 0.5f + 18f));
+        waypointHelpText.rectTransform.sizeDelta = new Vector2(620f, 32f);
+
+        directionIndicator.gameObject.SetActive(false);
+        waypointHelpText.gameObject.SetActive(false);
+    }
+
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (eventData.button == PointerEventData.InputButton.Left)
+        if (eventData.button == PointerEventData.InputButton.Right)
+        {
+            if (isExpanded)
+                ClearWaypoint();
+            return;
+        }
+
+        if (eventData.button != PointerEventData.InputButton.Left)
+            return;
+
+        if (!isExpanded)
+        {
             ToggleExpanded();
+            return;
+        }
+
+        if (localPlayer == null || mapArea == null)
+            return;
+
+        Vector2 localPoint;
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                mapArea, eventData.position, eventData.pressEventCamera, out localPoint))
+            return;
+
+        float halfSize = Mathf.Min(mapArea.rect.width, mapArea.rect.height) * 0.5f;
+        if (halfSize <= 0f || localPoint.sqrMagnitude > halfSize * halfSize)
+            return;
+
+        if (hasWaypoint)
+        {
+            Vector2 existingPoint = WorldOffsetToMapPoint(waypointPosition - (Vector2)localPlayer.position);
+            if ((localPoint - existingPoint).sqrMagnitude <= waypointMarkerSize * waypointMarkerSize)
+            {
+                ClearWaypoint();
+                return;
+            }
+        }
+
+        waypointPosition = (Vector2)localPlayer.position + localPoint * (CurrentWorldRadius / halfSize);
+        hasWaypoint = true;
+        UpdateWaypoint();
+        RefreshWaypointMarker();
+    }
+
+    private void UpdateWaypoint()
+    {
+        if (!hasWaypoint || localPlayer == null)
+        {
+            if (directionIndicator != null)
+                directionIndicator.gameObject.SetActive(false);
+            return;
+        }
+
+        Vector2 direction = waypointPosition - (Vector2)localPlayer.position;
+        float distance = direction.magnitude;
+        if (distance <= waypointArrivalDistance)
+        {
+            ClearWaypoint();
+            return;
+        }
+
+        directionIndicator.gameObject.SetActive(true);
+        distanceText.text = Mathf.CeilToInt(distance) + " m";
+        directionArrow.rectTransform.localRotation =
+            Quaternion.Euler(0f, 0f, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f);
+    }
+
+    private void RefreshWaypointMarker()
+    {
+        if (waypointMarker == null)
+            return;
+
+        if (!hasWaypoint || localPlayer == null)
+        {
+            waypointMarker.gameObject.SetActive(false);
+            return;
+        }
+
+        Vector2 offset = waypointPosition - (Vector2)localPlayer.position;
+        if (offset.sqrMagnitude > CurrentWorldRadius * CurrentWorldRadius)
+        {
+            waypointMarker.gameObject.SetActive(false);
+            return;
+        }
+
+        waypointMarker.gameObject.SetActive(true);
+        waypointMarker.rectTransform.sizeDelta = new Vector2(waypointMarkerSize, waypointMarkerSize);
+        waypointMarker.rectTransform.anchoredPosition = WorldOffsetToMapPoint(offset);
+        waypointMarker.transform.SetAsLastSibling();
+    }
+
+    private Vector2 WorldOffsetToMapPoint(Vector2 worldOffset)
+    {
+        float pixelsPerWorldUnit = (CurrentMapSize * 0.5f - 10f) / Mathf.Max(1f, CurrentWorldRadius);
+        return worldOffset * pixelsPerWorldUnit;
+    }
+
+    private void ClearWaypoint()
+    {
+        hasWaypoint = false;
+        if (waypointMarker != null)
+            waypointMarker.gameObject.SetActive(false);
+        if (directionIndicator != null)
+            directionIndicator.gameObject.SetActive(false);
     }
 
     private float CurrentMapSize => isExpanded ? Mathf.Max(mapSize, expandedMapSize) : mapSize;
@@ -355,8 +522,26 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
             horizontalGrid.sizeDelta = new Vector2(currentSize - 18f, 1f);
         if (verticalGrid != null)
             verticalGrid.sizeDelta = new Vector2(1f, currentSize - 18f);
+        if (waypointHelpText != null)
+        {
+            waypointHelpText.gameObject.SetActive(isExpanded);
+            waypointHelpText.rectTransform.anchoredPosition = new Vector2(0f, -(currentSize * 0.5f + 18f));
+        }
 
         RefreshMarkers();
+    }
+
+    private static Text CreateText(string objectName, Transform parent, int fontSize, TextAnchor alignment)
+    {
+        GameObject textObject = new GameObject(objectName, typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
+        textObject.transform.SetParent(parent, false);
+        Text text = textObject.GetComponent<Text>();
+        text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        text.fontSize = fontSize;
+        text.alignment = alignment;
+        text.color = Color.white;
+        text.raycastTarget = false;
+        return text;
     }
 
     private static Image CreateImage(string objectName, Transform parent, Color color, Sprite sprite)
@@ -368,6 +553,31 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
         image.sprite = sprite;
         image.raycastTarget = false;
         return image;
+    }
+
+    private static Sprite CreateArrowSprite(int size, out Texture2D texture)
+    {
+        texture = new Texture2D(size, size, TextureFormat.RGBA32, false)
+        {
+            name = "Runtime Waypoint Arrow",
+            filterMode = FilterMode.Bilinear,
+            wrapMode = TextureWrapMode.Clamp
+        };
+
+        Color32[] pixels = new Color32[size * size];
+        for (int y = 0; y < size; y++)
+        {
+            float halfWidth = (y / (float)(size - 1)) * (size * 0.45f);
+            for (int x = 0; x < size; x++)
+            {
+                bool inside = Mathf.Abs(x - (size - 1) * 0.5f) <= halfWidth;
+                pixels[y * size + x] = inside ? Color.white : Color.clear;
+            }
+        }
+
+        texture.SetPixels32(pixels);
+        texture.Apply(false, true);
+        return Sprite.Create(texture, new Rect(0f, 0f, size, size), new Vector2(0.5f, 0.5f), size);
     }
 
     private static Sprite CreateCircleSprite(int size, out Texture2D texture)
@@ -421,5 +631,9 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
             Destroy(circleSprite);
         if (circleTexture != null)
             Destroy(circleTexture);
+        if (arrowSprite != null)
+            Destroy(arrowSprite);
+        if (arrowTexture != null)
+            Destroy(arrowTexture);
     }
 }
