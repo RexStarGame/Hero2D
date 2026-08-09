@@ -10,6 +10,14 @@ public sealed class LiveMinimapHUD : MonoBehaviour
     [Min(1f)] [SerializeField] private float worldRadius = 28f;
     [SerializeField] private Vector2 topRightMargin = new Vector2(24f, 24f);
 
+    [Header("World View")]
+    [SerializeField] private bool showWorld = true;
+    [Range(128, 512)] [SerializeField] private int renderTextureSize = 256;
+    [SerializeField] private LayerMask worldCullingMask = ~0;
+    [SerializeField] private float minimapCameraZ = -100f;
+    [SerializeField] private float minimapCameraDepth = -100f;
+    [SerializeField] private Color cameraBackgroundColor = new Color(0.035f, 0.055f, 0.075f, 1f);
+
     [Header("Markers")]
     [Min(3f)] [SerializeField] private float localPlayerSize = 15f;
     [Min(3f)] [SerializeField] private float otherPlayerSize = 12f;
@@ -33,6 +41,8 @@ public sealed class LiveMinimapHUD : MonoBehaviour
     private Sprite circleSprite;
     private Texture2D circleTexture;
     private Transform localPlayer;
+    private Camera minimapCamera;
+    private RenderTexture worldTexture;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStatics()
@@ -77,11 +87,25 @@ public sealed class LiveMinimapHUD : MonoBehaviour
         if (Input.GetKeyDown(toggleKey))
             panel.SetActive(!panel.activeSelf);
 
+        bool shouldRenderWorld = showWorld && panel.activeSelf;
+        if (minimapCamera != null)
+            minimapCamera.enabled = shouldRenderWorld;
+
         if (!panel.activeSelf)
             return;
 
         ResolveLocalPlayer();
         RefreshMarkers();
+    }
+
+    private void LateUpdate()
+    {
+        if (minimapCamera == null || localPlayer == null || !minimapCamera.enabled)
+            return;
+
+        Vector3 playerPosition = localPlayer.position;
+        minimapCamera.transform.position = new Vector3(playerPosition.x, playerPosition.y, minimapCameraZ);
+        minimapCamera.orthographicSize = worldRadius;
     }
 
     private void ResolveLocalPlayer()
@@ -216,8 +240,55 @@ public sealed class LiveMinimapHUD : MonoBehaviour
         mapArea.offsetMin = new Vector2(4f, 4f);
         mapArea.offsetMax = new Vector2(-4f, -4f);
 
+        Mask mapMask = background.gameObject.AddComponent<Mask>();
+        mapMask.showMaskGraphic = true;
+
+        if (showWorld)
+            BuildWorldView();
+
         CreateGridLine("Horizontal Grid", new Vector2(mapSize - 18f, 1f));
         CreateGridLine("Vertical Grid", new Vector2(1f, mapSize - 18f));
+    }
+
+    private void BuildWorldView()
+    {
+        int textureSize = Mathf.ClosestPowerOfTwo(Mathf.Clamp(renderTextureSize, 128, 512));
+        worldTexture = new RenderTexture(textureSize, textureSize, 16, RenderTextureFormat.ARGB32)
+        {
+            name = "Live Minimap World",
+            filterMode = FilterMode.Bilinear,
+            wrapMode = TextureWrapMode.Clamp,
+            useMipMap = false,
+            autoGenerateMips = false
+        };
+        worldTexture.Create();
+
+        GameObject cameraObject = new GameObject("Live Minimap Camera", typeof(Camera));
+        cameraObject.transform.SetParent(transform, false);
+        minimapCamera = cameraObject.GetComponent<Camera>();
+        minimapCamera.orthographic = true;
+        minimapCamera.orthographicSize = worldRadius;
+        minimapCamera.clearFlags = CameraClearFlags.SolidColor;
+        minimapCamera.backgroundColor = cameraBackgroundColor;
+        minimapCamera.cullingMask = worldCullingMask;
+        minimapCamera.depth = minimapCameraDepth;
+        minimapCamera.nearClipPlane = 0.1f;
+        minimapCamera.farClipPlane = 1000f;
+        minimapCamera.targetTexture = worldTexture;
+        minimapCamera.allowHDR = false;
+        minimapCamera.allowMSAA = false;
+
+        GameObject worldImageObject = new GameObject("Live World", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
+        worldImageObject.transform.SetParent(mapArea, false);
+        RawImage worldImage = worldImageObject.GetComponent<RawImage>();
+        worldImage.texture = worldTexture;
+        worldImage.color = Color.white;
+        worldImage.raycastTarget = false;
+        worldImage.rectTransform.anchorMin = Vector2.zero;
+        worldImage.rectTransform.anchorMax = Vector2.one;
+        worldImage.rectTransform.offsetMin = Vector2.zero;
+        worldImage.rectTransform.offsetMax = Vector2.zero;
+        worldImage.transform.SetAsFirstSibling();
     }
 
     private void CreateGridLine(string objectName, Vector2 size)
@@ -274,6 +345,19 @@ public sealed class LiveMinimapHUD : MonoBehaviour
     {
         if (instance == this)
             instance = null;
+
+        if (minimapCamera != null)
+        {
+            minimapCamera.targetTexture = null;
+            Destroy(minimapCamera.gameObject);
+        }
+
+        if (worldTexture != null)
+        {
+            if (worldTexture.IsCreated())
+                worldTexture.Release();
+            Destroy(worldTexture);
+        }
 
         if (circleSprite != null)
             Destroy(circleSprite);
