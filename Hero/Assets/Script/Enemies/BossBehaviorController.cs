@@ -64,7 +64,15 @@ public class BossBehaviorController : MonoBehaviour
         public float jumpTime = 0.5f;
         [Tooltip("Radius på chokbølgen.")]
         public float shockwaveRadius = 4f;
-        public float cooldown = 5f;
+
+        [Header("Random AOE Timing")]
+        [Tooltip("Minimum seconds before Stomp AOE can be selected again.")]
+        [Min(0f)] public float minAttackDelay = 4f;
+        [Tooltip("Maximum seconds before Stomp AOE can be selected again.")]
+        [Min(0f)] public float maxAttackDelay = 6f;
+
+        // Kept serialized for compatibility with existing prefabs. Random AOE timing now replaces it.
+        [HideInInspector] public float cooldown = 5f;
     }
 
     [System.Serializable]
@@ -207,6 +215,8 @@ public class BossBehaviorController : MonoBehaviour
     private Transform player;
     private EnemyAggro2D aggro;
     private Rigidbody2D rb;
+    private BossHealth bossHealth;
+    private BossStompAoeTelegraph2D stompAoeSequence;
     private bool isAttacking;
     private bool isChasing;
     private float nextAttackTime;
@@ -226,6 +236,14 @@ public class BossBehaviorController : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        bossHealth = GetComponentInParent<BossHealth>();
+        if (bossHealth == null)
+            bossHealth = GetComponentInChildren<BossHealth>(true);
+
+        stompAoeSequence = GetComponentInChildren<BossStompAoeTelegraph2D>(true);
+        if (stompAoeSequence == null)
+            stompAoeSequence = GetComponentInParent<BossStompAoeTelegraph2D>();
+
         aggro = GetComponent<EnemyAggro2D>();
         if (aggro == null) aggro = gameObject.AddComponent<EnemyAggro2D>();
         aggro.ConfigureRanges(detectionRange, giveUpRange);
@@ -437,42 +455,79 @@ public class BossBehaviorController : MonoBehaviour
 
     private IEnumerator ExecuteAttack(BossAttackType attack)
     {
-        //isAttacking = true;
-        float attackSpeed = desperation.enabled ? desperation.attackSpeedMultiplier : 1f;
+        bool completed = false;
 
-        switch (attack)
+        try
         {
-            case BossAttackType.TelegraphedCharge:
-                onTelegraphedCharge?.Invoke();
-                yield return new WaitForSeconds(telegraphedCharge.windupTime / attackSpeed);
-                break;
-            case BossAttackType.MultiPhaseCombo:
-                onMultiPhaseCombo?.Invoke();
-                for (int i = 0; i < multiPhaseCombo.comboHits; i++)
-                {
-                    yield return new WaitForSeconds(multiPhaseCombo.hitInterval / attackSpeed);
-                }
-                break;
-            case BossAttackType.StompAoe:
-                onStompAoe?.Invoke();
-                yield return new WaitForSeconds(stompAoe.jumpTime / attackSpeed);
-                break;
-            case BossAttackType.Feint:
-                onFeint?.Invoke();
-                yield return new WaitForSeconds(feint.feintTime / attackSpeed);
-                break;
-            case BossAttackType.Grab:
-                onGrab?.Invoke();
-                yield return new WaitForSeconds(0.2f / attackSpeed);
-                break;
+            float attackSpeed = IsDesperationActive()
+                ? Mathf.Max(0.1f, desperation.attackSpeedMultiplier)
+                : 1f;
+
+            switch (attack)
+            {
+                case BossAttackType.TelegraphedCharge:
+                    onTelegraphedCharge?.Invoke();
+                    yield return new WaitForSeconds(telegraphedCharge.windupTime / attackSpeed);
+                    break;
+                case BossAttackType.MultiPhaseCombo:
+                    onMultiPhaseCombo?.Invoke();
+                    for (int i = 0; i < multiPhaseCombo.comboHits; i++)
+                        yield return new WaitForSeconds(multiPhaseCombo.hitInterval / attackSpeed);
+                    break;
+                case BossAttackType.StompAoe:
+                    onStompAoe?.Invoke();
+
+                    // Preserve existing UnityEvent wiring, but also self-heal if the
+                    // AOE listener was not assigned in the Inspector.
+                    if (stompAoeSequence != null && !stompAoeSequence.IsRunning)
+                        stompAoeSequence.TryPlayStompAoe();
+
+                    if (stompAoeSequence != null && stompAoeSequence.IsRunning)
+                    {
+                        while (stompAoeSequence.IsRunning)
+                            yield return null;
+                    }
+                    else
+                    {
+                        // Legacy fallback for bosses that use only an animation/FX event.
+                        yield return new WaitForSeconds(stompAoe.jumpTime / attackSpeed);
+                    }
+                    break;
+                case BossAttackType.Feint:
+                    onFeint?.Invoke();
+                    yield return new WaitForSeconds(feint.feintTime / attackSpeed);
+                    break;
+                case BossAttackType.Grab:
+                    onGrab?.Invoke();
+                    yield return new WaitForSeconds(0.2f / attackSpeed);
+                    break;
+            }
+
+            completed = true;
         }
+        finally
+        {
+            // Never leave the boss permanently locked if an event listener,
+            // animation hook or AOE sequence fails or is interrupted.
+            if (completed)
+            {
+                ApplyWeaknessWindows(attack);
+                SetAttackCooldown(attack);
+                nextAttackTime = Time.time + 0.2f;
+            }
 
-        ApplyWeaknessWindows(attack);
-        SetAttackCooldown(attack);
-        nextAttackTime = Time.time + 0.2f;
-        isAttacking = false;
-        attackRoutine = null;
+            isAttacking = false;
+            attackRoutine = null;
+        }
+    }
 
+    private bool IsDesperationActive()
+    {
+        if (!desperation.enabled || bossHealth == null || bossHealth.MaxHealth <= 0f)
+            return false;
+
+        float healthPercent = bossHealth.CurrentHealth / bossHealth.MaxHealth;
+        return healthPercent <= Mathf.Clamp01(desperation.triggerHealthPercent);
     }
 
     private void ApplyWeaknessWindows(BossAttackType attack)
@@ -499,13 +554,15 @@ public class BossBehaviorController : MonoBehaviour
         {
             BossAttackType.TelegraphedCharge => telegraphedCharge.cooldown,
             BossAttackType.MultiPhaseCombo => multiPhaseCombo.cooldown,
-            BossAttackType.StompAoe => stompAoe.cooldown,
+            BossAttackType.StompAoe => Random.Range(
+                Mathf.Min(stompAoe.minAttackDelay, stompAoe.maxAttackDelay),
+                Mathf.Max(stompAoe.minAttackDelay, stompAoe.maxAttackDelay)),
             BossAttackType.Feint => feint.cooldown,
             BossAttackType.Grab => grab.cooldown,
             _ => 1f
         };
 
-        if (desperation.enabled)
+        if (IsDesperationActive())
             cooldown /= Mathf.Max(0.1f, desperation.attackSpeedMultiplier);
 
         cooldowns[attack] = Time.time + cooldown;
