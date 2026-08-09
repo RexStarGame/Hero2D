@@ -25,24 +25,10 @@ public class PlayerXP : MonoBehaviour
     private void Awake()
     {
         AutoFindEquipment();
-        RestoreBossCheckpoint();
-    }
 
-    private void RestoreBossCheckpoint()
-    {
-        int startingLevel = Mathf.Max(1, level);
-        int startingAbilityPoints = Mathf.Max(0, abilityPoints);
-        int checkpointLevel = Mathf.Max(startingLevel, BossLevelCheckpoint.Level);
-
-        // Start exactly at the secured checkpoint. Run XP and previously chosen
-        // ability upgrades are deliberately not restored.
-        level = checkpointLevel;
-        xp = 0;
-        xpToNextLevel = 100 + ((checkpointLevel - 1) * 50);
-
-        // Restore the points naturally earned up to this level, allowing the
-        // player to create a fresh ability build each run.
-        abilityPoints = startingAbilityPoints + (checkpointLevel - startingLevel);
+        int inspectorLevel = Mathf.Max(1, level);
+        int inspectorAbilityPoints = Mathf.Max(0, abilityPoints);
+        PlayerProgressSave.RestorePlayer(this, inspectorLevel, inspectorAbilityPoints);
     }
 
 
@@ -54,6 +40,7 @@ public class PlayerXP : MonoBehaviour
         xp += amount;
 
         ProcessLevelUps();
+        SaveProgress();
     }
 
     /// <summary>
@@ -72,6 +59,38 @@ public class PlayerXP : MonoBehaviour
         xp += awardedXp;
 
         ProcessLevelUps();
+        SaveProgress();
+    }
+
+    /// <summary>
+    /// Removes 10% of only the XP collected toward the next level. Completed
+    /// levels are never touched. The loss rounds up so 1-9 XP still has a cost.
+    /// </summary>
+    public int ApplyDeathPenaltyAndSave()
+    {
+        int lostXp = Mathf.Min(xp, Mathf.CeilToInt(xp * 0.10f));
+        xp -= lostXp;
+        SaveProgress();
+
+        Debug.Log($"Death penalty: lost {lostXp} current-level XP. " +
+                  $"Level {level} remains secured with {xp}/{xpToNextLevel} XP.");
+        return lostXp;
+    }
+
+    public void SaveProgress()
+    {
+        PlayerProgressSave.SavePlayer(this);
+    }
+
+    private void OnApplicationPause(bool paused)
+    {
+        if (paused)
+            SaveProgress();
+    }
+
+    private void OnApplicationQuit()
+    {
+        SaveProgress();
     }
 
     private void ProcessLevelUps()
