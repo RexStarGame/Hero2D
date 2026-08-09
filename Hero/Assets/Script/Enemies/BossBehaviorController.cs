@@ -219,8 +219,30 @@ public class BossBehaviorController : MonoBehaviour
     private BossStompAoeTelegraph2D stompAoeSequence;
     private BossGrabHandler grabSequence;
     private bool isAttacking;
+    private BossGrabHandler reservedGrabSequence;
 
     public bool IsAttacking => isAttacking;
+    public bool IsAttackSlotReservedBy(BossGrabHandler sequence) =>
+        sequence != null && reservedGrabSequence == sequence;
+
+    public bool TryReserveGrabAttack(BossGrabHandler sequence, bool controllerInitiated = false)
+    {
+        if (sequence == null || (isAttacking && !controllerInitiated))
+            return false;
+
+        if (reservedGrabSequence != null && reservedGrabSequence != sequence)
+            return false;
+
+        reservedGrabSequence = sequence;
+        StopChasing();
+        return true;
+    }
+
+    public void ReleaseGrabAttack(BossGrabHandler sequence)
+    {
+        if (reservedGrabSequence == sequence)
+            reservedGrabSequence = null;
+    }
     private bool isChasing;
     private float nextAttackTime;
     private readonly Dictionary<BossAttackType, float> cooldowns = new Dictionary<BossAttackType, float>();
@@ -265,7 +287,8 @@ public class BossBehaviorController : MonoBehaviour
 
         // BossGrabHandler can run autonomously from its warning ring. Treat its
         // charge, hold and throw as one authoritative boss attack.
-        if (grabSequence != null && grabSequence.IsRunning)
+        if (reservedGrabSequence != null ||
+            (grabSequence != null && grabSequence.IsRunning))
         {
             StopChasing();
             return;
@@ -312,7 +335,8 @@ public class BossBehaviorController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if ((grabSequence != null && grabSequence.IsRunning) ||
+        if (reservedGrabSequence != null ||
+            (grabSequence != null && grabSequence.IsRunning) ||
             !isChasing || rb == null || player == null || aggro == null || !aggro.HasAuthority())
             return;
 
@@ -519,7 +543,7 @@ public class BossBehaviorController : MonoBehaviour
                     // Preserve existing event wiring, but use the actual grab
                     // sequence as the completion signal when it is available.
                     if (grabSequence != null && !grabSequence.IsRunning)
-                        grabSequence.TryBeginGrab();
+                        grabSequence.TryBeginGrab(controllerInitiated: true);
 
                     if (grabSequence != null && grabSequence.IsRunning)
                     {
