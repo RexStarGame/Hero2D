@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e58d3672d1ed2db498e592ec117e887e, type: 3}
+  m_Name: Ronin Sword Rare - level 32
+  m_EditorClassIdentifier: 
+  itemID: '#fvkdfmkfdk342lkVFKDmePPckKKd35c'
+  itemName: Iron Wraith
+  description: Forged entirely from hardened iron, this rare ronin blade favors strength
+    and simplicity over decoration. Its black-wrapped grip and matching cord were
+    designed for warriors who travel light, strike quickly, and rely on skill rather
+    than ornament.
+  rarity: 2
+  requiredLevel: 32
+  goldValue: 7650
+  icon: {fileID: -7720793141497576669, guid: 565eaa9e879c704428b52e30ee0000f8, type: 3}
+  worldPrefab: {fileID: 4190710211853887424, guid: c5af4c1ebc416b04fbaa178846df93d2, type: 3}
+  equipmentSlot: 1
+  statModifiers:
+    maxHealth: 0
+    minimumDamage: 88
+    maximumDamage: 98
+    defense: 0
+    regeneration: 0
+    lifeSteal: 0.05
+    criticalChance: 0.02
+    attackSpeed: 0.07
+    movementSpeed: -0.05
+    experienceGain: 0
+  weaponType: 0
+  minimumBaseDamage: 0
+  maximumBaseDamage: 0
+  attackRange: 1
