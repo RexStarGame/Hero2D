@@ -25879,6 +25879,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8d8cede72911e724eaa743e1357b2e56, type: 2}
   - {fileID: 11400000, guid: 5a0204ebae7f4e34aa3951c502eff2cb, type: 2}
   - {fileID: 11400000, guid: 9b5410205db1415428c3a382a5db6653, type: 2}
+  - {fileID: 11400000, guid: a87d7fe95be64d842bdaa5645099ad56, type: 2}
   - {fileID: 11400000, guid: 4d9ec517c149f4f4fac59cadca290b89, type: 2}
   - {fileID: 11400000, guid: 58cb0bb62b8ec6948b82837c3e3faf15, type: 2}
   - {fileID: 11400000, guid: 80bb3fde9146b194c972908ee0b20318, type: 2}
@@ -67908,7 +67909,7 @@ Transform:
   - {fileID: 6090724278834478751}
   - {fileID: 3635757023592911326}
   - {fileID: 4106109352727412796}
-  - {fileID: 2144979114849614559}
+  - {fileID: 4281673128359197926}
   - {fileID: 4319025719567389021}
   - {fileID: 596678054481037194}
   - {fileID: 9010574823252024314}
@@ -84727,6 +84728,67 @@ MonoBehaviour:
     Combat is disabled'
   exitedMessage: COMBAT ENABLED
   blockedMessage: Combat is disabled here
+--- !u!1001 &62203060691530595
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1705830961}
+    m_Modifications:
+    - target: {fileID: 2593053749997302098, guid: 29aba24995acff34fb889be38e375aee, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -1012.538
+      objectReference: {fileID: 0}
+    - target: {fileID: 2593053749997302098, guid: 29aba24995acff34fb889be38e375aee, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -773.664
+      objectReference: {fileID: 0}
+    - target: {fileID: 2593053749997302098, guid: 29aba24995acff34fb889be38e375aee, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 15.965406
+      objectReference: {fileID: 0}
+    - target: {fileID: 2593053749997302098, guid: 29aba24995acff34fb889be38e375aee, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2593053749997302098, guid: 29aba24995acff34fb889be38e375aee, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2593053749997302098, guid: 29aba24995acff34fb889be38e375aee, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2593053749997302098, guid: 29aba24995acff34fb889be38e375aee, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2593053749997302098, guid: 29aba24995acff34fb889be38e375aee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2593053749997302098, guid: 29aba24995acff34fb889be38e375aee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2593053749997302098, guid: 29aba24995acff34fb889be38e375aee, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3983373291039322967, guid: 29aba24995acff34fb889be38e375aee, type: 3}
+      propertyPath: m_Name
+      value: Sword - level 32 commen
+      objectReference: {fileID: 0}
+    - target: {fileID: 3983373291039322967, guid: 29aba24995acff34fb889be38e375aee, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 29aba24995acff34fb889be38e375aee, type: 3}
 --- !u!4 &112732568475948090 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6430937212238586514, guid: 8343e1d44689c3d4abe8279afc2f6942, type: 3}
@@ -85051,11 +85113,6 @@ Transform:
 Transform:
   m_CorrespondingSourceObject: {fileID: 8469553862496098547, guid: 5d2460c44acb5054d81b5a1d7c70154b, type: 3}
   m_PrefabInstance: {fileID: 6699507554991476441}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &2144979114849614559 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 409021920364938115, guid: 0fc7866addf436041a2ae22380fc0aee, type: 3}
-  m_PrefabInstance: {fileID: 4523492277768437605}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &2417932597287366823 stripped
 Transform:
@@ -85699,72 +85756,16 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8917138505089209682, guid: c898bd5f26f5b3841b673b4d0cc04e59, type: 3}
   m_PrefabInstance: {fileID: 4919618975391491988}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &4281673128359197926 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2593053749997302098, guid: 29aba24995acff34fb889be38e375aee, type: 3}
+  m_PrefabInstance: {fileID: 62203060691530595}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4319025719567389021 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4176076291772436778, guid: 58450fef15526164bbc54970868b0d5b, type: 3}
   m_PrefabInstance: {fileID: 1123340165220093002}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &4523492277768437605
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 1705830961}
-    m_Modifications:
-    - target: {fileID: 409021920364938115, guid: 0fc7866addf436041a2ae22380fc0aee, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -1012.538
-      objectReference: {fileID: 0}
-    - target: {fileID: 409021920364938115, guid: 0fc7866addf436041a2ae22380fc0aee, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -773.664
-      objectReference: {fileID: 0}
-    - target: {fileID: 409021920364938115, guid: 0fc7866addf436041a2ae22380fc0aee, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 15.965406
-      objectReference: {fileID: 0}
-    - target: {fileID: 409021920364938115, guid: 0fc7866addf436041a2ae22380fc0aee, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 409021920364938115, guid: 0fc7866addf436041a2ae22380fc0aee, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 409021920364938115, guid: 0fc7866addf436041a2ae22380fc0aee, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 409021920364938115, guid: 0fc7866addf436041a2ae22380fc0aee, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 409021920364938115, guid: 0fc7866addf436041a2ae22380fc0aee, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 409021920364938115, guid: 0fc7866addf436041a2ae22380fc0aee, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 409021920364938115, guid: 0fc7866addf436041a2ae22380fc0aee, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5992654994455800442, guid: 0fc7866addf436041a2ae22380fc0aee, type: 3}
-      propertyPath: m_Name
-      value: Sword - level 32 Uncommen
-      objectReference: {fileID: 0}
-    - target: {fileID: 5992654994455800442, guid: 0fc7866addf436041a2ae22380fc0aee, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 0fc7866addf436041a2ae22380fc0aee, type: 3}
 --- !u!1001 &4524523432213261083
 PrefabInstance:
   m_ObjectHideFlags: 0
