@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e58d3672d1ed2db498e592ec117e887e, type: 3}
+  m_Name: Ronin Sword - Uncommon Level 32
+  m_EditorClassIdentifier: 
+  itemID: '#Gcv34KVm59i32498430CVerklVGVFReCV'
+  itemName: Mossshadow Edge
+  description: An uncommon ronin blade forged from iron and fitted with a black-and-green
+    wrapped hilt, accented by worn bronze. Though modest in craftsmanship, its balanced
+    form and steady grip make it a dependable weapon for a wandering swordsman who
+    survives through patience, discipline, and precision.
+  rarity: 1
+  requiredLevel: 32
+  goldValue: 5000
+  icon: {fileID: -2921975423765037875, guid: 3e1d8c6e13d9c284285089dc5704469e, type: 3}
+  worldPrefab: {fileID: 5992654994455800442, guid: 0fc7866addf436041a2ae22380fc0aee, type: 3}
+  equipmentSlot: 1
+  statModifiers:
+    maxHealth: 0
+    minimumDamage: 67.7
+    maximumDamage: 90
+    defense: 0
+    regeneration: 0
+    lifeSteal: 0.04
+    criticalChance: 0.01
+    attackSpeed: 0.03
+    movementSpeed: 0
+    experienceGain: 0
+  weaponType: 0
+  minimumBaseDamage: 0
+  maximumBaseDamage: 0
+  attackRange: 1
