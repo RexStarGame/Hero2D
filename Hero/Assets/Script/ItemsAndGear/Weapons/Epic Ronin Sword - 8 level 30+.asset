@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e58d3672d1ed2db498e592ec117e887e, type: 3}
+  m_Name: Epic Ronin Sword - 8 level 30+
+  m_EditorClassIdentifier: 
+  itemID: '#fkdsfmkd342FGOVLP34034vkDFc'
+  itemName: "Ryoma\u2019s Resolve"
+  description: Forged almost entirely from dark iron and tempered steel, this austere
+    ronin blade bears only a trace of silver around its black-wrapped hilt and a
+    blood-red metal crest at its end. Named in honor of Sakamoto Ryoma, it symbolizes
+    a warrior who walks beyond tradition and chooses his own fate.
+  rarity: 3
+  requiredLevel: 32
+  goldValue: 15250
+  icon: {fileID: -2697163358646543105, guid: 91deae833cf96dd4da85046aca67b180, type: 3}
+  worldPrefab: {fileID: 1548243618517592699, guid: 03cf85f99be97dc458e7dcd3c28ae77f, type: 3}
+  equipmentSlot: 1
+  statModifiers:
+    maxHealth: 0
+    minimumDamage: 120
+    maximumDamage: 135.7
+    defense: 0
+    regeneration: 0
+    lifeSteal: 0.08
+    criticalChance: 0.05
+    attackSpeed: 0.13
+    movementSpeed: -0.15
+    experienceGain: 0
+  weaponType: 0
+  minimumBaseDamage: 0
+  maximumBaseDamage: 0
+  attackRange: 1
