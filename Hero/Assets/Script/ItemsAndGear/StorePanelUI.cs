@@ -17,6 +17,7 @@ public class StorePanelUI : MonoBehaviour
     [Header("UI")]
     [SerializeField] private CanvasGroup panelGroup;
     [SerializeField] private Transform gridRoot;
+    [SerializeField] private ScrollRect itemsScrollRect;
     [SerializeField] private StoreItemSlotUI slotTemplate;
     [SerializeField] private Image previewIcon;
     [SerializeField] private TMP_Text titleText;
@@ -58,6 +59,7 @@ public class StorePanelUI : MonoBehaviour
         AutoFindPlayer();
         EnsureDetailsScrollArea();
         EnsureCategoryFilters();
+        EnsureItemsScrollArea();
 
         if (buyButton != null)
         {
@@ -152,6 +154,7 @@ public class StorePanelUI : MonoBehaviour
             spawned.Add(slot);
         }
 
+        RefreshItemsScroll();
         RefreshBalance();
     }
 
@@ -378,6 +381,34 @@ public class StorePanelUI : MonoBehaviour
         categoryFilterUI?.Initialize(this, activeCategory);
     }
 
+    private void EnsureItemsScrollArea()
+    {
+        if (!(gridRoot is RectTransform gridRect))
+            return;
+
+        if (itemsScrollRect == null)
+        {
+            ScrollRect parentScroll = gridRect.GetComponentInParent<ScrollRect>();
+            if (parentScroll != null && parentScroll.content == gridRect)
+                itemsScrollRect = parentScroll;
+        }
+
+        if (itemsScrollRect == null)
+            itemsScrollRect = CreateItemsScrollArea(gridRect);
+
+        if (itemsScrollRect == null)
+            return;
+
+        itemsScrollRect.horizontal = false;
+        itemsScrollRect.vertical = true;
+        itemsScrollRect.movementType = ScrollRect.MovementType.Clamped;
+        itemsScrollRect.inertia = true;
+        itemsScrollRect.decelerationRate = 0.135f;
+        itemsScrollRect.scrollSensitivity = 24f;
+        itemsScrollRect.verticalScrollbarVisibility =
+            ScrollRect.ScrollbarVisibility.AutoHideAndExpandViewport;
+    }
+
     private bool MatchesActiveCategory(ItemDefinition item)
     {
         switch (activeCategory)
@@ -467,6 +498,49 @@ public class StorePanelUI : MonoBehaviour
         return scroll;
     }
 
+    private ScrollRect CreateItemsScrollArea(RectTransform gridRect)
+    {
+        RectTransform oldParent = gridRect.parent as RectTransform;
+        if (oldParent == null)
+            return null;
+
+        int siblingIndex = gridRect.GetSiblingIndex();
+
+        GameObject scrollObject = new GameObject(
+            "StoreItemsScrollView",
+            typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(ScrollRect));
+        RectTransform scrollRectTransform = scrollObject.GetComponent<RectTransform>();
+        scrollRectTransform.SetParent(oldParent, false);
+        scrollRectTransform.SetSiblingIndex(siblingIndex);
+        CopyRectTransform(gridRect, scrollRectTransform);
+
+        Image scrollRaycastArea = scrollObject.GetComponent<Image>();
+        scrollRaycastArea.color = new Color(0f, 0f, 0f, 0f);
+        scrollRaycastArea.raycastTarget = true;
+
+        GameObject viewportObject = new GameObject(
+            "Viewport", typeof(RectTransform), typeof(RectMask2D));
+        RectTransform viewport = viewportObject.GetComponent<RectTransform>();
+        viewport.SetParent(scrollRectTransform, false);
+        Stretch(viewport);
+
+        gridRect.SetParent(viewport, false);
+        gridRect.anchorMin = new Vector2(0f, 1f);
+        gridRect.anchorMax = new Vector2(1f, 1f);
+        gridRect.pivot = new Vector2(0.5f, 1f);
+        gridRect.anchoredPosition = Vector2.zero;
+        gridRect.sizeDelta = Vector2.zero;
+        gridRect.localScale = Vector3.one;
+
+        Scrollbar scrollbar = CreateVerticalScrollbar(scrollRectTransform);
+        ScrollRect scroll = scrollObject.GetComponent<ScrollRect>();
+        scroll.viewport = viewport;
+        scroll.content = gridRect;
+        scroll.verticalScrollbar = scrollbar;
+        scroll.verticalScrollbarSpacing = 3f;
+        return scroll;
+    }
+
     private static Scrollbar CreateVerticalScrollbar(RectTransform parent)
     {
         GameObject scrollbarObject = new GameObject(
@@ -521,6 +595,33 @@ public class StorePanelUI : MonoBehaviour
         Canvas.ForceUpdateCanvases();
         detailsScrollRect.StopMovement();
         detailsScrollRect.verticalNormalizedPosition = 1f;
+    }
+
+    private void RefreshItemsScroll()
+    {
+        if (itemsScrollRect == null || !(gridRoot is RectTransform gridRect))
+            return;
+
+        GridLayoutGroup grid = gridRect.GetComponent<GridLayoutGroup>();
+        if (grid != null)
+        {
+            int columns = grid.constraint == GridLayoutGroup.Constraint.FixedColumnCount
+                ? Mathf.Max(1, grid.constraintCount)
+                : 1;
+            int rows = Mathf.CeilToInt(spawned.Count / (float)columns);
+            float height = grid.padding.top + grid.padding.bottom;
+
+            if (rows > 0)
+                height += rows * grid.cellSize.y + (rows - 1) * grid.spacing.y;
+
+            gridRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
+        }
+
+        Canvas.ForceUpdateCanvases();
+        LayoutRebuilder.ForceRebuildLayoutImmediate(gridRect);
+        Canvas.ForceUpdateCanvases();
+        itemsScrollRect.StopMovement();
+        itemsScrollRect.verticalNormalizedPosition = 1f;
     }
 
     private static void CopyRectTransform(RectTransform source, RectTransform destination)
