@@ -3,6 +3,12 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine.SceneManagement;
+#endif
+
 public sealed class AbilityResetUI : MonoBehaviour
 {
     private const string Prefix = "Hero2D.AbilityReset.";
@@ -97,6 +103,8 @@ public sealed class AbilityResetUI : MonoBehaviour
 
         Transform existing = transform.Find("AbilityResetButton");
         GameObject buttonObject;
+        bool created = false;
+
         if (existing != null)
         {
             buttonObject = existing.gameObject;
@@ -110,18 +118,28 @@ public sealed class AbilityResetUI : MonoBehaviour
                 typeof(Image),
                 typeof(Button));
             buttonObject.transform.SetParent(transform, false);
+            created = true;
         }
 
         RectTransform rect = buttonObject.GetComponent<RectTransform>();
-        rect.anchorMin = new Vector2(0.5f, 0f);
-        rect.anchorMax = new Vector2(0.5f, 0f);
-        rect.pivot = new Vector2(0.5f, 0f);
-        rect.anchoredPosition = new Vector2(0f, 20f);
-        rect.sizeDelta = new Vector2(310f, 58f);
-        rect.localScale = Vector3.one;
+        if (created)
+        {
+            rect.anchorMin = new Vector2(0.5f, 0f);
+            rect.anchorMax = new Vector2(0.5f, 0f);
+            rect.pivot = new Vector2(0.5f, 0f);
+            rect.anchoredPosition = new Vector2(0f, 20f);
+            rect.sizeDelta = new Vector2(310f, 58f);
+            rect.localScale = Vector3.one;
+        }
 
         buttonImage = buttonObject.GetComponent<Image>();
+        if (buttonImage == null)
+            buttonImage = buttonObject.AddComponent<Image>();
+
         resetButton = buttonObject.GetComponent<Button>();
+        if (resetButton == null)
+            resetButton = buttonObject.AddComponent<Button>();
+
         resetButton.targetGraphic = buttonImage;
         resetButton.onClick.RemoveListener(TryResetAbilities);
         resetButton.onClick.AddListener(TryResetAbilities);
@@ -129,6 +147,12 @@ public sealed class AbilityResetUI : MonoBehaviour
         buttonText = buttonObject.GetComponentInChildren<TMP_Text>(true);
         if (buttonText == null)
             buttonText = CreateButtonText(buttonObject.transform);
+
+        if (created)
+        {
+            buttonText.text = "RESET ABILITIES • FREE";
+            SetButtonColor(new Color(0.18f, 0.55f, 0.30f, 1f));
+        }
     }
 
     private TMP_Text CreateButtonText(Transform parent)
@@ -162,6 +186,13 @@ public sealed class AbilityResetUI : MonoBehaviour
         text.raycastTarget = false;
         return text;
     }
+
+#if UNITY_EDITOR
+    internal void EnsureButtonForEditor()
+    {
+        EnsureButton();
+    }
+#endif
 
     public void TryResetAbilities()
     {
@@ -312,3 +343,76 @@ public sealed class AbilityResetUI : MonoBehaviour
         subscribed = false;
     }
 }
+
+#if UNITY_EDITOR
+[InitializeOnLoad]
+internal static class AbilityResetUIEditorBootstrap
+{
+    static AbilityResetUIEditorBootstrap()
+    {
+        EditorApplication.delayCall += EnsurePhysicalButtonInOpenScene;
+        EditorSceneManager.sceneOpened += OnSceneOpened;
+    }
+
+    private static void OnSceneOpened(Scene scene, OpenSceneMode mode)
+    {
+        EditorApplication.delayCall += EnsurePhysicalButtonInOpenScene;
+    }
+
+    private static void EnsurePhysicalButtonInOpenScene()
+    {
+        if (Application.isPlaying || EditorApplication.isPlayingOrWillChangePlaymode)
+            return;
+
+        GameObject upgradeMenu = FindUpgradeMenuInLoadedScene();
+        if (upgradeMenu == null)
+            return;
+
+        AbilityResetUI ui = upgradeMenu.GetComponent<AbilityResetUI>();
+        bool changed = false;
+
+        if (ui == null)
+        {
+            ui = Undo.AddComponent<AbilityResetUI>(upgradeMenu);
+            changed = true;
+        }
+
+        Transform existingButton = upgradeMenu.transform.Find("AbilityResetButton");
+        ui.EnsureButtonForEditor();
+        Transform physicalButton = upgradeMenu.transform.Find("AbilityResetButton");
+
+        if (existingButton == null && physicalButton != null)
+        {
+            Undo.RegisterCreatedObjectUndo(physicalButton.gameObject, "Create Reset Abilities Button");
+            changed = true;
+        }
+
+        if (!changed)
+            return;
+
+        EditorUtility.SetDirty(upgradeMenu);
+        EditorSceneManager.MarkSceneDirty(upgradeMenu.scene);
+    }
+
+    private static GameObject FindUpgradeMenuInLoadedScene()
+    {
+        Transform[] transforms = Resources.FindObjectsOfTypeAll<Transform>();
+        foreach (Transform candidate in transforms)
+        {
+            if (candidate == null || candidate.name != "UpgradeMenu")
+                continue;
+
+            GameObject go = candidate.gameObject;
+            if (!go.scene.IsValid() || !go.scene.isLoaded)
+                continue;
+
+            if ((go.hideFlags & HideFlags.HideAndDontSave) != 0)
+                continue;
+
+            return go;
+        }
+
+        return null;
+    }
+}
+#endif
