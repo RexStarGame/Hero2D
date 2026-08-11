@@ -119,6 +119,7 @@ public class PlayerEquipment : MonoBehaviour
     public float GetAttackSpeedBonus() => GetCombinedModifiers().AttackSpeed;
     public float GetMovementSpeedBonus() => GetCombinedModifiers().MovementSpeed;
     public float GetExperienceGainBonus() => GetCombinedModifiers().ExperienceGain;
+    public float GetGoldGainBonus() => GetCombinedModifiers().GoldGain;
 
     // Compatibility while the old ring UI is being migrated.
     public RingDefinition GetRing(int index) => GetItem(EquipmentSlotType.Ring, index) as RingDefinition;
