@@ -17,6 +17,9 @@ public static class PlayerProgressSave
     private const string PositionSavedKey = Prefix + "PositionSaved";
     private const string PositionXKey = Prefix + "PositionX";
     private const string PositionYKey = Prefix + "PositionY";
+    private const string DeathRespawnPendingKey = Prefix + "DeathRespawnPending";
+    private const string DeathRespawnXKey = Prefix + "DeathRespawnX";
+    private const string DeathRespawnYKey = Prefix + "DeathRespawnY";
 
     private const string DamageLevelKey = Prefix + "DamageLevel";
     private const string MaxHealthLevelKey = Prefix + "MaxHealthLevel";
@@ -74,6 +77,43 @@ public static class PlayerProgressSave
 
         float x = PlayerPrefs.GetFloat(PositionXKey, 0f);
         float y = PlayerPrefs.GetFloat(PositionYKey, 0f);
+
+        if (float.IsNaN(x) || float.IsInfinity(x) ||
+            float.IsNaN(y) || float.IsInfinity(y))
+        {
+            return false;
+        }
+
+        position = new Vector2(x, y);
+        return true;
+    }
+
+    public static void SetDeathRespawnPosition(Vector2 position)
+    {
+        if (float.IsNaN(position.x) || float.IsInfinity(position.x) ||
+            float.IsNaN(position.y) || float.IsInfinity(position.y))
+        {
+            return;
+        }
+
+        PlayerPrefs.SetInt(DeathRespawnPendingKey, 1);
+        PlayerPrefs.SetFloat(DeathRespawnXKey, position.x);
+        PlayerPrefs.SetFloat(DeathRespawnYKey, position.y);
+        PlayerPrefs.Save();
+    }
+
+    public static bool TryConsumeDeathRespawnPosition(out Vector2 position)
+    {
+        position = Vector2.zero;
+        if (PlayerPrefs.GetInt(DeathRespawnPendingKey, 0) != 1)
+            return false;
+
+        float x = PlayerPrefs.GetFloat(DeathRespawnXKey, 0f);
+        float y = PlayerPrefs.GetFloat(DeathRespawnYKey, 0f);
+        PlayerPrefs.DeleteKey(DeathRespawnPendingKey);
+        PlayerPrefs.DeleteKey(DeathRespawnXKey);
+        PlayerPrefs.DeleteKey(DeathRespawnYKey);
+        PlayerPrefs.Save();
 
         if (float.IsNaN(x) || float.IsInfinity(x) ||
             float.IsNaN(y) || float.IsInfinity(y))
