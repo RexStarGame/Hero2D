@@ -11838,7 +11838,7 @@ MonoBehaviour:
     xpIncreasePerLevel: 125
   - fromLevel: 11
     toLevel: 20
-    xpIncreasePerLevel: 250
+    xpIncreasePerLevel: 300
   - fromLevel: 21
     toLevel: 30
     xpIncreasePerLevel: 500
