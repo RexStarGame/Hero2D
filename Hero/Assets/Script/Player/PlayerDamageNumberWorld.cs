@@ -123,10 +123,19 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         DamageNumber number = AcquireNumber();
         number.RectTransform.sizeDelta = guardTextBoxSize;
         number.Text.text =
-            $"GUARD! -{preventedDamage:0.##} DMG\n{blockedPercent:0.##}% blocked";
+            $"GUARD! -{FormatGuardDamage(preventedDamage)} DMG\n{blockedPercent:0.##}% blocked";
         number.Text.fontSize = guardFontSize;
         number.Text.color = guardColor;
         ActivateNumber(number);
+    }
+
+    private static string FormatGuardDamage(float value)
+    {
+        if (value >= 1f)
+            return value.ToString("0.##");
+        if (value >= 0.01f)
+            return value.ToString("0.###");
+        return value.ToString("0.####");
     }
 
     private DamageNumber AcquireNumber()
