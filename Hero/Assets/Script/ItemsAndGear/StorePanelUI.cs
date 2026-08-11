@@ -13,6 +13,7 @@ public class StorePanelUI : MonoBehaviour
     [SerializeField] private PlayerInventory inventory;
     [SerializeField] private PlayerWallet wallet;
     [SerializeField] private PlayerXP playerXP;
+    [SerializeField] private InventorySaveSystem inventorySaveSystem;
 
     [Header("UI")]
     [SerializeField] private CanvasGroup panelGroup;
@@ -210,6 +211,7 @@ public class StorePanelUI : MonoBehaviour
             return;
         }
 
+        inventorySaveSystem?.Save();
         ShowFeedback($"Purchased {item.ItemName}", true);
         RefreshBalance();
     }
@@ -636,10 +638,12 @@ public class StorePanelUI : MonoBehaviour
         if (inventory == null) inventory = FindAnyObjectByType<PlayerInventory>();
         if (wallet == null) wallet = FindAnyObjectByType<PlayerWallet>();
         if (playerXP == null) playerXP = FindAnyObjectByType<PlayerXP>();
+        if (inventorySaveSystem == null) inventorySaveSystem = FindAnyObjectByType<InventorySaveSystem>();
 #else
         if (inventory == null) inventory = FindObjectOfType<PlayerInventory>();
         if (wallet == null) wallet = FindObjectOfType<PlayerWallet>();
         if (playerXP == null) playerXP = FindObjectOfType<PlayerXP>();
+        if (inventorySaveSystem == null) inventorySaveSystem = FindObjectOfType<InventorySaveSystem>();
 #endif
     }
 
