@@ -12,10 +12,13 @@ using UnityEngine.SceneManagement;
 [RequireComponent(typeof(PlayerAttack))]
 public sealed class PlayerDamageNumberWorld : MonoBehaviour
 {
+    private const string CanvasObjectName = "Player Damage Numbers";
+    private const string DamageNumberObjectName = "Damage Number";
+
     [Header("Spawn Position")]
     [Tooltip("Where normal and critical damage numbers start, measured in Canvas units. X moves them left/right and Y moves them up/down relative to the player.")]
     [SerializeField] private Vector2 localStartOffset = new Vector2(0f, 120f);
-    [Tooltip("Separates consecutive damage numbers horizontally so rapid hits remain readable.")]
+    [Tooltip("Separates consecutive normal/critical damage numbers horizontally so rapid hits remain readable.")]
     [Min(0f)] [SerializeField] private float horizontalSpacing = 22f;
 
     [Header("Motion And Timing")]
@@ -37,7 +40,7 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
     [SerializeField] private string damageSuffix = "!";
 
     [Header("Guard Feedback")]
-    [Tooltip("Where Guard feedback starts, measured in Canvas units relative to the player. This is separate from normal damage-number position and can be edited live in the Inspector.")]
+    [Tooltip("Exact Guard spawn position inside Player Damage Numbers. Guard does not use the random horizontal spacing used by ordinary damage numbers.")]
     [SerializeField] private Vector2 guardStartOffset = new Vector2(0f, 120f);
     [Tooltip("Color used when Guard successfully reduces incoming damage.")]
     [SerializeField] private Color guardColor = new Color(0.35f, 0.85f, 1f, 1f);
@@ -47,11 +50,11 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
     [SerializeField] private Vector2 guardTextBoxSize = new Vector2(360f, 110f);
 
     [Header("World Space Canvas")]
-    [Tooltip("Overall world-space size of the complete effect. Lower values make all text and movement smaller on screen.")]
+    [Tooltip("Initial world-space scale used when Player Damage Numbers is first created in the scene. Once scene-authored, its Transform can be positioned manually.")]
     [Min(0.0001f)] [SerializeField] private float worldScale = 0.01f;
-    [Tooltip("Internal size of the generated World Space Canvas.")]
+    [Tooltip("Internal size of Player Damage Numbers when it is first created.")]
     [SerializeField] private Vector2 canvasSize = new Vector2(400f, 300f);
-    [Tooltip("Size available to each TMP damage label. Increase this only if long values are clipped.")]
+    [Tooltip("Size available to each normal TMP damage label.")]
     [SerializeField] private Vector2 textBoxSize = new Vector2(280f, 70f);
     [Tooltip("Render priority for the damage-number Canvas.")]
     [SerializeField] private int sortingOrder = 100;
@@ -75,9 +78,9 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
 
     private void Awake()
     {
-        BuildCanvas();
+        BindScenePoolOrCreateRuntimePool();
 
-        for (int i = 0; i < initialPoolSize; i++)
+        while (available.Count < initialPoolSize)
             available.Enqueue(CreateDamageNumber());
 
         enabled = false;
@@ -94,7 +97,8 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
             float progress = Mathf.Clamp01(number.Elapsed / lifetime);
             float easedProgress = 1f - (1f - progress) * (1f - progress);
 
-            number.RectTransform.anchoredPosition = number.StartPosition + Vector2.up * (riseDistance * easedProgress);
+            number.RectTransform.anchoredPosition =
+                number.StartPosition + Vector2.up * (riseDistance * easedProgress);
 
             Color color = number.Text.color;
             color.a = 1f - Mathf.SmoothStep(0f, 1f, progress);
@@ -113,7 +117,7 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         if (damage <= 0)
             return;
 
-        DamageNumber number = AcquireNumber(localStartOffset);
+        DamageNumber number = AcquireNumber(localStartOffset, true);
         number.RectTransform.sizeDelta = textBoxSize;
         number.Text.text = isCritical
             ? $"{criticalPrefix}{damage}{damageSuffix}"
@@ -128,7 +132,8 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         if (preventedDamage <= 0f || blockedPercent <= 0f)
             return;
 
-        DamageNumber number = AcquireNumber(guardStartOffset);
+        // Guard uses the exact Inspector position. No per-hit horizontal offset is added.
+        DamageNumber number = AcquireNumber(guardStartOffset, false);
         number.RectTransform.sizeDelta = guardTextBoxSize;
         number.Text.text =
             $"GUARD! -{FormatGuardDamage(preventedDamage)} DMG\n{blockedPercent:0.##}% blocked";
@@ -146,13 +151,16 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         return value.ToString("0.####");
     }
 
-    private DamageNumber AcquireNumber(Vector2 startOffset)
+    private DamageNumber AcquireNumber(Vector2 startOffset, bool applyHorizontalSpacing)
     {
         DamageNumber number = available.Count > 0
             ? available.Dequeue()
             : CreateDamageNumber();
 
-        float horizontalOffset = ((sequence++ % 3) - 1) * horizontalSpacing;
+        float horizontalOffset = applyHorizontalSpacing
+            ? ((sequence++ % 3) - 1) * horizontalSpacing
+            : 0f;
+
         number.StartPosition = startOffset + Vector2.right * horizontalOffset;
         number.Elapsed = 0f;
         number.RectTransform.anchoredPosition = number.StartPosition;
@@ -166,22 +174,62 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         enabled = true;
     }
 
-    private void BuildCanvas()
+    private void BindScenePoolOrCreateRuntimePool()
+    {
+        available.Clear();
+        active.Clear();
+
+        Transform existingCanvas = transform.Find(CanvasObjectName);
+        if (existingCanvas != null)
+            canvasRect = existingCanvas as RectTransform;
+
+        if (canvasRect == null)
+            canvasRect = CreateCanvasObject();
+
+        ConfigureCanvasComponent(canvasRect);
+
+        for (int i = 0; i < canvasRect.childCount; i++)
+        {
+            Transform child = canvasRect.GetChild(i);
+            if (child == null || child.name != DamageNumberObjectName)
+                continue;
+
+            RectTransform rect = child as RectTransform;
+            TextMeshProUGUI text = child.GetComponent<TextMeshProUGUI>();
+            if (rect == null || text == null)
+                continue;
+
+            child.gameObject.SetActive(false);
+            available.Enqueue(BindDamageNumber(child.gameObject, rect, text));
+        }
+    }
+
+    private RectTransform CreateCanvasObject()
     {
         GameObject canvasObject = new GameObject(
-            "Player Damage Numbers",
+            CanvasObjectName,
             typeof(RectTransform),
             typeof(Canvas));
         canvasObject.transform.SetParent(transform, false);
         canvasObject.layer = gameObject.layer;
 
-        canvasRect = canvasObject.GetComponent<RectTransform>();
-        canvasRect.localPosition = Vector3.zero;
-        canvasRect.localRotation = Quaternion.identity;
-        canvasRect.localScale = Vector3.one * worldScale;
-        canvasRect.sizeDelta = canvasSize;
+        RectTransform rect = canvasObject.GetComponent<RectTransform>();
+        rect.localPosition = Vector3.zero;
+        rect.localRotation = Quaternion.identity;
+        rect.localScale = Vector3.one * worldScale;
+        rect.sizeDelta = canvasSize;
+        return rect;
+    }
 
-        Canvas canvas = canvasObject.GetComponent<Canvas>();
+    private void ConfigureCanvasComponent(RectTransform rect)
+    {
+        if (rect == null)
+            return;
+
+        Canvas canvas = rect.GetComponent<Canvas>();
+        if (canvas == null)
+            canvas = rect.gameObject.AddComponent<Canvas>();
+
         canvas.renderMode = RenderMode.WorldSpace;
         canvas.overrideSorting = true;
         canvas.sortingOrder = sortingOrder;
@@ -190,7 +238,7 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
     private DamageNumber CreateDamageNumber()
     {
         GameObject textObject = new GameObject(
-            "Damage Number",
+            DamageNumberObjectName,
             typeof(RectTransform),
             typeof(CanvasRenderer),
             typeof(TextMeshProUGUI));
@@ -204,19 +252,35 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         rect.sizeDelta = textBoxSize;
 
         TextMeshProUGUI text = textObject.GetComponent<TextMeshProUGUI>();
-        text.alignment = TextAlignmentOptions.Center;
-        text.fontStyle = FontStyles.Bold;
-        text.enableWordWrapping = false;
-        text.overflowMode = TextOverflowModes.Overflow;
-        text.raycastTarget = false;
+        ConfigureDamageText(text);
 
         textObject.SetActive(false);
+        return BindDamageNumber(textObject, rect, text);
+    }
+
+    private static DamageNumber BindDamageNumber(
+        GameObject textObject,
+        RectTransform rect,
+        TextMeshProUGUI text)
+    {
         return new DamageNumber
         {
             GameObject = textObject,
             RectTransform = rect,
             Text = text
         };
+    }
+
+    private static void ConfigureDamageText(TextMeshProUGUI text)
+    {
+        if (text == null)
+            return;
+
+        text.alignment = TextAlignmentOptions.Center;
+        text.fontStyle = FontStyles.Bold;
+        text.enableWordWrapping = false;
+        text.overflowMode = TextOverflowModes.Overflow;
+        text.raycastTarget = false;
     }
 
     private void Recycle(int activeIndex, DamageNumber number)
@@ -257,6 +321,96 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         guardTextBoxSize.y = Mathf.Max(1f, guardTextBoxSize.y);
         initialPoolSize = Mathf.Max(1, initialPoolSize);
     }
+
+#if UNITY_EDITOR
+    internal bool EnsureScenePoolForEditor()
+    {
+        if (Application.isPlaying || EditorApplication.isPlayingOrWillChangePlaymode)
+            return false;
+
+        bool changed = false;
+        Transform existingCanvas = transform.Find(CanvasObjectName);
+        RectTransform sceneCanvas = existingCanvas as RectTransform;
+
+        if (sceneCanvas == null)
+        {
+            GameObject canvasObject = new GameObject(
+                CanvasObjectName,
+                typeof(RectTransform),
+                typeof(Canvas));
+            Undo.RegisterCreatedObjectUndo(canvasObject, "Create Player Damage Numbers");
+            canvasObject.transform.SetParent(transform, false);
+            canvasObject.layer = gameObject.layer;
+
+            sceneCanvas = canvasObject.GetComponent<RectTransform>();
+            sceneCanvas.localPosition = Vector3.zero;
+            sceneCanvas.localRotation = Quaternion.identity;
+            sceneCanvas.localScale = Vector3.one * worldScale;
+            sceneCanvas.sizeDelta = canvasSize;
+            changed = true;
+        }
+
+        Canvas sceneCanvasComponent = sceneCanvas.GetComponent<Canvas>();
+        if (sceneCanvasComponent == null)
+        {
+            sceneCanvasComponent = Undo.AddComponent<Canvas>(sceneCanvas.gameObject);
+            changed = true;
+        }
+
+        sceneCanvasComponent.renderMode = RenderMode.WorldSpace;
+        sceneCanvasComponent.overrideSorting = true;
+        sceneCanvasComponent.sortingOrder = sortingOrder;
+
+        int validPoolObjects = 0;
+        for (int i = 0; i < sceneCanvas.childCount; i++)
+        {
+            Transform child = sceneCanvas.GetChild(i);
+            if (child != null &&
+                child.name == DamageNumberObjectName &&
+                child.GetComponent<TextMeshProUGUI>() != null)
+            {
+                validPoolObjects++;
+            }
+        }
+
+        while (validPoolObjects < initialPoolSize)
+        {
+            GameObject textObject = new GameObject(
+                DamageNumberObjectName,
+                typeof(RectTransform),
+                typeof(CanvasRenderer),
+                typeof(TextMeshProUGUI));
+            Undo.RegisterCreatedObjectUndo(textObject, "Create Damage Number");
+            textObject.transform.SetParent(sceneCanvas, false);
+            textObject.layer = gameObject.layer;
+
+            RectTransform rect = textObject.GetComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.5f, 0.5f);
+            rect.anchorMax = new Vector2(0.5f, 0.5f);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = localStartOffset;
+            rect.sizeDelta = textBoxSize;
+
+            TextMeshProUGUI text = textObject.GetComponent<TextMeshProUGUI>();
+            ConfigureDamageText(text);
+            text.text = string.Empty;
+            text.fontSize = normalFontSize;
+            text.color = normalColor;
+
+            textObject.SetActive(false);
+            validPoolObjects++;
+            changed = true;
+        }
+
+        if (changed)
+        {
+            EditorUtility.SetDirty(sceneCanvas.gameObject);
+            EditorUtility.SetDirty(gameObject);
+        }
+
+        return changed;
+    }
+#endif
 }
 
 #if UNITY_EDITOR
@@ -265,16 +419,16 @@ internal static class PlayerDamageNumberWorldEditorBootstrap
 {
     static PlayerDamageNumberWorldEditorBootstrap()
     {
-        EditorApplication.delayCall += EnsureComponentInOpenScenes;
+        EditorApplication.delayCall += EnsureSceneObjectsInOpenScenes;
         EditorSceneManager.sceneOpened += OnSceneOpened;
     }
 
     private static void OnSceneOpened(Scene scene, OpenSceneMode mode)
     {
-        EditorApplication.delayCall += EnsureComponentInOpenScenes;
+        EditorApplication.delayCall += EnsureSceneObjectsInOpenScenes;
     }
 
-    private static void EnsureComponentInOpenScenes()
+    private static void EnsureSceneObjectsInOpenScenes()
     {
         if (Application.isPlaying || EditorApplication.isPlayingOrWillChangePlaymode)
             return;
@@ -292,10 +446,22 @@ internal static class PlayerDamageNumberWorldEditorBootstrap
             if ((playerObject.hideFlags & HideFlags.HideAndDontSave) != 0)
                 continue;
 
-            if (playerObject.GetComponent<PlayerDamageNumberWorld>() != null)
+            bool changed = false;
+            PlayerDamageNumberWorld world =
+                playerObject.GetComponent<PlayerDamageNumberWorld>();
+
+            if (world == null)
+            {
+                world = Undo.AddComponent<PlayerDamageNumberWorld>(playerObject);
+                changed = true;
+            }
+
+            if (world.EnsureScenePoolForEditor())
+                changed = true;
+
+            if (!changed)
                 continue;
 
-            Undo.AddComponent<PlayerDamageNumberWorld>(playerObject);
             EditorUtility.SetDirty(playerObject);
             EditorSceneManager.MarkSceneDirty(playerObject.scene);
         }
