@@ -30,6 +30,14 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
     [Tooltip("Text placed after every damage value. Set this to empty to remove it.")]
     [SerializeField] private string damageSuffix = "!";
 
+    [Header("Guard Feedback")]
+    [Tooltip("Color used when Guard successfully reduces incoming damage.")]
+    [SerializeField] private Color guardColor = new Color(0.35f, 0.85f, 1f, 1f);
+    [Tooltip("Font size used by the two-line Guard popup.")]
+    [Min(1f)] [SerializeField] private float guardFontSize = 27f;
+    [Tooltip("Size available to the two-line Guard popup.")]
+    [SerializeField] private Vector2 guardTextBoxSize = new Vector2(360f, 110f);
+
     [Header("World Space Canvas")]
     [Tooltip("Overall world-space size of the complete effect. Lower values make all text and movement smaller on screen.")]
     [Min(0.0001f)] [SerializeField] private float worldScale = 0.01f;
@@ -97,6 +105,32 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         if (damage <= 0)
             return;
 
+        DamageNumber number = AcquireNumber();
+        number.RectTransform.sizeDelta = textBoxSize;
+        number.Text.text = isCritical
+            ? $"{criticalPrefix}{damage}{damageSuffix}"
+            : $"{damage}{damageSuffix}";
+        number.Text.fontSize = isCritical ? criticalFontSize : normalFontSize;
+        number.Text.color = isCritical ? criticalColor : normalColor;
+        ActivateNumber(number);
+    }
+
+    public void ShowGuard(float preventedDamage, float blockedPercent)
+    {
+        if (preventedDamage <= 0f || blockedPercent <= 0f)
+            return;
+
+        DamageNumber number = AcquireNumber();
+        number.RectTransform.sizeDelta = guardTextBoxSize;
+        number.Text.text =
+            $"GUARD! -{preventedDamage:0.##} DMG\n{blockedPercent:0.##}% blocked";
+        number.Text.fontSize = guardFontSize;
+        number.Text.color = guardColor;
+        ActivateNumber(number);
+    }
+
+    private DamageNumber AcquireNumber()
+    {
         DamageNumber number = available.Count > 0
             ? available.Dequeue()
             : CreateDamageNumber();
@@ -105,11 +139,11 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         number.StartPosition = localStartOffset + Vector2.right * horizontalOffset;
         number.Elapsed = 0f;
         number.RectTransform.anchoredPosition = number.StartPosition;
-        number.Text.text = isCritical
-            ? $"{criticalPrefix}{damage}{damageSuffix}"
-            : $"{damage}{damageSuffix}";
-        number.Text.fontSize = isCritical ? criticalFontSize : normalFontSize;
-        number.Text.color = isCritical ? criticalColor : normalColor;
+        return number;
+    }
+
+    private void ActivateNumber(DamageNumber number)
+    {
         number.GameObject.SetActive(true);
         active.Add(number);
         enabled = true;
@@ -156,6 +190,7 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         text.alignment = TextAlignmentOptions.Center;
         text.fontStyle = FontStyles.Bold;
         text.enableWordWrapping = false;
+        text.overflowMode = TextOverflowModes.Overflow;
         text.raycastTarget = false;
 
         textObject.SetActive(false);
@@ -195,11 +230,14 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         horizontalSpacing = Mathf.Max(0f, horizontalSpacing);
         normalFontSize = Mathf.Max(1f, normalFontSize);
         criticalFontSize = Mathf.Max(1f, criticalFontSize);
+        guardFontSize = Mathf.Max(1f, guardFontSize);
         worldScale = Mathf.Max(0.0001f, worldScale);
         canvasSize.x = Mathf.Max(1f, canvasSize.x);
         canvasSize.y = Mathf.Max(1f, canvasSize.y);
         textBoxSize.x = Mathf.Max(1f, textBoxSize.x);
         textBoxSize.y = Mathf.Max(1f, textBoxSize.y);
+        guardTextBoxSize.x = Mathf.Max(1f, guardTextBoxSize.x);
+        guardTextBoxSize.y = Mathf.Max(1f, guardTextBoxSize.y);
         initialPoolSize = Mathf.Max(1, initialPoolSize);
     }
 }
