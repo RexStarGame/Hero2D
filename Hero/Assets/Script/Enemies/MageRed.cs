@@ -13,6 +13,27 @@ public class MageRed : MonoBehaviour
     [Min(0f)] [SerializeField] private float chaseStopDistance = 0.9f;
     [SerializeField] private float chaseSpeedMultiplier = 1.15f;
 
+    [Header("Ranged Combat Movement")]
+    [Min(0.1f)] [SerializeField] private float preferredCombatDistance = 4.25f;
+    [Min(0.05f)] [SerializeField] private float combatDistanceTolerance = 0.45f;
+    [Range(0.1f, 1f)] [SerializeField] private float retreatSpeedMultiplier = 0.7f;
+    [Range(0f, 1f)] [SerializeField] private float strafeSpeedMultiplier = 0.35f;
+    [Min(0.1f)] [SerializeField] private float movementAcceleration = 12f;
+    [Min(0.05f)] [SerializeField] private float combatDecisionInterval = 0.12f;
+    [Min(0.1f)] [SerializeField] private float strafeDirectionInterval = 1.25f;
+    [Min(0f)] [SerializeField] private float closingSpeedLookAhead = 0.3f;
+
+    [Header("Ranged Attack Timing")]
+    [Tooltip("Randomizes only the pause after each shot. The existing windup/telegraph always plays before firing.")]
+    [Min(0.1f)] [SerializeField] private float minimumAttackCooldownMultiplier = 0.65f;
+    [Min(0.1f)] [SerializeField] private float maximumAttackCooldownMultiplier = 1.25f;
+
+    [Header("Ranged Movement Safety")]
+    [Min(0.05f)] [SerializeField] private float movementProbeDistance = 0.45f;
+    [Min(0f)] [SerializeField] private float obstacleProbeRadius = 0.18f;
+    [Tooltip("Optional override. Leave empty to use the physics layers that collide with this enemy.")]
+    [SerializeField] private LayerMask movementBlockingLayers;
+
     [Header("Patrol Validation")]
     [Min(0.05f)] [SerializeField] private float routeValidationInterval = 0.2f;
     [Min(0.1f)] [SerializeField] private float stuckTimeout = 1f;
@@ -37,6 +58,14 @@ public class MageRed : MonoBehaviour
     private Vector2 lastRejectedTarget;
     private float showRejectedTargetUntil;
     private bool returningToRegion;
+    private Vector2 desiredCombatVelocity;
+    private float previousTargetDistance;
+    private float lastCombatDecisionTime;
+    private float nextCombatDecisionTime;
+    private float nextStrafeDirectionTime;
+    private int strafeDirection = 1;
+
+    private readonly Collider2D[] movementProbeHits = new Collider2D[8];
 
     public Vector2 CurrentPatrolTarget => currentTarget;
 
@@ -50,6 +79,14 @@ public class MageRed : MonoBehaviour
         aggro = GetComponent<EnemyAggro2D>();
         if (aggro == null) aggro = gameObject.AddComponent<EnemyAggro2D>();
         aggro.ConfigureRanges(detectionRange, giveUpRange);
+
+        EnemyAttack enemyAttack = GetComponent<EnemyAttack>();
+        if (enemyAttack != null)
+        {
+            enemyAttack.ConfigureCooldownVariation(
+                minimumAttackCooldownMultiplier,
+                maximumAttackCooldownMultiplier);
+        }
 
         GameObject managerObject = GameObject.FindGameObjectWithTag("Manger");
         if (managerObject != null)
@@ -69,7 +106,10 @@ public class MageRed : MonoBehaviour
         if (playerTarget != null)
         {
             wasChasing = true;
-            UpdateAnimation(((Vector2)playerTarget.position - (Vector2)transform.position).normalized, true);
+            Vector2 combatDirection = rb != null && rb.linearVelocity.sqrMagnitude > 0.0025f
+                ? rb.linearVelocity.normalized
+                : ((Vector2)playerTarget.position - (Vector2)transform.position).normalized;
+            UpdateAnimation(combatDirection, rb != null && rb.linearVelocity.sqrMagnitude > 0.0025f);
             return;
         }
 
@@ -122,13 +162,12 @@ public class MageRed : MonoBehaviour
         Transform playerTarget = aggro.CurrentTarget;
         if (playerTarget != null)
         {
-            Vector2 offset = (Vector2)playerTarget.position - rb.position;
-            if (offset.sqrMagnitude <= chaseStopDistance * chaseStopDistance)
-                rb.linearVelocity = Vector2.zero;
-            else
-                rb.linearVelocity = offset.normalized * moveSpeed * chaseSpeedMultiplier;
+            UpdateCombatMovement(playerTarget);
             return;
         }
+
+        desiredCombatVelocity = Vector2.zero;
+        previousTargetDistance = 0f;
 
         rb.linearVelocity = isMoving
             ? (currentTarget - rb.position).normalized * moveSpeed
@@ -163,6 +202,212 @@ public class MageRed : MonoBehaviour
     {
         Collider2D spawnArea = regionLink != null ? regionLink.SpawnArea : null;
         return spawnArea != null && !spawnArea.OverlapPoint(transform.position);
+    }
+
+    private void UpdateCombatMovement(Transform playerTarget)
+    {
+        Vector2 toPlayer = (Vector2)playerTarget.position - rb.position;
+        float distance = toPlayer.magnitude;
+        if (distance <= 0.001f)
+        {
+            desiredCombatVelocity = Vector2.zero;
+            rb.linearVelocity = Vector2.MoveTowards(
+                rb.linearVelocity, Vector2.zero, movementAcceleration * Time.fixedDeltaTime);
+            return;
+        }
+
+        if (Time.time >= nextCombatDecisionTime)
+        {
+            float elapsed = lastCombatDecisionTime > 0f
+                ? Mathf.Max(Time.fixedDeltaTime, Time.time - lastCombatDecisionTime)
+                : combatDecisionInterval;
+            float closingSpeed = previousTargetDistance > 0f
+                ? Mathf.Max(0f, (previousTargetDistance - distance) / elapsed)
+                : 0f;
+
+            desiredCombatVelocity = ChooseCombatVelocity(
+                playerTarget.position,
+                toPlayer / distance,
+                distance,
+                closingSpeed);
+
+            previousTargetDistance = distance;
+            lastCombatDecisionTime = Time.time;
+            nextCombatDecisionTime = Time.time + combatDecisionInterval;
+        }
+
+        rb.linearVelocity = Vector2.MoveTowards(
+            rb.linearVelocity,
+            desiredCombatVelocity,
+            movementAcceleration * Time.fixedDeltaTime);
+    }
+
+    private Vector2 ChooseCombatVelocity(
+        Vector2 playerPosition,
+        Vector2 directionToPlayer,
+        float distance,
+        float closingSpeed)
+    {
+        float minimumDistance = preferredCombatDistance - combatDistanceTolerance;
+        float maximumDistance = preferredCombatDistance + combatDistanceTolerance;
+        float predictedDistance = distance - closingSpeed * closingSpeedLookAhead;
+
+        if (predictedDistance < minimumDistance || distance <= chaseStopDistance)
+        {
+            Vector2 awayFromPlayer = -directionToPlayer;
+            float retreatSpeed = moveSpeed * retreatSpeedMultiplier;
+            return FindSafeCombatVelocity(
+                playerPosition,
+                awayFromPlayer,
+                retreatSpeed,
+                true);
+        }
+
+        if (distance > maximumDistance)
+        {
+            return FindSafeCombatVelocity(
+                playerPosition,
+                directionToPlayer,
+                moveSpeed * chaseSpeedMultiplier,
+                false);
+        }
+
+        if (strafeSpeedMultiplier <= 0f)
+            return Vector2.zero;
+
+        if (Time.time >= nextStrafeDirectionTime)
+        {
+            strafeDirection = Random.value < 0.5f ? -1 : 1;
+            nextStrafeDirectionTime = Time.time + strafeDirectionInterval;
+        }
+
+        Vector2 perpendicular = new Vector2(-directionToPlayer.y, directionToPlayer.x) * strafeDirection;
+        Vector2 strafeVelocity = FindSafeCombatVelocity(
+            playerPosition,
+            perpendicular,
+            moveSpeed * strafeSpeedMultiplier,
+            false);
+
+        if (strafeVelocity.sqrMagnitude > 0f)
+            return strafeVelocity;
+
+        strafeDirection *= -1;
+        nextStrafeDirectionTime = Time.time + strafeDirectionInterval;
+        return FindSafeCombatVelocity(
+            playerPosition,
+            -perpendicular,
+            moveSpeed * strafeSpeedMultiplier,
+            false);
+    }
+
+    private Vector2 FindSafeCombatVelocity(
+        Vector2 playerPosition,
+        Vector2 preferredDirection,
+        float speed,
+        bool prioritizeDistance)
+    {
+        preferredDirection.Normalize();
+        Vector2 perpendicular = new Vector2(-preferredDirection.y, preferredDirection.x);
+
+        Vector2 bestDirection = Vector2.zero;
+        float bestScore = float.NegativeInfinity;
+        float currentDistance = Vector2.Distance(rb.position, playerPosition);
+
+        EvaluateCombatDirection(
+            preferredDirection,
+            preferredDirection,
+            playerPosition,
+            currentDistance,
+            prioritizeDistance,
+            ref bestDirection,
+            ref bestScore);
+        EvaluateCombatDirection(
+            (preferredDirection + perpendicular * 0.65f).normalized,
+            preferredDirection,
+            playerPosition,
+            currentDistance,
+            prioritizeDistance,
+            ref bestDirection,
+            ref bestScore);
+        EvaluateCombatDirection(
+            (preferredDirection - perpendicular * 0.65f).normalized,
+            preferredDirection,
+            playerPosition,
+            currentDistance,
+            prioritizeDistance,
+            ref bestDirection,
+            ref bestScore);
+        EvaluateCombatDirection(
+            perpendicular,
+            preferredDirection,
+            playerPosition,
+            currentDistance,
+            prioritizeDistance,
+            ref bestDirection,
+            ref bestScore);
+        EvaluateCombatDirection(
+            -perpendicular,
+            preferredDirection,
+            playerPosition,
+            currentDistance,
+            prioritizeDistance,
+            ref bestDirection,
+            ref bestScore);
+
+        return bestDirection * speed;
+    }
+
+    private void EvaluateCombatDirection(
+        Vector2 candidate,
+        Vector2 preferredDirection,
+        Vector2 playerPosition,
+        float currentDistance,
+        bool prioritizeDistance,
+        ref Vector2 bestDirection,
+        ref float bestScore)
+    {
+        Vector2 destination = rb.position + candidate * movementProbeDistance;
+        if (!IsCombatStepSafe(destination)) return;
+
+        float resultingDistance = Vector2.Distance(destination, playerPosition);
+        float directionScore = Vector2.Dot(candidate, preferredDirection);
+        float distanceScore = prioritizeDistance ? resultingDistance - currentDistance : 0f;
+        float score = directionScore + distanceScore * 2f;
+        if (score <= bestScore) return;
+
+        bestScore = score;
+        bestDirection = candidate;
+    }
+
+    private bool IsCombatStepSafe(Vector2 destination)
+    {
+        Collider2D spawnArea = regionLink != null ? regionLink.SpawnArea : null;
+        if (spawnArea != null && !spawnArea.OverlapPoint(destination))
+            return false;
+
+        if (myManager != null && !myManager.IsPatrolRouteValid(rb.position, destination))
+            return false;
+
+        int blockingMask = movementBlockingLayers.value != 0
+            ? movementBlockingLayers.value
+            : Physics2D.GetLayerCollisionMask(gameObject.layer);
+
+        if (blockingMask == 0) return true;
+
+        int hitCount = Physics2D.OverlapCircleNonAlloc(
+            destination,
+            obstacleProbeRadius,
+            movementProbeHits,
+            blockingMask);
+
+        for (int i = 0; i < hitCount; i++)
+        {
+            Collider2D hit = movementProbeHits[i];
+            if (hit == null || hit.isTrigger || hit.transform.IsChildOf(transform)) continue;
+            return false;
+        }
+
+        return true;
     }
 
     private void BeginReturningToRegion()
@@ -233,6 +478,20 @@ public class MageRed : MonoBehaviour
         detectionRange = Mathf.Max(0.1f, detectionRange);
         giveUpRange = Mathf.Max(detectionRange, giveUpRange);
         chaseStopDistance = Mathf.Max(0f, chaseStopDistance);
+        preferredCombatDistance = Mathf.Max(0.1f, preferredCombatDistance);
+        combatDistanceTolerance = Mathf.Clamp(combatDistanceTolerance, 0.05f, preferredCombatDistance);
+        retreatSpeedMultiplier = Mathf.Clamp(retreatSpeedMultiplier, 0.1f, 1f);
+        strafeSpeedMultiplier = Mathf.Clamp01(strafeSpeedMultiplier);
+        movementAcceleration = Mathf.Max(0.1f, movementAcceleration);
+        combatDecisionInterval = Mathf.Max(0.05f, combatDecisionInterval);
+        strafeDirectionInterval = Mathf.Max(0.1f, strafeDirectionInterval);
+        closingSpeedLookAhead = Mathf.Max(0f, closingSpeedLookAhead);
+        minimumAttackCooldownMultiplier = Mathf.Max(0.1f, minimumAttackCooldownMultiplier);
+        maximumAttackCooldownMultiplier = Mathf.Max(
+            minimumAttackCooldownMultiplier,
+            maximumAttackCooldownMultiplier);
+        movementProbeDistance = Mathf.Max(0.05f, movementProbeDistance);
+        obstacleProbeRadius = Mathf.Max(0f, obstacleProbeRadius);
         routeValidationInterval = Mathf.Max(0.05f, routeValidationInterval);
         stuckTimeout = Mathf.Max(0.1f, stuckTimeout);
         minimumProgressDistance = Mathf.Max(0.001f, minimumProgressDistance);
@@ -266,12 +525,24 @@ public class MageRed : MonoBehaviour
 
         if (rb != null && aggro != null && aggro.HasAuthority())
             rb.linearVelocity = Vector2.zero;
+
+        desiredCombatVelocity = Vector2.zero;
+        previousTargetDistance = 0f;
+        lastCombatDecisionTime = 0f;
     }
 
     private void OnDrawGizmosSelected()
     {
         DrawChaseRanges(detectionRange, giveUpRange);
+        DrawCombatRanges();
         DrawPatrolTarget();
+    }
+
+    private void DrawCombatRanges()
+    {
+        Gizmos.color = new Color(0.2f, 0.85f, 1f, 0.75f);
+        Gizmos.DrawWireSphere(transform.position, preferredCombatDistance - combatDistanceTolerance);
+        Gizmos.DrawWireSphere(transform.position, preferredCombatDistance + combatDistanceTolerance);
     }
 
     private void DrawPatrolTarget()
