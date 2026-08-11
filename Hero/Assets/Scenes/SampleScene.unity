@@ -11838,13 +11838,16 @@ MonoBehaviour:
     xpIncreasePerLevel: 125
   - fromLevel: 11
     toLevel: 20
-    xpIncreasePerLevel: 200
+    xpIncreasePerLevel: 250
   - fromLevel: 21
     toLevel: 30
-    xpIncreasePerLevel: 350
+    xpIncreasePerLevel: 500
   - fromLevel: 31
     toLevel: 40
-    xpIncreasePerLevel: 500
+    xpIncreasePerLevel: 850
+  - fromLevel: 41
+    toLevel: 50
+    xpIncreasePerLevel: 1540
   fallbackXpIncreasePerLevel: 278
   deathXpLossPercent: 20
   equipment: {fileID: 239307054}
@@ -11898,7 +11901,7 @@ MonoBehaviour:
   items: []
   equipment: {fileID: 239307054}
   playerXP: {fileID: 239307050}
-  inventorySaveSystem: {fileID: 0}
+  inventorySaveSystem: {fileID: 239307052}
   dropOffset: {x: 0, y: -1}
 --- !u!114 &239307054
 MonoBehaviour:
@@ -26797,7 +26800,7 @@ MonoBehaviour:
   inventory: {fileID: 239307053}
   wallet: {fileID: 239307055}
   playerXP: {fileID: 239307050}
-  inventorySaveSystem: {fileID: 0}
+  inventorySaveSystem: {fileID: 239307052}
   panelGroup: {fileID: 619029389}
   gridRoot: {fileID: 940600006}
   itemsScrollRect: {fileID: 2100000004}
