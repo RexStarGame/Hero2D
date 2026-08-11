@@ -145,7 +145,14 @@ public class PlayerMovement : MonoBehaviour
         if (rb == null)
             return;
 
-        if (PlayerProgressSave.TryRestorePlayerPosition(out Vector2 savedPosition))
+        if (PlayerProgressSave.TryConsumeDeathRespawnPosition(out Vector2 deathRespawnPosition))
+        {
+            rb.position = deathRespawnPosition;
+            rb.linearVelocity = Vector2.zero;
+            movement = Vector2.zero;
+            PlayerProgressSave.SavePlayerPosition(deathRespawnPosition);
+        }
+        else if (PlayerProgressSave.TryRestorePlayerPosition(out Vector2 savedPosition))
         {
             rb.position = savedPosition;
             rb.linearVelocity = Vector2.zero;
