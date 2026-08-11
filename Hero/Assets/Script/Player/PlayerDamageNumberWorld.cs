@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -14,6 +15,7 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
 {
     private const string CanvasObjectName = "Player Damage Numbers";
     private const string DamageNumberObjectName = "Damage Number";
+    private const string FeedbackIconObjectName = "Feedback Icon";
 
     [Header("Spawn Position")]
     [Tooltip("Where normal and critical damage numbers start, measured in Canvas units. X moves them left/right and Y moves them up/down relative to the player.")]
@@ -27,34 +29,49 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
     [Tooltip("How far the number travels upward before disappearing, measured in Canvas units.")]
     [Min(0f)] [SerializeField] private float riseDistance = 80f;
 
-    [Header("Text Appearance")]
+    [Header("Normal Damage")]
     [SerializeField] private Color normalColor = new Color(1f, 0.95f, 0.82f, 1f);
-    [SerializeField] private Color criticalColor = new Color(1f, 0.55f, 0.08f, 1f);
     [Tooltip("Font size used by normal damage numbers.")]
     [Min(1f)] [SerializeField] private float normalFontSize = 34f;
-    [Tooltip("Font size used by critical-hit damage numbers.")]
+
+    [Header("Critical Feedback")]
+    [Tooltip("Sprite shown beside critical-hit damage. Leave empty to show only the number.")]
+    [SerializeField] private Sprite criticalIcon;
+    [Tooltip("Critical-hit number color.")]
+    [SerializeField] private Color criticalColor = new Color(1f, 0.55f, 0.08f, 1f);
+    [Tooltip("Tint applied to the critical icon. White preserves the sprite's original colors.")]
+    [SerializeField] private Color criticalIconColor = Color.white;
+    [Tooltip("Font size used by critical-hit numbers.")]
     [Min(1f)] [SerializeField] private float criticalFontSize = 42f;
-    [Tooltip("Text placed before critical damage. Include a trailing space if desired.")]
-    [SerializeField] private string criticalPrefix = "CRIT ";
-    [Tooltip("Text placed after every damage value. Set this to empty to remove it.")]
-    [SerializeField] private string damageSuffix = "!";
+    [Tooltip("Size of the critical icon inside each pooled Damage Number.")]
+    [SerializeField] private Vector2 criticalIconSize = new Vector2(34f, 34f);
+    [Tooltip("Position of the critical icon relative to the damage number text.")]
+    [SerializeField] private Vector2 criticalIconOffset = new Vector2(-52f, 0f);
 
     [Header("Guard Feedback")]
     [Tooltip("Exact Guard spawn position inside Player Damage Numbers. Guard does not use the random horizontal spacing used by ordinary damage numbers.")]
     [SerializeField] private Vector2 guardStartOffset = new Vector2(0f, 120f);
-    [Tooltip("Color used when Guard successfully reduces incoming damage.")]
+    [Tooltip("Sprite shown beside the amount of damage Guard prevented. Leave empty to show only the number.")]
+    [SerializeField] private Sprite guardIcon;
+    [Tooltip("Guard prevented-damage number color.")]
     [SerializeField] private Color guardColor = new Color(0.35f, 0.85f, 1f, 1f);
-    [Tooltip("Font size used by the two-line Guard popup. New Guard popups use Inspector changes immediately during Play Mode.")]
+    [Tooltip("Tint applied to the Guard icon. White preserves the sprite's original colors.")]
+    [SerializeField] private Color guardIconColor = Color.white;
+    [Tooltip("Font size used by the Guard prevented-damage number.")]
     [Min(1f)] [SerializeField] private float guardFontSize = 27f;
-    [Tooltip("Size available to the two-line Guard popup.")]
+    [Tooltip("Size available to the Guard number.")]
     [SerializeField] private Vector2 guardTextBoxSize = new Vector2(360f, 110f);
+    [Tooltip("Size of the Guard icon inside each pooled Damage Number.")]
+    [SerializeField] private Vector2 guardIconSize = new Vector2(34f, 34f);
+    [Tooltip("Position of the Guard icon relative to the prevented-damage number.")]
+    [SerializeField] private Vector2 guardIconOffset = new Vector2(-52f, 0f);
 
     [Header("World Space Canvas")]
     [Tooltip("Initial world-space scale used when Player Damage Numbers is first created in the scene. Once scene-authored, its Transform can be positioned manually.")]
     [Min(0.0001f)] [SerializeField] private float worldScale = 0.01f;
     [Tooltip("Internal size of Player Damage Numbers when it is first created.")]
     [SerializeField] private Vector2 canvasSize = new Vector2(400f, 300f);
-    [Tooltip("Size available to each normal TMP damage label.")]
+    [Tooltip("Size available to each normal/critical TMP damage label.")]
     [SerializeField] private Vector2 textBoxSize = new Vector2(280f, 70f);
     [Tooltip("Render priority for the damage-number Canvas.")]
     [SerializeField] private int sortingOrder = 100;
@@ -72,6 +89,8 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         public GameObject GameObject;
         public RectTransform RectTransform;
         public TextMeshProUGUI Text;
+        public RectTransform IconRectTransform;
+        public Image Icon;
         public Vector2 StartPosition;
         public float Elapsed;
     }
@@ -96,13 +115,21 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
             number.Elapsed += deltaTime;
             float progress = Mathf.Clamp01(number.Elapsed / lifetime);
             float easedProgress = 1f - (1f - progress) * (1f - progress);
+            float alpha = 1f - Mathf.SmoothStep(0f, 1f, progress);
 
             number.RectTransform.anchoredPosition =
                 number.StartPosition + Vector2.up * (riseDistance * easedProgress);
 
-            Color color = number.Text.color;
-            color.a = 1f - Mathf.SmoothStep(0f, 1f, progress);
-            number.Text.color = color;
+            Color textColor = number.Text.color;
+            textColor.a = alpha;
+            number.Text.color = textColor;
+
+            if (number.Icon != null && number.Icon.enabled)
+            {
+                Color iconColor = number.Icon.color;
+                iconColor.a = alpha;
+                number.Icon.color = iconColor;
+            }
 
             if (progress >= 1f)
                 Recycle(i, number);
@@ -119,11 +146,24 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
 
         DamageNumber number = AcquireNumber(localStartOffset, true);
         number.RectTransform.sizeDelta = textBoxSize;
-        number.Text.text = isCritical
-            ? $"{criticalPrefix}{damage}{damageSuffix}"
-            : $"{damage}{damageSuffix}";
+        number.Text.text = damage.ToString();
         number.Text.fontSize = isCritical ? criticalFontSize : normalFontSize;
         number.Text.color = isCritical ? criticalColor : normalColor;
+
+        if (isCritical)
+        {
+            SetFeedbackIcon(
+                number,
+                criticalIcon,
+                criticalIconSize,
+                criticalIconOffset,
+                criticalIconColor);
+        }
+        else
+        {
+            HideFeedbackIcon(number);
+        }
+
         ActivateNumber(number);
     }
 
@@ -135,10 +175,15 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         // Guard uses the exact Inspector position. No per-hit horizontal offset is added.
         DamageNumber number = AcquireNumber(guardStartOffset, false);
         number.RectTransform.sizeDelta = guardTextBoxSize;
-        number.Text.text =
-            $"GUARD! -{FormatGuardDamage(preventedDamage)} DMG\n{blockedPercent:0.##}% blocked";
+        number.Text.text = $"-{FormatGuardDamage(preventedDamage)}";
         number.Text.fontSize = guardFontSize;
         number.Text.color = guardColor;
+        SetFeedbackIcon(
+            number,
+            guardIcon,
+            guardIconSize,
+            guardIconOffset,
+            guardIconColor);
         ActivateNumber(number);
     }
 
@@ -165,6 +210,33 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         number.Elapsed = 0f;
         number.RectTransform.anchoredPosition = number.StartPosition;
         return number;
+    }
+
+    private static void SetFeedbackIcon(
+        DamageNumber number,
+        Sprite sprite,
+        Vector2 size,
+        Vector2 offset,
+        Color tint)
+    {
+        if (number == null || number.Icon == null || number.IconRectTransform == null)
+            return;
+
+        number.Icon.sprite = sprite;
+        number.Icon.color = tint;
+        number.Icon.preserveAspect = true;
+        number.IconRectTransform.sizeDelta = size;
+        number.IconRectTransform.anchoredPosition = offset;
+        number.Icon.enabled = sprite != null;
+    }
+
+    private static void HideFeedbackIcon(DamageNumber number)
+    {
+        if (number == null || number.Icon == null)
+            return;
+
+        number.Icon.enabled = false;
+        number.Icon.sprite = null;
     }
 
     private void ActivateNumber(DamageNumber number)
@@ -199,8 +271,15 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
             if (rect == null || text == null)
                 continue;
 
+            Image icon = EnsureRuntimeFeedbackIcon(child);
+            RectTransform iconRect = icon == null ? null : icon.rectTransform;
             child.gameObject.SetActive(false);
-            available.Enqueue(BindDamageNumber(child.gameObject, rect, text));
+            available.Enqueue(BindDamageNumber(
+                child.gameObject,
+                rect,
+                text,
+                iconRect,
+                icon));
         }
     }
 
@@ -254,20 +333,65 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         TextMeshProUGUI text = textObject.GetComponent<TextMeshProUGUI>();
         ConfigureDamageText(text);
 
+        Image icon = EnsureRuntimeFeedbackIcon(textObject.transform);
+        RectTransform iconRect = icon == null ? null : icon.rectTransform;
+
         textObject.SetActive(false);
-        return BindDamageNumber(textObject, rect, text);
+        return BindDamageNumber(textObject, rect, text, iconRect, icon);
+    }
+
+    private Image EnsureRuntimeFeedbackIcon(Transform damageNumberTransform)
+    {
+        if (damageNumberTransform == null)
+            return null;
+
+        Transform existing = damageNumberTransform.Find(FeedbackIconObjectName);
+        GameObject iconObject;
+
+        if (existing != null)
+        {
+            iconObject = existing.gameObject;
+        }
+        else
+        {
+            iconObject = new GameObject(
+                FeedbackIconObjectName,
+                typeof(RectTransform),
+                typeof(CanvasRenderer),
+                typeof(Image));
+            iconObject.transform.SetParent(damageNumberTransform, false);
+            iconObject.layer = gameObject.layer;
+        }
+
+        Image icon = iconObject.GetComponent<Image>();
+        if (icon == null)
+            icon = iconObject.AddComponent<Image>();
+
+        RectTransform iconRect = icon.rectTransform;
+        iconRect.anchorMin = new Vector2(0.5f, 0.5f);
+        iconRect.anchorMax = new Vector2(0.5f, 0.5f);
+        iconRect.pivot = new Vector2(0.5f, 0.5f);
+        iconRect.anchoredPosition = Vector2.zero;
+        iconRect.sizeDelta = new Vector2(34f, 34f);
+
+        ConfigureFeedbackIcon(icon);
+        return icon;
     }
 
     private static DamageNumber BindDamageNumber(
         GameObject textObject,
         RectTransform rect,
-        TextMeshProUGUI text)
+        TextMeshProUGUI text,
+        RectTransform iconRect,
+        Image icon)
     {
         return new DamageNumber
         {
             GameObject = textObject,
             RectTransform = rect,
-            Text = text
+            Text = text,
+            IconRectTransform = iconRect,
+            Icon = icon
         };
     }
 
@@ -283,8 +407,19 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         text.raycastTarget = false;
     }
 
+    private static void ConfigureFeedbackIcon(Image icon)
+    {
+        if (icon == null)
+            return;
+
+        icon.raycastTarget = false;
+        icon.preserveAspect = true;
+        icon.enabled = false;
+    }
+
     private void Recycle(int activeIndex, DamageNumber number)
     {
+        HideFeedbackIcon(number);
         number.GameObject.SetActive(false);
         int lastIndex = active.Count - 1;
         active[activeIndex] = active[lastIndex];
@@ -297,6 +432,7 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         for (int i = active.Count - 1; i >= 0; i--)
         {
             DamageNumber number = active[i];
+            HideFeedbackIcon(number);
             number.GameObject.SetActive(false);
             available.Enqueue(number);
         }
@@ -319,6 +455,10 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         textBoxSize.y = Mathf.Max(1f, textBoxSize.y);
         guardTextBoxSize.x = Mathf.Max(1f, guardTextBoxSize.x);
         guardTextBoxSize.y = Mathf.Max(1f, guardTextBoxSize.y);
+        criticalIconSize.x = Mathf.Max(1f, criticalIconSize.x);
+        criticalIconSize.y = Mathf.Max(1f, criticalIconSize.y);
+        guardIconSize.x = Mathf.Max(1f, guardIconSize.x);
+        guardIconSize.y = Mathf.Max(1f, guardIconSize.y);
         initialPoolSize = Mathf.Max(1, initialPoolSize);
     }
 
@@ -365,12 +505,16 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         for (int i = 0; i < sceneCanvas.childCount; i++)
         {
             Transform child = sceneCanvas.GetChild(i);
-            if (child != null &&
-                child.name == DamageNumberObjectName &&
-                child.GetComponent<TextMeshProUGUI>() != null)
+            if (child == null ||
+                child.name != DamageNumberObjectName ||
+                child.GetComponent<TextMeshProUGUI>() == null)
             {
-                validPoolObjects++;
+                continue;
             }
+
+            validPoolObjects++;
+            if (EnsureFeedbackIconForEditor(child))
+                changed = true;
         }
 
         while (validPoolObjects < initialPoolSize)
@@ -397,6 +541,7 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
             text.fontSize = normalFontSize;
             text.color = normalColor;
 
+            EnsureFeedbackIconForEditor(textObject.transform);
             textObject.SetActive(false);
             validPoolObjects++;
             changed = true;
@@ -408,6 +553,55 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
             EditorUtility.SetDirty(gameObject);
         }
 
+        return changed;
+    }
+
+    private bool EnsureFeedbackIconForEditor(Transform damageNumberTransform)
+    {
+        if (damageNumberTransform == null)
+            return false;
+
+        bool changed = false;
+        Transform existing = damageNumberTransform.Find(FeedbackIconObjectName);
+        GameObject iconObject;
+        bool created = false;
+
+        if (existing != null)
+        {
+            iconObject = existing.gameObject;
+        }
+        else
+        {
+            iconObject = new GameObject(
+                FeedbackIconObjectName,
+                typeof(RectTransform),
+                typeof(CanvasRenderer),
+                typeof(Image));
+            Undo.RegisterCreatedObjectUndo(iconObject, "Create Combat Feedback Icon");
+            iconObject.transform.SetParent(damageNumberTransform, false);
+            iconObject.layer = gameObject.layer;
+            created = true;
+            changed = true;
+        }
+
+        Image icon = iconObject.GetComponent<Image>();
+        if (icon == null)
+        {
+            icon = Undo.AddComponent<Image>(iconObject);
+            changed = true;
+        }
+
+        if (created)
+        {
+            RectTransform iconRect = icon.rectTransform;
+            iconRect.anchorMin = new Vector2(0.5f, 0.5f);
+            iconRect.anchorMax = new Vector2(0.5f, 0.5f);
+            iconRect.pivot = new Vector2(0.5f, 0.5f);
+            iconRect.anchoredPosition = Vector2.zero;
+            iconRect.sizeDelta = new Vector2(34f, 34f);
+        }
+
+        ConfigureFeedbackIcon(icon);
         return changed;
     }
 #endif
