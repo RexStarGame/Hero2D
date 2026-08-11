@@ -9,10 +9,16 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private TMP_Text defenseText;
     [Tooltip("Separate, low-noise text field for XP gained from equipped gear.")]
     [SerializeField] private TMP_Text experienceBonusText;
+    [Tooltip("Separate text field for extra gold gained from kills through equipped gear.")]
+    [SerializeField] private TMP_Text goldBonusText;
 
     [Header("Kill XP Text Layout")]
     [Tooltip("Position of the generated Kill XP row relative to DefenseText when no ExperienceBonusText is assigned.")]
     [SerializeField] private Vector2 experienceBonusOffsetFromDefense = new Vector2(0f, -34f);
+
+    [Header("Kill Gold Text Layout")]
+    [Tooltip("Position of the generated Kill Gold row relative to ExperienceBonusText when no GoldBonusText is assigned.")]
+    [SerializeField] private Vector2 goldBonusOffsetFromExperience = new Vector2(0f, -34f);
 
     [Header("References (auto-find if null)")]
     [SerializeField] private PlayerXP playerXP;
@@ -43,6 +49,7 @@ public class PlayerStats : MonoBehaviour
     {
         AutoFind();
         EnsureExperienceBonusText();
+        EnsureGoldBonusText();
         ForceUpdate();
         if (upgradeMenu != null)
         {
@@ -56,6 +63,7 @@ public class PlayerStats : MonoBehaviour
     {
         AutoFind();
         EnsureExperienceBonusText();
+        EnsureGoldBonusText();
         ForceUpdate();
     }
 
@@ -120,6 +128,12 @@ public class PlayerStats : MonoBehaviour
             GameObject go = GameObject.Find("ExperienceBonusText");
             if (go != null) experienceBonusText = go.GetComponent<TMP_Text>();
         }
+
+        if (goldBonusText == null)
+        {
+            GameObject go = GameObject.Find("GoldBonusText");
+            if (go != null) goldBonusText = go.GetComponent<TMP_Text>();
+        }
     }
 
     private void EnsureExperienceBonusText()
@@ -153,6 +167,41 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
+    private void EnsureGoldBonusText()
+    {
+        if (goldBonusText != null)
+            return;
+
+        TMP_Text template = experienceBonusText != null ? experienceBonusText : defenseText;
+        if (template == null)
+            return;
+
+        Transform parent = template.transform.parent;
+        if (parent == null)
+            return;
+
+        GameObject textObject = Instantiate(template.gameObject, parent);
+        textObject.name = "GoldBonusText";
+        textObject.transform.SetSiblingIndex(
+            Mathf.Min(template.transform.GetSiblingIndex() + 1, parent.childCount - 1));
+
+        goldBonusText = textObject.GetComponent<TMP_Text>();
+        if (goldBonusText == null)
+        {
+            Destroy(textObject);
+            return;
+        }
+
+        goldBonusText.raycastTarget = false;
+
+        if (template.transform is RectTransform templateRect &&
+            goldBonusText.transform is RectTransform goldRect)
+        {
+            goldRect.anchoredPosition =
+                templateRect.anchoredPosition + goldBonusOffsetFromExperience;
+        }
+    }
+
     public void ResumeGame()
     {
         if (upgradeMenu == null) return;
@@ -172,6 +221,7 @@ public class PlayerStats : MonoBehaviour
     {
         UpdateDefenseText();
         UpdateExperienceBonusText();
+        UpdateGoldBonusText();
 
         if (statsText == null) return;
 
@@ -302,6 +352,20 @@ public class PlayerStats : MonoBehaviour
         experienceBonusText.text = bonusPercent > 0f
             ? Row("Kill XP Bonus", $"{Color($"+{bonusPercent:0.##}%", goodColor)} {Soft("per kill")}")
             : Row("Kill XP Bonus", $"{Soft("0% per kill")}");
+    }
+
+    private void UpdateGoldBonusText()
+    {
+        if (goldBonusText == null)
+            return;
+
+        float bonusPercent = equipment != null
+            ? Mathf.Max(0f, equipment.GetGoldGainBonus()) * 100f
+            : 0f;
+
+        goldBonusText.text = bonusPercent > 0f
+            ? Row("Kill Gold Bonus", $"{Color($"+{bonusPercent:0.##}%", goodColor)} {Soft("per kill")}")
+            : Row("Kill Gold Bonus", $"{Soft("0% per kill")}");
     }
 
     // ---------- Formatting helpers ----------
