@@ -2,12 +2,18 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine.SceneManagement;
+#endif
+
 [DisallowMultipleComponent]
 [RequireComponent(typeof(PlayerAttack))]
 public sealed class PlayerDamageNumberWorld : MonoBehaviour
 {
     [Header("Spawn Position")]
-    [Tooltip("Where each number starts, measured in Canvas units. X moves it left/right and Y moves it up/down relative to the player.")]
+    [Tooltip("Where normal and critical damage numbers start, measured in Canvas units. X moves them left/right and Y moves them up/down relative to the player.")]
     [SerializeField] private Vector2 localStartOffset = new Vector2(0f, 120f);
     [Tooltip("Separates consecutive damage numbers horizontally so rapid hits remain readable.")]
     [Min(0f)] [SerializeField] private float horizontalSpacing = 22f;
@@ -31,9 +37,11 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
     [SerializeField] private string damageSuffix = "!";
 
     [Header("Guard Feedback")]
+    [Tooltip("Where Guard feedback starts, measured in Canvas units relative to the player. This is separate from normal damage-number position and can be edited live in the Inspector.")]
+    [SerializeField] private Vector2 guardStartOffset = new Vector2(0f, 120f);
     [Tooltip("Color used when Guard successfully reduces incoming damage.")]
     [SerializeField] private Color guardColor = new Color(0.35f, 0.85f, 1f, 1f);
-    [Tooltip("Font size used by the two-line Guard popup.")]
+    [Tooltip("Font size used by the two-line Guard popup. New Guard popups use Inspector changes immediately during Play Mode.")]
     [Min(1f)] [SerializeField] private float guardFontSize = 27f;
     [Tooltip("Size available to the two-line Guard popup.")]
     [SerializeField] private Vector2 guardTextBoxSize = new Vector2(360f, 110f);
@@ -105,7 +113,7 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         if (damage <= 0)
             return;
 
-        DamageNumber number = AcquireNumber();
+        DamageNumber number = AcquireNumber(localStartOffset);
         number.RectTransform.sizeDelta = textBoxSize;
         number.Text.text = isCritical
             ? $"{criticalPrefix}{damage}{damageSuffix}"
@@ -120,7 +128,7 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         if (preventedDamage <= 0f || blockedPercent <= 0f)
             return;
 
-        DamageNumber number = AcquireNumber();
+        DamageNumber number = AcquireNumber(guardStartOffset);
         number.RectTransform.sizeDelta = guardTextBoxSize;
         number.Text.text =
             $"GUARD! -{FormatGuardDamage(preventedDamage)} DMG\n{blockedPercent:0.##}% blocked";
@@ -138,14 +146,14 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         return value.ToString("0.####");
     }
 
-    private DamageNumber AcquireNumber()
+    private DamageNumber AcquireNumber(Vector2 startOffset)
     {
         DamageNumber number = available.Count > 0
             ? available.Dequeue()
             : CreateDamageNumber();
 
         float horizontalOffset = ((sequence++ % 3) - 1) * horizontalSpacing;
-        number.StartPosition = localStartOffset + Vector2.right * horizontalOffset;
+        number.StartPosition = startOffset + Vector2.right * horizontalOffset;
         number.Elapsed = 0f;
         number.RectTransform.anchoredPosition = number.StartPosition;
         return number;
@@ -250,3 +258,47 @@ public sealed class PlayerDamageNumberWorld : MonoBehaviour
         initialPoolSize = Mathf.Max(1, initialPoolSize);
     }
 }
+
+#if UNITY_EDITOR
+[InitializeOnLoad]
+internal static class PlayerDamageNumberWorldEditorBootstrap
+{
+    static PlayerDamageNumberWorldEditorBootstrap()
+    {
+        EditorApplication.delayCall += EnsureComponentInOpenScenes;
+        EditorSceneManager.sceneOpened += OnSceneOpened;
+    }
+
+    private static void OnSceneOpened(Scene scene, OpenSceneMode mode)
+    {
+        EditorApplication.delayCall += EnsureComponentInOpenScenes;
+    }
+
+    private static void EnsureComponentInOpenScenes()
+    {
+        if (Application.isPlaying || EditorApplication.isPlayingOrWillChangePlaymode)
+            return;
+
+        PlayerAttack[] attacks = Resources.FindObjectsOfTypeAll<PlayerAttack>();
+        foreach (PlayerAttack attack in attacks)
+        {
+            if (attack == null)
+                continue;
+
+            GameObject playerObject = attack.gameObject;
+            if (!playerObject.scene.IsValid() || !playerObject.scene.isLoaded)
+                continue;
+
+            if ((playerObject.hideFlags & HideFlags.HideAndDontSave) != 0)
+                continue;
+
+            if (playerObject.GetComponent<PlayerDamageNumberWorld>() != null)
+                continue;
+
+            Undo.AddComponent<PlayerDamageNumberWorld>(playerObject);
+            EditorUtility.SetDirty(playerObject);
+            EditorSceneManager.MarkSceneDirty(playerObject.scene);
+        }
+    }
+}
+#endif
