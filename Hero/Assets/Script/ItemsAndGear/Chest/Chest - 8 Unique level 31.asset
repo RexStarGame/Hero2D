@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3611d678efbbef04a93edaec562a1f6f, type: 3}
+  m_Name: Chest - 8 Unique level 31
+  m_EditorClassIdentifier: 
+  itemID: 
+  itemName: Aegis of the Diamond Sovereign
+  description: "Forged from flawless high steel and adorned with radiant gold and
+    master-cut diamonds, this cuirass stands far above ordinary legendary armor.
+    Every plate shines with royal perfection, untouched by rust, weakness, or time.
+    Worn only by those destined to stand above kings and conquerors, the Aegis of
+    the Diamond Sovereign is not merely protection \u2014 it is a symbol of absolute
+    power, unbreakable will, and immortal glory."
+  rarity: 5
+  requiredLevel: 31
+  goldValue: 29500
+  icon: {fileID: -318472116359822305, guid: a7a8b29b81a6e944e8becc1725b4b6a3, type: 3}
+  worldPrefab: {fileID: 4524019756052496876, guid: bb693d5bffc0a0d4b8e5e238792219c5, type: 3}
+  equipmentSlot: 3
+  statModifiers:
+    maxHealth: 750
+    minimumDamage: 0
+    maximumDamage: 0
+    defense: 90
+    regeneration: 0.1
+    lifeSteal: 0
+    criticalChance: 0
+    attackSpeed: 0
+    movementSpeed: 0
+    experienceGain: 0
+    goldGain: 0
+    guardChance: 0.08
+    guardReduction: 0.08
+  armorRating: 0

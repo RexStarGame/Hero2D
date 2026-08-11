@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84ad063d2d0be7143b731bf233a811ac, type: 3}
+  m_Name: Necklace - level 24 Legendary
+  m_EditorClassIdentifier: 
+  itemID: '#Vkfdi34IJfklasd239iefLKjNCED3324hJPqC3'
+  itemName: Oath of the Azure Crown
+  description: Forged from polished silver and radiant gold, this legendary necklace
+    carries deep-blue inlays said to represent wisdom, loyalty, and unwavering resolve.
+    Its intricate craftsmanship marks it as a treasure worthy of renowned warriors
+    and noble wanderers alike. Those who wear the Oath of the Azure Crown are believed
+    to carry the strength to endure hardship without abandoning their path.
+  rarity: 4
+  requiredLevel: 24
+  goldValue: 6800
+  icon: {fileID: -8355066944998490013, guid: e40531503caac4c4ca30bb36a04e9fd9, type: 3}
+  worldPrefab: {fileID: 8696787061934807561, guid: d98e729b19369354d87a89f41df40266, type: 3}
+  equipmentSlot: 6
+  statModifiers:
+    maxHealth: 210
+    minimumDamage: 42
+    maximumDamage: 50
+    defense: 0
+    regeneration: 0
+    lifeSteal: 0
+    criticalChance: 0.07
+    attackSpeed: 0
+    movementSpeed: 0.05
+    experienceGain: 0.25
+    goldGain: 0.13
+    guardChance: 0
+    guardReduction: 0

@@ -29,7 +29,10 @@ MonoBehaviour:
     defense: 0
     regeneration: 0
     lifeSteal: 0
-    criticalChance: 0.07
+    criticalChance: 0.03
     attackSpeed: 0
     movementSpeed: 0.05
     experienceGain: 0.12
+    goldGain: 0
+    guardChance: 0
+    guardReduction: 0
