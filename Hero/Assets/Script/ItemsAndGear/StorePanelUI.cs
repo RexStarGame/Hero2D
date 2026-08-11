@@ -251,6 +251,7 @@ public class StorePanelUI : MonoBehaviour
             AppendStat("Attack Speed", stats.AttackSpeed * 100f, "%");
             AppendStat("Movement Speed", stats.MovementSpeed * 100f, "%");
             AppendStat("Kill XP", stats.ExperienceGain * 100f, "%");
+            AppendStat("Kill Gold", stats.GoldGain * 100f, "%");
         }
 
         if (item is WeaponDefinition weapon)
