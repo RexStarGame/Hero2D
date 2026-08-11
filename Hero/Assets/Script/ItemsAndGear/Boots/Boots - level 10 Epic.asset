@@ -28,11 +28,14 @@ MonoBehaviour:
     maxHealth: 54
     minimumDamage: 0
     maximumDamage: 0
-    defense: 21.9
+    defense: 22
     regeneration: 0
     lifeSteal: 0
     criticalChance: 0
     attackSpeed: 0
     movementSpeed: 0.24
     experienceGain: 0
+    goldGain: 0
+    guardChance: 0.03
+    guardReduction: 0.07
   armorRating: 0

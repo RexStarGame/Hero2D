@@ -32,4 +32,8 @@ MonoBehaviour:
     criticalChance: 0
     attackSpeed: 0
     movementSpeed: 0
+    experienceGain: 0
+    goldGain: 0
+    guardChance: 0
+    guardReduction: 0
   armorRating: 2
