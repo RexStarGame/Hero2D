@@ -8,6 +8,7 @@ public class PlayerInventory : MonoBehaviour
     [SerializeField] private List<ItemDefinition> items = new List<ItemDefinition>();
     [SerializeField] private PlayerEquipment equipment;
     [SerializeField] private PlayerXP playerXP;
+    [SerializeField] private InventorySaveSystem inventorySaveSystem;
 
     [Header("World Drop")]
     [SerializeField] private Vector2 dropOffset = new Vector2(0f, -1f);
@@ -24,6 +25,9 @@ public class PlayerInventory : MonoBehaviour
 
         if (playerXP == null)
             playerXP = GetComponent<PlayerXP>();
+
+        if (inventorySaveSystem == null)
+            inventorySaveSystem = GetComponent<InventorySaveSystem>();
     }
 
     public ItemDefinition GetItem(int index)
@@ -68,6 +72,7 @@ public class PlayerInventory : MonoBehaviour
             items.Add(replaced);
 
         InventoryChanged?.Invoke();
+        SaveEquipmentState();
         return true;
     }
 
@@ -102,6 +107,7 @@ public class PlayerInventory : MonoBehaviour
 
         items.Add(item);
         InventoryChanged?.Invoke();
+        SaveEquipmentState();
         return true;
     }
 
@@ -131,7 +137,13 @@ public class PlayerInventory : MonoBehaviour
             return false;
 
         SpawnWorldItem(removed);
+        SaveEquipmentState();
         return true;
+    }
+
+    public void SaveEquipmentState()
+    {
+        inventorySaveSystem?.Save();
     }
 
     private static bool CanSpawnWorldItem(ItemDefinition item)
