@@ -154,6 +154,7 @@ public static class StoreSceneSetupEditor
         SetObject(store, "inventory", inventory);
         SetObject(store, "wallet", wallet);
         SetObject(store, "playerXP", playerXP);
+        SetObject(store, "inventorySaveSystem", saveSystem);
         SetObject(store, "panelGroup", group);
         SetObject(store, "gridRoot", gridRoot);
         SetObject(store, "slotTemplate", template);
