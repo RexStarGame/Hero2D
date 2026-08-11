@@ -101,6 +101,7 @@ public class ItemTooltipUI : MonoBehaviour
         Line("Attack Speed", s.AttackSpeed * 100f, "%");
         Line("Movement Speed", s.MovementSpeed * 100f, "%");
         Line("Kill XP", s.ExperienceGain * 100f, "%");
+        Line("Kill Gold", s.GoldGain * 100f, "%");
     }
 
     private void Line(string label, float value, string suffix = "")
@@ -126,6 +127,7 @@ public class ItemTooltipUI : MonoBehaviour
         Compare("Attack Speed", (next.AttackSpeed - old.AttackSpeed) * 100f, "%");
         Compare("Movement Speed", (next.MovementSpeed - old.MovementSpeed) * 100f, "%");
         Compare("Kill XP", (next.ExperienceGain - old.ExperienceGain) * 100f, "%");
+        Compare("Kill Gold", (next.GoldGain - old.GoldGain) * 100f, "%");
 
         float nextMinBase = nextItem is WeaponDefinition nextWeapon ? nextWeapon.MinimumBaseDamage : 0f;
         float nextMaxBase = nextItem is WeaponDefinition nextWeaponMax ? nextWeaponMax.MaximumBaseDamage : 0f;
