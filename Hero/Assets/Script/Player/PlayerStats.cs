@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using TMPro;
 using System.Text;
 
@@ -9,6 +9,10 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private TMP_Text defenseText;
     [Tooltip("Separate, low-noise text field for XP gained from equipped gear.")]
     [SerializeField] private TMP_Text experienceBonusText;
+
+    [Header("Kill XP Text Layout")]
+    [Tooltip("Position of the generated Kill XP row relative to DefenseText when no ExperienceBonusText is assigned.")]
+    [SerializeField] private Vector2 experienceBonusOffsetFromDefense = new Vector2(0f, -34f);
 
     [Header("References (auto-find if null)")]
     [SerializeField] private PlayerXP playerXP;
@@ -38,6 +42,7 @@ public class PlayerStats : MonoBehaviour
     private void Awake()
     {
         AutoFind();
+        EnsureExperienceBonusText();
         ForceUpdate();
         if (upgradeMenu != null)
         {
@@ -50,6 +55,7 @@ public class PlayerStats : MonoBehaviour
     private void OnEnable()
     {
         AutoFind();
+        EnsureExperienceBonusText();
         ForceUpdate();
     }
 
@@ -115,6 +121,38 @@ public class PlayerStats : MonoBehaviour
             if (go != null) experienceBonusText = go.GetComponent<TMP_Text>();
         }
     }
+
+    private void EnsureExperienceBonusText()
+    {
+        if (experienceBonusText != null || defenseText == null)
+            return;
+
+        Transform parent = defenseText.transform.parent;
+        if (parent == null)
+            return;
+
+        GameObject textObject = Instantiate(defenseText.gameObject, parent);
+        textObject.name = "ExperienceBonusText";
+        textObject.transform.SetSiblingIndex(
+            Mathf.Min(defenseText.transform.GetSiblingIndex() + 1, parent.childCount - 1));
+
+        experienceBonusText = textObject.GetComponent<TMP_Text>();
+        if (experienceBonusText == null)
+        {
+            Destroy(textObject);
+            return;
+        }
+
+        experienceBonusText.raycastTarget = false;
+
+        if (defenseText.transform is RectTransform defenseRect &&
+            experienceBonusText.transform is RectTransform experienceRect)
+        {
+            experienceRect.anchoredPosition =
+                defenseRect.anchoredPosition + experienceBonusOffsetFromDefense;
+        }
+    }
+
     public void ResumeGame()
     {
         if (upgradeMenu == null) return;
