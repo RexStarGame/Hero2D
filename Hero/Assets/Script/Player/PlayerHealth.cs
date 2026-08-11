@@ -43,6 +43,7 @@ public class PlayerHealth : MonoBehaviour
     public int maxHealthUpgradeMaxLevel = 10;
 
     private DashDoge dashDoge;
+    private PlayerDamageNumberWorld guardFeedbackWorld;
     private float levelZeroMaxHealth;
 
     void Start()
@@ -51,6 +52,7 @@ public class PlayerHealth : MonoBehaviour
         if (equipment == null) equipment = GetComponent<PlayerEquipment>();
         if (equipment != null) equipment.EquipmentChanged += OnEquipmentChanged;
         dashDoge = GetComponent<DashDoge>();
+        guardFeedbackWorld = GetComponent<PlayerDamageNumberWorld>();
         PlayerProgressSave.RestoreHealthUpgrades(this);
 
         // Start fuld HP
@@ -149,7 +151,12 @@ public class PlayerHealth : MonoBehaviour
         float guardChance = GuardChance;
         float guardReduction = GuardReduction;
         if (guardChance > 0f && guardReduction > 0f && Random.value < guardChance)
+        {
+            float damageBeforeGuard = damage;
             damage *= 1f - guardReduction;
+            float preventedDamage = Mathf.Max(0f, damageBeforeGuard - damage);
+            ShowGuardFeedback(preventedDamage, guardReduction * 100f);
+        }
 
         health = Mathf.Clamp(health - damage, 0f, MaxHealth);
 
@@ -157,6 +164,18 @@ public class PlayerHealth : MonoBehaviour
 
         if (health <= 0f)
             Die();
+    }
+
+    private void ShowGuardFeedback(float preventedDamage, float blockedPercent)
+    {
+        if (preventedDamage <= 0f || blockedPercent <= 0f)
+            return;
+
+        if (guardFeedbackWorld == null)
+            guardFeedbackWorld = GetComponent<PlayerDamageNumberWorld>();
+
+        if (guardFeedbackWorld != null)
+            guardFeedbackWorld.ShowGuard(preventedDamage, blockedPercent);
     }
 
     // ✅ ADD THIS: used by Life Steal / healing items / etc.
