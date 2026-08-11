@@ -35,6 +35,7 @@ MonoBehaviour:
     attackSpeed: 0.3
     movementSpeed: -0.15
     experienceGain: 0.05
+    goldGain: 0.08
   weaponType: 0
   minimumBaseDamage: 0
   maximumBaseDamage: 0
