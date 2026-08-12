@@ -18,6 +18,8 @@ If your artwork is still only Sprite assets, select the sprites or sliced sprite
 - Use ordinary Tile assets for weighted natural variation.
 - Use Rule Tile assets when a terrain needs automatic edges and corners.
 - Configure decoration chance and weighted decoration tiles for rocks, flowers, cacti, and similar details.
+- Set Minimum Decoration Scale and Maximum Decoration Scale on each terrain to give scattered decorations a fixed or randomized size. For example, `1.5` and `2` creates decorations between 150% and 200% of their normal size. Existing profiles remain at `1` and `1` until changed.
+- Scale is applied when a decoration is painted. Repaint existing decoration cells if you want them to receive the new range.
 - Enable collision on terrain types that should paint into the hidden collision Tilemap.
 - Hold Shift while painting to erase temporarily.
 - Every brush stroke, rectangle, fill, import, and layer-creation action supports Undo.
