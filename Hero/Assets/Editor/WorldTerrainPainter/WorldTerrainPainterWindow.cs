@@ -392,7 +392,7 @@ public sealed class WorldTerrainPainterWindow : EditorWindow
         if (erase)
         {
             target.SetTile(cell, null);
-            if (targets.decorations != null) targets.decorations.SetTile(cell, null);
+            ClearDecoration(cell);
             if (targets.collision != null) targets.collision.SetTile(cell, null);
             return;
         }
@@ -404,13 +404,41 @@ public sealed class WorldTerrainPainterWindow : EditorWindow
 
         if (scatterDecorations && targets.decorations != null && terrain.decorationChance > 0f)
         {
-            targets.decorations.SetTile(cell, null);
+            ClearDecoration(cell);
             if (random.NextDouble() <= terrain.decorationChance)
-                targets.decorations.SetTile(cell, terrain.PickDecorationTile(random));
+            {
+                TileBase decoration = terrain.PickDecorationTile(random);
+                if (decoration != null)
+                    SetDecoration(cell, decoration, terrain.PickDecorationScale(random));
+            }
         }
 
         if (paintCollision && targets.collision != null && terrain.paintCollision)
             targets.collision.SetTile(cell, terrain.collisionTile != null ? terrain.collisionTile : tile);
+    }
+
+    private void SetDecoration(Vector3Int cell, TileBase decoration, float uniformScale)
+    {
+        Tilemap decorationMap = targets.decorations;
+        if (decorationMap == null) return;
+
+        decorationMap.SetTile(cell, decoration);
+        decorationMap.RemoveTileFlags(cell, TileFlags.LockTransform);
+        decorationMap.SetTransformMatrix(
+            cell,
+            Matrix4x4.TRS(
+                Vector3.zero,
+                Quaternion.identity,
+                new Vector3(uniformScale, uniformScale, 1f)));
+    }
+
+    private void ClearDecoration(Vector3Int cell)
+    {
+        Tilemap decorationMap = targets.decorations;
+        if (decorationMap == null) return;
+
+        decorationMap.SetTile(cell, null);
+        decorationMap.SetTransformMatrix(cell, Matrix4x4.identity);
     }
 
     private void DrawPreview(Tilemap target, WorldTerrainType terrain, bool temporaryErase)
@@ -633,7 +661,7 @@ public sealed class WorldTerrainPainterWindow : EditorWindow
             if (clearMatchedCellsBeforeImport)
             {
                 target.SetTile(cell, null);
-                if (targets.decorations != null) targets.decorations.SetTile(cell, null);
+                ClearDecoration(cell);
                 if (targets.collision != null) targets.collision.SetTile(cell, null);
             }
 

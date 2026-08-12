@@ -33,6 +33,15 @@ public sealed class WorldTerrainType
     [Range(0f, 1f)] public float decorationChance;
     public List<WorldTerrainWeightedTile> decorationTiles = new List<WorldTerrainWeightedTile>();
 
+    [Header("Decoration Scale")]
+    [Min(0.01f)]
+    [Tooltip("Smallest uniform scale used for randomly scattered decorations. Use 1 for the sprite's normal size.")]
+    public float minimumDecorationScale = 1f;
+
+    [Min(0.01f)]
+    [Tooltip("Largest uniform scale used for randomly scattered decorations. Set this equal to Minimum Decoration Scale for a fixed size.")]
+    public float maximumDecorationScale = 1f;
+
     [Header("Optional Collision")]
     public bool paintCollision;
     public TileBase collisionTile;
@@ -45,6 +54,15 @@ public sealed class WorldTerrainType
     public TileBase PickDecorationTile(System.Random random)
     {
         return PickWeighted(decorationTiles, random);
+    }
+
+    public float PickDecorationScale(System.Random random)
+    {
+        float minimum = minimumDecorationScale > 0f ? minimumDecorationScale : 1f;
+        float maximum = maximumDecorationScale > 0f ? maximumDecorationScale : 1f;
+        minimum = Mathf.Max(0.01f, minimum);
+        maximum = Mathf.Max(minimum, maximum);
+        return Mathf.Lerp(minimum, maximum, (float)random.NextDouble());
     }
 
     private static TileBase PickWeighted(List<WorldTerrainWeightedTile> entries, System.Random random)
@@ -122,6 +140,25 @@ public sealed class WorldTerrainPainterProfile : ScriptableObject
     {
         cellSize.x = Mathf.Max(0.001f, cellSize.x);
         cellSize.y = Mathf.Max(0.001f, cellSize.y);
+
+        if (terrains == null) return;
+
+        for (int i = 0; i < terrains.Count; i++)
+        {
+            WorldTerrainType terrain = terrains[i];
+            if (terrain == null) continue;
+
+            if (terrain.minimumDecorationScale <= 0f)
+                terrain.minimumDecorationScale = 1f;
+
+            if (terrain.maximumDecorationScale <= 0f)
+                terrain.maximumDecorationScale = 1f;
+
+            terrain.minimumDecorationScale = Mathf.Max(0.01f, terrain.minimumDecorationScale);
+            terrain.maximumDecorationScale = Mathf.Max(
+                terrain.minimumDecorationScale,
+                terrain.maximumDecorationScale);
+        }
     }
 }
 #endif
