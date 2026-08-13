@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3611d678efbbef04a93edaec562a1f6f, type: 3}
+  m_Name: Chest - 6 Legendary
+  m_EditorClassIdentifier: 
+  itemID: '#gkfvkcv342KCFmxw2982UJfnckaP0'
+  itemName: "Musashi\u2019s Waysteel Cuirass"
+  description: "Forged in honor of the legendary r\u014Dnin Miyamoto Musashi, this
+    iron-and-steel cuirass bears golden symbols of courage, wisdom, loyalty, and
+    discipline. Crimson bindings represent the blood and sacrifice of the warrior\u2019s
+    path, while subtle green details symbolize endurance and renewal. Though not
+    a relic of Musashi himself, the armor was crafted to honor the principles associated
+    with his legendary life \u2014 strength guided by wisdom, and victory achieved
+    through mastery of oneself."
+  rarity: 4
+  requiredLevel: 21
+  goldValue: 11500
+  icon: {fileID: 960725774344393375, guid: a49557fedb370fe46836a842912850a2, type: 3}
+  worldPrefab: {fileID: 360492341534607072, guid: 86ebd244b519d5e418688f6feb89bd29, type: 3}
+  equipmentSlot: 3
+  statModifiers:
+    maxHealth: 300
+    minimumDamage: 0
+    maximumDamage: 0
+    defense: 57
+    regeneration: 0
+    lifeSteal: 0
+    criticalChance: 0
+    attackSpeed: 0
+    movementSpeed: 0.035
+    experienceGain: 0
+    goldGain: 0
+    guardChance: 0.055
+    guardReduction: 0.03
+  armorRating: 0

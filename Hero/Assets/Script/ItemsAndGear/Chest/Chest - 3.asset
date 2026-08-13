@@ -18,19 +18,22 @@ MonoBehaviour:
     fur lining has carried many wandering warriors through bitter battles.
   rarity: 2
   requiredLevel: 21
-  goldValue: 3121
+  goldValue: 4567
   icon: {fileID: -8040763124686223759, guid: cdd007ddf7155cc4789d417e55189289, type: 3}
   worldPrefab: {fileID: 5062342003631343955, guid: 8343e1d44689c3d4abe8279afc2f6942, type: 3}
   equipmentSlot: 3
   statModifiers:
-    maxHealth: 50
+    maxHealth: 88
     minimumDamage: 0
     maximumDamage: 0
-    defense: 24
+    defense: 35
     regeneration: 0
     lifeSteal: 0
     criticalChance: 0
     attackSpeed: 0
     movementSpeed: 0.06
     experienceGain: 0
+    goldGain: 0
+    guardChance: 0
+    guardReduction: 0.01
   armorRating: 0

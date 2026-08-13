@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3611d678efbbef04a93edaec562a1f6f, type: 3}
+  m_Name: Chest - 7 level 21 Uncommen
+  m_EditorClassIdentifier: 
+  itemID: '#Vge563KI9432LK23344P0324CV342g4532f'
+  itemName: Oldwood Iron Cuirass
+  description: An uncommon chestplate forged from weathered iron and reinforced with
+    aged wood. Ancient symbols carved across its plates are believed to bring endurance
+    and protection to wandering warriors. Rust and countless battle marks cover its
+    surface, yet the armor remains surprisingly sturdy.
+  rarity: 1
+  requiredLevel: 21
+  goldValue: 2235
+  icon: {fileID: -2249413349142247850, guid: d577d2acab50bcc4f88cdf4d7f9967e7, type: 3}
+  worldPrefab: {fileID: 8544576381118778902, guid: 30d0acdd461a0024ba50bc110d9c0b2a, type: 3}
+  equipmentSlot: 0
+  statModifiers:
+    maxHealth: 56
+    minimumDamage: 0
+    maximumDamage: 0
+    defense: 22
+    regeneration: 0
+    lifeSteal: 0
+    criticalChance: 0
+    attackSpeed: 0
+    movementSpeed: 0.08
+    experienceGain: 0
+    goldGain: 0
+    guardChance: 0
+    guardReduction: 0
+  armorRating: 0
