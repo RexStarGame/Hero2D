@@ -25,7 +25,7 @@ MonoBehaviour:
   statModifiers:
     maxHealth: 0
     minimumDamage: 47.3
-    maximumDamage: 50.6
+    maximumDamage: 51.8
     defense: 0
     regeneration: 0
     lifeSteal: 0.08
