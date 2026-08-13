@@ -11773,7 +11773,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startingGold: 0
-  equipment: {fileID: 0}
+  equipment: {fileID: 239307054}
 --- !u!1 &247908283
 GameObject:
   m_ObjectHideFlags: 0
@@ -85985,6 +85985,9 @@ MonoBehaviour:
   criticalFontSize: 12
   criticalPrefix: 'CRIT '
   damageSuffix: '!'
+  guardColor: {r: 0.35, g: 0.85, b: 1, a: 1}
+  guardFontSize: 27
+  guardTextBoxSize: {x: 360, y: 110}
   worldScale: 0.01
   canvasSize: {x: 400, y: 300}
   textBoxSize: {x: 280, y: 70}
