@@ -6063,7 +6063,8 @@ Transform:
   m_LocalPosition: {x: -15.41, y: -13.95, z: -0.0042097303}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 2099999998}
   m_Father: {fileID: 405888503}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &138475164
@@ -6080,33 +6081,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   regionProfile: {fileID: 11400000, guid: b193aa4735e68d04c8a733ab2933e80e, type: 2}
   director: {fileID: 781469748}
-  dynamicEnemiesRoot: {fileID: 0}
+  dynamicEnemiesRoot: {fileID: 2099999998}
   localObserverCamera: {fileID: 519420031}
   enemies:
   - displayName: Level 1
     enemyPrefab: {fileID: 8233854846743954295, guid: cc1175b0a56f8204d9a362b86c83c482, type: 3}
     spawnArea: {fileID: 138475165}
     desiredPopulation: 1
-    initialSpawnDelay: 0
-    minimumRespawnTime: 0.05
-    maximumRespawnTime: 0.05
-    failedPointRetryTime: 0.05
-    minimumDistanceFromPlayers: 0
-    maximumDistanceFromPlayers: 2.68
-    requireOffscreen: 0
-    offscreenPadding: 0
-    requireAllowedGround: 1
+    initialSpawnDelay: 0.5
+    minimumRespawnTime: 8
+    maximumRespawnTime: 14
+    failedPointRetryTime: 1.5
+    minimumDistanceFromPlayers: 7
+    maximumDistanceFromPlayers: 28
+    requireOffscreen: 1
+    offscreenPadding: 1.25
+    requireAllowedGround: 0
     allowedGroundLayers:
       serializedVersion: 2
-      m_Bits: 9
+      m_Bits: 0
     allowTriggerGround: 1
     blockedEnvironmentLayers:
       serializedVersion: 2
       m_Bits: 128
     blockedTags: []
-    enemyClearanceRadius: 0
-    blockedTriggersCount: 1
-    spawnPointSearchAttempts: 1
+    enemyClearanceRadius: 0.5
+    blockedTriggersCount: 0
+    spawnPointSearchAttempts: 32
   evaluationInterval: 0.25
   drawSpawnAreas: 1
   logConfigurationProblems: 1
@@ -6140,7 +6141,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -10119,6 +10120,7 @@ GameObject:
   - component: {fileID: 239307053}
   - component: {fileID: 239307052}
   - component: {fileID: 239307055}
+  - component: {fileID: 2100000000}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -77485,6 +77487,51 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f8264a80d0327014781588a08a6a0b32, type: 3}
+--- !u!114 &2100000000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 239307039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6534396e58c446c88ad4049e0a59b7cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  affectsPresentation: 1
+  affectsSimulation: 1
+--- !u!1 &2099999999
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2099999998}
+  m_Layer: 0
+  m_Name: DynamicEnemies
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2099999998
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2099999999}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 138475163}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
