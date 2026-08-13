@@ -11,6 +11,8 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private TMP_Text experienceBonusText;
     [Tooltip("Separate text field for extra gold gained from kills through equipped gear.")]
     [SerializeField] private TMP_Text goldBonusText;
+    [Tooltip("Separate text field containing both Guard Chance and Guard Reduction.")]
+    [SerializeField] private TMP_Text guardStatsText;
 
     [Header("Kill XP Text Layout")]
     [Tooltip("Position of the generated Kill XP row relative to DefenseText when no ExperienceBonusText is assigned.")]
@@ -19,6 +21,10 @@ public class PlayerStats : MonoBehaviour
     [Header("Kill Gold Text Layout")]
     [Tooltip("Position of the generated Kill Gold row relative to ExperienceBonusText when no GoldBonusText is assigned.")]
     [SerializeField] private Vector2 goldBonusOffsetFromExperience = new Vector2(0f, -34f);
+
+    [Header("Guard Text Layout")]
+    [Tooltip("Position of the generated two-line Guard block relative to GoldBonusText when no GuardStatsText is assigned.")]
+    [SerializeField] private Vector2 guardStatsOffsetFromGold = new Vector2(0f, -48f);
 
     [Header("References (auto-find if null)")]
     [SerializeField] private PlayerXP playerXP;
@@ -50,6 +56,7 @@ public class PlayerStats : MonoBehaviour
         AutoFind();
         EnsureExperienceBonusText();
         EnsureGoldBonusText();
+        EnsureGuardStatsText();
         ForceUpdate();
         if (upgradeMenu != null)
         {
@@ -64,6 +71,7 @@ public class PlayerStats : MonoBehaviour
         AutoFind();
         EnsureExperienceBonusText();
         EnsureGoldBonusText();
+        EnsureGuardStatsText();
         ForceUpdate();
     }
 
@@ -134,6 +142,12 @@ public class PlayerStats : MonoBehaviour
             GameObject go = GameObject.Find("GoldBonusText");
             if (go != null) goldBonusText = go.GetComponent<TMP_Text>();
         }
+
+        if (guardStatsText == null)
+        {
+            GameObject go = GameObject.Find("GuardStatsText");
+            if (go != null) guardStatsText = go.GetComponent<TMP_Text>();
+        }
     }
 
     private void EnsureExperienceBonusText()
@@ -202,6 +216,47 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
+    private void EnsureGuardStatsText()
+    {
+        if (guardStatsText != null)
+            return;
+
+        TMP_Text template = goldBonusText != null
+            ? goldBonusText
+            : (experienceBonusText != null ? experienceBonusText : defenseText);
+        if (template == null)
+            return;
+
+        Transform parent = template.transform.parent;
+        if (parent == null)
+            return;
+
+        GameObject textObject = Instantiate(template.gameObject, parent);
+        textObject.name = "GuardStatsText";
+        textObject.transform.SetSiblingIndex(
+            Mathf.Min(template.transform.GetSiblingIndex() + 1, parent.childCount - 1));
+
+        guardStatsText = textObject.GetComponent<TMP_Text>();
+        if (guardStatsText == null)
+        {
+            Destroy(textObject);
+            return;
+        }
+
+        guardStatsText.raycastTarget = false;
+        guardStatsText.overflowMode = TextOverflowModes.Overflow;
+
+        if (template.transform is RectTransform templateRect &&
+            guardStatsText.transform is RectTransform guardRect)
+        {
+            guardRect.anchoredPosition =
+                templateRect.anchoredPosition + guardStatsOffsetFromGold;
+            guardRect.sizeDelta = new Vector2(
+                guardRect.sizeDelta.x,
+                Mathf.Max(guardRect.sizeDelta.y, templateRect.sizeDelta.y * 2f + 6f));
+        }
+    }
+
     public void ResumeGame()
     {
         if (upgradeMenu == null) return;
@@ -222,6 +277,7 @@ public class PlayerStats : MonoBehaviour
         UpdateDefenseText();
         UpdateExperienceBonusText();
         UpdateGoldBonusText();
+        UpdateGuardStatsText();
 
         if (statsText == null) return;
 
@@ -366,6 +422,34 @@ public class PlayerStats : MonoBehaviour
         goldBonusText.text = bonusPercent > 0f
             ? Row("Kill Gold Bonus", $"{Color($"+{bonusPercent:0.##}%", goodColor)} {Soft("per kill")}")
             : Row("Kill Gold Bonus", $"{Soft("0% per kill")}");
+    }
+
+    private void UpdateGuardStatsText()
+    {
+        if (guardStatsText == null)
+            return;
+
+        if (playerHealth == null)
+        {
+            guardStatsText.text =
+                Row("Guard Chance", Soft("N/A")) + "\n" +
+                Row("Guard Reduction", Soft("N/A"));
+            return;
+        }
+
+        float chancePercent = playerHealth.GuardChance * 100f;
+        float reductionPercent = playerHealth.GuardReduction * 100f;
+
+        string chanceValue = chancePercent > 0f
+            ? Color($"+{chancePercent:0.##}%", goodColor)
+            : Soft("0%");
+        string reductionValue = reductionPercent > 0f
+            ? Color($"+{reductionPercent:0.##}%", goodColor)
+            : Soft("0%");
+
+        guardStatsText.text =
+            Row("Guard Chance", chanceValue) + "\n" +
+            Row("Guard Reduction", reductionValue);
     }
 
     // ---------- Formatting helpers ----------

@@ -9,12 +9,22 @@ public class PlayerHealth : MonoBehaviour
     public float health;
     [SerializeField] private PlayerEquipment equipment;
 
+    [Header("Guard")]
+    [Tooltip("Base Guard trigger chance. Decimal: 0.05 means 5%.")]
+    [Range(0f, 1f)] [SerializeField] private float baseGuardChance = 0f;
+    [Tooltip("Base damage reduction when Guard triggers. Decimal: 0.005 means 0.5%.")]
+    [Range(0f, 1f)] [SerializeField] private float baseGuardReduction = 0.005f;
+
     public float BaseAndAbilityMaxHealth => maxHealth;
     public float EquipmentHealthBonus => equipment == null ? 0f : equipment.GetHealthBonus();
     public float MaxHealth => Mathf.Max(1f, BaseAndAbilityMaxHealth + EquipmentHealthBonus);
     public float EquipmentRegenBonus => equipment == null ? 0f : equipment.GetRegenerationBonus();
     public float RegenPerSecond => Mathf.Max(0f, baseRegen + regenLevel * regenPerLevel + EquipmentRegenBonus);
     public float Defense => equipment == null ? 0f : Mathf.Max(0f, equipment.GetDefenseBonus());
+    public float EquipmentGuardChance => equipment == null ? 0f : Mathf.Max(0f, equipment.GetGuardChanceBonus());
+    public float EquipmentGuardReduction => equipment == null ? 0f : Mathf.Max(0f, equipment.GetGuardReductionBonus());
+    public float GuardChance => Mathf.Clamp01(baseGuardChance + EquipmentGuardChance);
+    public float GuardReduction => Mathf.Clamp01(baseGuardReduction + EquipmentGuardReduction);
 
     [Header("UI")]
     public Slider healthSlider;
@@ -133,6 +143,14 @@ public class PlayerHealth : MonoBehaviour
         damage *= 1f - reduction;
         DifficultyDebugTelemetry.RecordDamageAfterDefense(
             incomingDifficultyDamage, damage);
+
+        // Guard is a separate equipment-driven defensive layer after normal Defense.
+        // One roll is made for each actual TakeDamage call.
+        float guardChance = GuardChance;
+        float guardReduction = GuardReduction;
+        if (guardChance > 0f && guardReduction > 0f && Random.value < guardChance)
+            damage *= 1f - guardReduction;
+
         health = Mathf.Clamp(health - damage, 0f, MaxHealth);
 
         UpdateHealthUI(false);
@@ -182,6 +200,12 @@ public class PlayerHealth : MonoBehaviour
     {
         health = Mathf.Min(health, MaxHealth);
         UpdateHealthUI(true);
+    }
+
+    private void OnValidate()
+    {
+        baseGuardChance = Mathf.Clamp01(baseGuardChance);
+        baseGuardReduction = Mathf.Clamp01(baseGuardReduction);
     }
 
     private void OnDestroy()
