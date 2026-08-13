@@ -17,15 +17,21 @@ MonoBehaviour:
   terrains:
   - displayName: 
     mapColor: {r: 0.26364803, g: 1, b: 0, a: 0}
-    targetLayer: 0
+    targetLayer: 3
     paintTiles:
-    - tile: {fileID: 11400000, guid: f732f7f91d0fa554dbeb66e120a43a98, type: 2}
-      weight: 0
-    decorationChance: 0.001
+    - tile: {fileID: 11400000, guid: 10d4f8eda07c0df41ae921eef32ca37e, type: 2}
+      weight: 0.18
+    decorationChance: 1
     decorationTiles:
-    - tile: {fileID: 11400000, guid: 71745016e5494bb41a14fbede6384669, type: 2}
+    - tile: {fileID: 11400000, guid: 89515a64151acd1439dd4fe4eccfdfe1, type: 2}
       weight: 1.22
-    - tile: {fileID: 11400000, guid: 4d344ff75424b8b41b1346eee5c1a652, type: 2}
+    - tile: {fileID: 11400000, guid: fa2d99b1882a7d94cbf60975539496ae, type: 2}
       weight: 1.09
-    paintCollision: 0
-    collisionTile: {fileID: 0}
+    - tile: {fileID: 11400000, guid: 725a05b58a958354fadf7c625633b4b4, type: 2}
+      weight: 1.09
+    - tile: {fileID: 11400000, guid: dfeeb7c8136b2304581db56f3bdcfc45, type: 2}
+      weight: 1.09
+    minimumDecorationScale: 7
+    maximumDecorationScale: 7
+    paintCollision: 1
+    collisionTile: {fileID: 11400000, guid: d0783529c88330c4aa6f171efe8117f5, type: 2}

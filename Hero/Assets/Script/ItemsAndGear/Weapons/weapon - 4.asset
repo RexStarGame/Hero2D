@@ -28,8 +28,8 @@ MonoBehaviour:
     maximumDamage: 51.8
     defense: 0
     regeneration: 0
-    lifeSteal: 0.03
-    criticalChance: 0.04
+    lifeSteal: 0.08
+    criticalChance: 0.09
     attackSpeed: 0.12
     movementSpeed: -0.02
     experienceGain: 0
