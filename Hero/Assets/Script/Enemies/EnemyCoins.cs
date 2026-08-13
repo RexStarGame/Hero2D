@@ -62,15 +62,16 @@ public class EnemyCoins : MonoBehaviour
     }
 
     // A future authoritative multiplayer layer can call this with the owning
-    // player's wallet and a server-approved reward. Presentation stays local.
+    // player's wallet and a server-approved base reward. The recipient wallet
+    // applies that player's equipped kill-gold bonus locally.
     public void AwardApprovedCoins(PlayerWallet recipient, int approvedReward)
     {
         if (rewarded || recipient == null || approvedReward <= 0)
             return;
 
         rewarded = true;
-        recipient.AddGold(approvedReward);
-        Debug.Log($"{gameObject.name} rewarded {approvedReward} coins.");
+        int awardedGold = recipient.AddKillGold(approvedReward);
+        Debug.Log($"{gameObject.name} rewarded {awardedGold} coins.");
     }
 
     private void FindDeathSource()

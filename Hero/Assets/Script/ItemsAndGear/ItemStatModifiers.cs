@@ -17,6 +17,8 @@ public class ItemStatModifiers : ISerializationCallbackReceiver
     [Tooltip("Decimal: 0.10 means +10%.")] [SerializeField] private float movementSpeed;
     [Tooltip("Decimal: 0.10 means +10% XP from kills while this item is equipped.")]
     [Min(0f)] [SerializeField] private float experienceGain;
+    [Tooltip("Decimal: 0.10 means +10% gold from kills while this item is equipped.")]
+    [Min(0f)] [SerializeField] private float goldGain;
 
     public float MaxHealth => maxHealth;
     public float MinimumDamage => minimumDamage;
@@ -29,6 +31,7 @@ public class ItemStatModifiers : ISerializationCallbackReceiver
     public float AttackSpeed => attackSpeed;
     public float MovementSpeed => movementSpeed;
     public float ExperienceGain => experienceGain;
+    public float GoldGain => goldGain;
 
     public static ItemStatModifiers operator +(ItemStatModifiers a, ItemStatModifiers b)
     {
@@ -43,7 +46,8 @@ public class ItemStatModifiers : ISerializationCallbackReceiver
             criticalChance = a.criticalChance + b.criticalChance,
             attackSpeed = a.attackSpeed + b.attackSpeed,
             movementSpeed = a.movementSpeed + b.movementSpeed,
-            experienceGain = a.experienceGain + b.experienceGain
+            experienceGain = a.experienceGain + b.experienceGain,
+            goldGain = a.goldGain + b.goldGain
         };
     }
 
