@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class PlayerXP : MonoBehaviour
@@ -18,6 +19,8 @@ public class PlayerXP : MonoBehaviour
 
     private float fractionalKillXp;
 
+    public event Action ProgressChanged;
+
     public float EquipmentKillXpBonus
     {
         get
@@ -34,8 +37,8 @@ public class PlayerXP : MonoBehaviour
         int inspectorLevel = Mathf.Max(1, level);
         int inspectorAbilityPoints = Mathf.Max(0, abilityPoints);
         PlayerProgressSave.RestorePlayer(this, inspectorLevel, inspectorAbilityPoints);
+        NotifyProgressChanged();
     }
-
 
     public void AddXP(int amount)
     {
@@ -46,6 +49,7 @@ public class PlayerXP : MonoBehaviour
 
         ProcessLevelUps();
         SaveProgress();
+        NotifyProgressChanged();
     }
 
     /// <summary>
@@ -65,6 +69,7 @@ public class PlayerXP : MonoBehaviour
 
         ProcessLevelUps();
         SaveProgress();
+        NotifyProgressChanged();
     }
 
     /// <summary>
@@ -78,6 +83,7 @@ public class PlayerXP : MonoBehaviour
         int lostXp = Mathf.FloorToInt(xp * (lossPercent / 100f));
         xp -= lostXp;
         SaveProgress();
+        NotifyProgressChanged();
 
         Debug.Log($"Death penalty ({lossPercent:0.##}%): lost {lostXp} current-level XP. " +
                   $"Level {level} remains secured with {xp}/{xpToNextLevel} XP.");
@@ -87,6 +93,11 @@ public class PlayerXP : MonoBehaviour
     public void SaveProgress()
     {
         PlayerProgressSave.SavePlayer(this);
+    }
+
+    public void RefreshProgressUI()
+    {
+        NotifyProgressChanged();
     }
 
     private void OnApplicationPause(bool paused)
@@ -102,7 +113,6 @@ public class PlayerXP : MonoBehaviour
 
     private void ProcessLevelUps()
     {
-
         while (xp >= xpToNextLevel)
         {
             xp -= xpToNextLevel;
@@ -116,15 +126,18 @@ public class PlayerXP : MonoBehaviour
             equipment = FindAnyObjectByType<PlayerEquipment>();
     }
 
-    void LevelUp()
+    private void NotifyProgressChanged()
+    {
+        ProgressChanged?.Invoke();
+    }
+
+    private void LevelUp()
     {
         level++;
-        abilityPoints++;          // <-- give 1 point
+        abilityPoints++;
         xpToNextLevel += 50;
 
         Debug.Log("Leveled up! Level " + level +
                   " | Ability Points: " + abilityPoints);
     }
-
-
 }
