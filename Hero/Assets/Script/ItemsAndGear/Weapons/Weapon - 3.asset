@@ -26,12 +26,12 @@ MonoBehaviour:
   statModifiers:
     maxHealth: 0
     minimumDamage: 23
-    maximumDamage: 28.6
+    maximumDamage: 27.6
     defense: 0
     regeneration: 0
-    lifeSteal: 0.065
-    criticalChance: 0.06
-    attackSpeed: 0.03
+    lifeSteal: 0.007
+    criticalChance: 0.01
+    attackSpeed: 0.032
     movementSpeed: 0
     experienceGain: 0
   weaponType: 0
