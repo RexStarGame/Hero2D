@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0d95ab5f45f40ebadcf63d87a3ad842, type: 3}
+  m_Name: Caktuser
+  m_EditorClassIdentifier: 
+  cellSize: {x: 0.32, y: 0.32}
+  colorTolerance: 0.03
+  terrains:
+  - displayName: 
+    mapColor: {r: 0.26364803, g: 1, b: 0, a: 0}
+    targetLayer: 3
+    paintTiles:
+    - tile: {fileID: 11400000, guid: 10d4f8eda07c0df41ae921eef32ca37e, type: 2}
+      weight: 0.18
+    decorationChance: 1
+    decorationTiles:
+    - tile: {fileID: 11400000, guid: 89515a64151acd1439dd4fe4eccfdfe1, type: 2}
+      weight: 1.22
+    - tile: {fileID: 11400000, guid: fa2d99b1882a7d94cbf60975539496ae, type: 2}
+      weight: 1.09
+    - tile: {fileID: 11400000, guid: 725a05b58a958354fadf7c625633b4b4, type: 2}
+      weight: 1.09
+    - tile: {fileID: 11400000, guid: dfeeb7c8136b2304581db56f3bdcfc45, type: 2}
+      weight: 1.09
+    minimumDecorationScale: 7
+    maximumDecorationScale: 7
+    paintCollision: 1
+    collisionTile: {fileID: 11400000, guid: d0783529c88330c4aa6f171efe8117f5, type: 2}
