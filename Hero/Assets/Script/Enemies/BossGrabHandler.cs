@@ -100,6 +100,7 @@ public class BossGrabHandler : MonoBehaviour
 
     // charge/cooldown state
     private bool charging;
+    private bool ownsBossAttackSlot;
     private float chargeStartTime;
     private float nextReadyTime; // cooldown end timestamp
 
@@ -135,7 +136,8 @@ public class BossGrabHandler : MonoBehaviour
     {
         if (grabbing) return;
 
-        if (bossController != null && bossController.IsAttacking)
+        if (bossController != null && bossController.IsAttacking &&
+            !bossController.IsAttackSlotReservedBy(this))
         {
             charging = false;
             return;
@@ -160,6 +162,9 @@ public class BossGrabHandler : MonoBehaviour
         {
             if (ShouldStartChargeNow())
             {
+                if (!TryReserveBossAttackSlot())
+                    return;
+
                 charging = true;
                 chargeStartTime = Time.time;
                 if (logDebug) Debug.Log("[Grab] Charge START");
@@ -180,6 +185,8 @@ public class BossGrabHandler : MonoBehaviour
 
             if (canGrabNow)
                 BeginGrab();
+            else
+                ReleaseBossAttackSlot();
 
             // Cooldown starts regardless (balance)
             nextReadyTime = Time.time + grabCooldown;
@@ -192,14 +199,7 @@ public class BossGrabHandler : MonoBehaviour
         if (col == null)
             return;
 
-        Transform target = null;
-        PlayerHealth health = col.GetComponentInParent<PlayerHealth>();
-        if (health != null)
-            target = health.transform;
-        else if (col.CompareTag(playerTag))
-            target = col.transform;
-        else if (col.transform.root != null && col.transform.root.CompareTag(playerTag))
-            target = col.transform.root;
+        Transform target = ResolvePlayerTransform(col);
 
         if (target == null)
             return;
@@ -223,35 +223,99 @@ public class BossGrabHandler : MonoBehaviour
 
     private void CachePlayer(Transform t)
     {
+        if (t == null)
+            return;
+
         player = t;
         playerRb = t.GetComponent<Rigidbody2D>();
+        if (playerRb == null)
+            playerRb = t.GetComponentInParent<Rigidbody2D>();
+        if (playerRb == null)
+            playerRb = t.GetComponentInChildren<Rigidbody2D>();
+
+        if (playerRb != null)
+            player = playerRb.transform;
 
         if (autoDisablePlayerMovement && cachedMovement == null)
         {
-            cachedMovement = t.GetComponent<PlayerMovement>();
+            cachedMovement = player.GetComponentInParent<PlayerMovement>();
+            if (cachedMovement == null)
+                cachedMovement = player.GetComponentInChildren<PlayerMovement>();
         }
 
         if (autoDisablePlayerAttack && cachedAttack == null)
         {
-            cachedAttack = t.GetComponent<PlayerAttack>();
+            cachedAttack = player.GetComponentInParent<PlayerAttack>();
+            if (cachedAttack == null)
+                cachedAttack = player.GetComponentInChildren<PlayerAttack>();
         }
+    }
+
+    private Transform ResolvePlayerTransform(Collider2D col)
+    {
+        if (col == null)
+            return null;
+
+        PlayerHealth health = col.GetComponentInParent<PlayerHealth>();
+        if (health != null)
+        {
+            Rigidbody2D healthBody = health.GetComponentInParent<Rigidbody2D>();
+            return healthBody != null ? healthBody.transform : health.transform;
+        }
+
+        if (col.attachedRigidbody != null)
+        {
+            Transform bodyTransform = col.attachedRigidbody.transform;
+            if (bodyTransform.CompareTag(playerTag) ||
+                (bodyTransform.root != null && bodyTransform.root.CompareTag(playerTag)))
+                return bodyTransform;
+        }
+
+        if (col.CompareTag(playerTag))
+            return col.transform;
+
+        Transform root = col.transform.root;
+        return root != null && root.CompareTag(playerTag) ? root : null;
+    }
+
+    private bool TryReserveBossAttackSlot(bool controllerInitiated = false)
+    {
+        if (ownsBossAttackSlot)
+            return true;
+
+        if (bossController == null)
+            return true;
+
+        ownsBossAttackSlot = bossController.TryReserveGrabAttack(this, controllerInitiated);
+        return ownsBossAttackSlot;
+    }
+
+    private void ReleaseBossAttackSlot()
+    {
+        if (bossController != null)
+            bossController.ReleaseGrabAttack(this);
+
+        ownsBossAttackSlot = false;
     }
 
     private bool ShouldStartChargeNow()
     {
-        if (requireGrabZone && !playerInGrabZone)
-            return false;
-
+        // Distance is authoritative. Trigger callbacks are only a hint because a
+        // player may use child colliders or cross the trigger between physics ticks.
         return IsPlayerWithinRadius(grabRadius);
     }
 
     private bool IsPlayerCloseRightNow()
     {
-        if (requireGrabZone && !playerInGrabZone)
-            return false;
-
-        // Must be within maxGrabDistance at the moment of attempt
-        return IsPlayerWithinRadius(maxGrabDistance);
+        // Keep the actual hit close to the visible ring. A small tolerance avoids
+        // rejecting a player standing on its edge; legacy oversized values such as
+        // 10 units can no longer make the visual and hit area disagree.
+        float visibleTolerance = Mathf.Max(0f, grabRadius) + 0.25f;
+        float configuredDistance = Mathf.Max(0f, maxGrabDistance);
+        float effectiveDistance = configuredDistance > 0f
+            ? Mathf.Min(configuredDistance, visibleTolerance)
+            : visibleTolerance;
+        return IsPlayerWithinRadius(effectiveDistance);
     }
 
     private bool IsPlayerWithinRadius(float r)
@@ -264,9 +328,10 @@ public class BossGrabHandler : MonoBehaviour
     private void BeginGrab()
     {
         if (grabbing || grabRoutine != null) return;
-        if (bossController != null && bossController.IsAttacking) return;
+        if (!TryReserveBossAttackSlot()) return;
 
-        TryBeginGrab();
+        if (!TryBeginGrab())
+            ReleaseBossAttackSlot();
     }
 
     /// <summary>
@@ -274,15 +339,23 @@ public class BossGrabHandler : MonoBehaviour
     /// Used by BossBehaviorController so both autonomous and controller-driven grabs
     /// share one state and one cleanup path.
     /// </summary>
-    public bool TryBeginGrab()
+    public bool TryBeginGrab(bool controllerInitiated = false)
     {
         EnsurePlayer();
 
         if (grabbing || grabRoutine != null || grabPoint == null || player == null)
             return false;
 
-        if (!IsPlayerCloseRightNow())
+        bool alreadyOwnedSlot = ownsBossAttackSlot;
+        if (!TryReserveBossAttackSlot(controllerInitiated))
             return false;
+
+        if (!IsPlayerCloseRightNow())
+        {
+            if (!alreadyOwnedSlot)
+                ReleaseBossAttackSlot();
+            return false;
+        }
 
         grabRoutine = StartCoroutine(GrabRoutine(player));
         return true;
@@ -292,9 +365,9 @@ public class BossGrabHandler : MonoBehaviour
     {
         grabbing = true;
         charging = false;
-        Rigidbody2D grabbedRb = grabbedPlayer != null
-            ? grabbedPlayer.GetComponent<Rigidbody2D>()
-            : null;
+        Rigidbody2D grabbedRb = playerRb;
+        if (grabbedRb == null && grabbedPlayer != null)
+            grabbedRb = grabbedPlayer.GetComponentInParent<Rigidbody2D>();
         activeGrabbedPlayer = grabbedPlayer;
         activeGrabbedRb = grabbedRb;
         bool completedThrow = false;
@@ -341,6 +414,8 @@ public class BossGrabHandler : MonoBehaviour
             DifficultyDebugTelemetry.RecordEnemyDamage(this, damage, scaledDamage);
 
             PlayerHealth health = grabbedPlayer.GetComponentInParent<PlayerHealth>();
+            if (health == null)
+                health = grabbedPlayer.GetComponentInChildren<PlayerHealth>();
             if (health != null)
                 health.TakeDamage(scaledDamage);
             else
@@ -376,7 +451,11 @@ public class BossGrabHandler : MonoBehaviour
                 grabbedRb.AddForce(direction * Mathf.Max(0f, throwForce), ForceMode2D.Impulse);
                 completedThrow = true;
 
-                PlayerMovement movement = grabbedPlayer.GetComponent<PlayerMovement>();
+                PlayerMovement movement = cachedMovement as PlayerMovement;
+                if (movement == null)
+                    movement = grabbedPlayer.GetComponentInParent<PlayerMovement>();
+                if (movement == null)
+                    movement = grabbedPlayer.GetComponentInChildren<PlayerMovement>();
                 if (movement != null)
                     movement.PreserveExternalVelocity(Mathf.Max(0.1f, stunAfterThrow + 0.1f));
             }
@@ -403,9 +482,17 @@ public class BossGrabHandler : MonoBehaviour
         if (grabbedPlayer != null)
         {
             if (autoDisablePlayerMovement)
-                cachedMovement = grabbedPlayer.GetComponent<PlayerMovement>();
+            {
+                cachedMovement = grabbedPlayer.GetComponentInParent<PlayerMovement>();
+                if (cachedMovement == null)
+                    cachedMovement = grabbedPlayer.GetComponentInChildren<PlayerMovement>();
+            }
             if (autoDisablePlayerAttack)
-                cachedAttack = grabbedPlayer.GetComponent<PlayerAttack>();
+            {
+                cachedAttack = grabbedPlayer.GetComponentInParent<PlayerAttack>();
+                if (cachedAttack == null)
+                    cachedAttack = grabbedPlayer.GetComponentInChildren<PlayerAttack>();
+            }
         }
 
         if (autoDisablePlayerMovement)
@@ -477,6 +564,7 @@ public class BossGrabHandler : MonoBehaviour
         grabRoutine = null;
         activeGrabbedPlayer = null;
         activeGrabbedRb = null;
+        ReleaseBossAttackSlot();
     }
 
     private static Vector2 GetVelocity(Rigidbody2D body)
@@ -651,6 +739,7 @@ public class BossGrabHandler : MonoBehaviour
         }
 
         CleanupGrab(activeGrabbedPlayer, activeGrabbedRb, false);
+        ReleaseBossAttackSlot();
 
         if (ring != null)
             ring.SetActive(false);

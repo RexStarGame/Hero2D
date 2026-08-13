@@ -58,6 +58,13 @@ public class GrabZone2D : MonoBehaviour
         if (other.CompareTag(playerTag))
             return true;
 
+        if (other.GetComponentInParent<PlayerHealth>() != null)
+            return true;
+
+        if (other.attachedRigidbody != null &&
+            other.attachedRigidbody.GetComponentInChildren<PlayerHealth>() != null)
+            return true;
+
         Transform root = other.transform.root;
         return root != null && root.CompareTag(playerTag);
     }
