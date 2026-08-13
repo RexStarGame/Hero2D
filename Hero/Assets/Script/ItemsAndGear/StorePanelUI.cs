@@ -394,10 +394,13 @@ public class StorePanelUI : MonoBehaviour
         }
 
         if (itemsScrollRect == null)
-            itemsScrollRect = CreateItemsScrollArea(gridRect);
-
-        if (itemsScrollRect == null)
+        {
+            Debug.LogWarning(
+                "StorePanelUI requires a scene-authored Items Scroll Rect. " +
+                "Assign StoreItemsScrollView in the Inspector.",
+                this);
             return;
+        }
 
         itemsScrollRect.horizontal = false;
         itemsScrollRect.vertical = true;
@@ -406,7 +409,7 @@ public class StorePanelUI : MonoBehaviour
         itemsScrollRect.decelerationRate = 0.135f;
         itemsScrollRect.scrollSensitivity = 24f;
         itemsScrollRect.verticalScrollbarVisibility =
-            ScrollRect.ScrollbarVisibility.AutoHideAndExpandViewport;
+            ScrollRect.ScrollbarVisibility.AutoHide;
     }
 
     private bool MatchesActiveCategory(ItemDefinition item)
@@ -498,49 +501,6 @@ public class StorePanelUI : MonoBehaviour
         return scroll;
     }
 
-    private ScrollRect CreateItemsScrollArea(RectTransform gridRect)
-    {
-        RectTransform oldParent = gridRect.parent as RectTransform;
-        if (oldParent == null)
-            return null;
-
-        int siblingIndex = gridRect.GetSiblingIndex();
-
-        GameObject scrollObject = new GameObject(
-            "StoreItemsScrollView",
-            typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(ScrollRect));
-        RectTransform scrollRectTransform = scrollObject.GetComponent<RectTransform>();
-        scrollRectTransform.SetParent(oldParent, false);
-        scrollRectTransform.SetSiblingIndex(siblingIndex);
-        CopyRectTransform(gridRect, scrollRectTransform);
-
-        Image scrollRaycastArea = scrollObject.GetComponent<Image>();
-        scrollRaycastArea.color = new Color(0f, 0f, 0f, 0f);
-        scrollRaycastArea.raycastTarget = true;
-
-        GameObject viewportObject = new GameObject(
-            "Viewport", typeof(RectTransform), typeof(RectMask2D));
-        RectTransform viewport = viewportObject.GetComponent<RectTransform>();
-        viewport.SetParent(scrollRectTransform, false);
-        Stretch(viewport);
-
-        gridRect.SetParent(viewport, false);
-        gridRect.anchorMin = new Vector2(0f, 1f);
-        gridRect.anchorMax = new Vector2(1f, 1f);
-        gridRect.pivot = new Vector2(0.5f, 1f);
-        gridRect.anchoredPosition = Vector2.zero;
-        gridRect.sizeDelta = Vector2.zero;
-        gridRect.localScale = Vector3.one;
-
-        Scrollbar scrollbar = CreateVerticalScrollbar(scrollRectTransform);
-        ScrollRect scroll = scrollObject.GetComponent<ScrollRect>();
-        scroll.viewport = viewport;
-        scroll.content = gridRect;
-        scroll.verticalScrollbar = scrollbar;
-        scroll.verticalScrollbarSpacing = 3f;
-        return scroll;
-    }
-
     private static Scrollbar CreateVerticalScrollbar(RectTransform parent)
     {
         GameObject scrollbarObject = new GameObject(
@@ -615,6 +575,17 @@ public class StorePanelUI : MonoBehaviour
                 height += rows * grid.cellSize.y + (rows - 1) * grid.spacing.y;
 
             gridRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
+
+            RectTransform content = itemsScrollRect.content;
+            if (content != null)
+            {
+                float viewportHeight = itemsScrollRect.viewport == null
+                    ? 0f
+                    : itemsScrollRect.viewport.rect.height;
+                content.SetSizeWithCurrentAnchors(
+                    RectTransform.Axis.Vertical,
+                    Mathf.Max(viewportHeight, height));
+            }
         }
 
         Canvas.ForceUpdateCanvases();
