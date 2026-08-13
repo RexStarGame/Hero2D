@@ -14,6 +14,7 @@ public enum StoreCategory
     Necklaces
 }
 
+[ExecuteAlways]
 [DisallowMultipleComponent]
 public class StoreCategoryFilterUI : MonoBehaviour
 {
@@ -42,6 +43,20 @@ public class StoreCategoryFilterUI : MonoBehaviour
     private readonly List<CategoryButton> categoryButtons = new List<CategoryButton>();
     private StorePanelUI store;
     private bool built;
+
+    private void OnEnable()
+    {
+        if (Application.isPlaying || HasAllCategoryButtons())
+            return;
+
+        store = GetComponentInParent<StorePanelUI>();
+        if (store == null)
+            return;
+
+        BuildButtons();
+        ApplyLayout();
+        SetSelected(StoreCategory.All);
+    }
 
     public static StoreCategoryFilterUI Create(StorePanelUI owner, RectTransform gridRoot)
     {
@@ -142,13 +157,19 @@ public class StoreCategoryFilterUI : MonoBehaviour
 
     private void CreateButton(StoreCategory category)
     {
-        GameObject buttonObject = new GameObject(
-            category.ToString(), typeof(RectTransform), typeof(CanvasRenderer),
-            typeof(Image), typeof(Button), typeof(LayoutElement));
+        Transform existing = transform.Find(category.ToString());
+        GameObject buttonObject = existing != null
+            ? existing.gameObject
+            : new GameObject(
+                category.ToString(), typeof(RectTransform), typeof(CanvasRenderer),
+                typeof(Image), typeof(Button), typeof(LayoutElement));
         RectTransform buttonRect = buttonObject.GetComponent<RectTransform>();
-        buttonRect.SetParent(transform, false);
-        buttonRect.localScale = Vector3.one;
-        buttonObject.layer = gameObject.layer;
+        if (existing == null)
+        {
+            buttonRect.SetParent(transform, false);
+            buttonRect.localScale = Vector3.one;
+            buttonObject.layer = gameObject.layer;
+        }
 
         LayoutElement layoutElement = buttonObject.GetComponent<LayoutElement>();
         layoutElement.minWidth = store == null ? 58f : store.CategoryButtonMinWidth;
@@ -175,14 +196,28 @@ public class StoreCategoryFilterUI : MonoBehaviour
         StoreCategory captured = category;
         button.onClick.AddListener(() => store?.SetCategory(captured));
 
-        CreateIcon(buttonRect, category);
-        CreateLabel(buttonRect, GetLabel(category));
+        if (buttonRect.Find("Icon") == null)
+            CreateIcon(buttonRect, category);
+        if (buttonRect.Find("Label") == null)
+            CreateLabel(buttonRect, GetLabel(category));
 
         categoryButtons.Add(new CategoryButton
         {
             Category = category,
             Background = background
         });
+    }
+
+    private bool HasAllCategoryButtons()
+    {
+        foreach (StoreCategory category in Categories)
+        {
+            Transform button = transform.Find(category.ToString());
+            if (button == null || button.Find("Icon") == null || button.Find("Label") == null)
+                return false;
+        }
+
+        return true;
     }
 
     private static void CreateIcon(RectTransform parent, StoreCategory category)
