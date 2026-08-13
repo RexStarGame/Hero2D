@@ -45,6 +45,37 @@ public sealed class SafeZone2D : MonoBehaviour
     public string ZoneId => zoneId;
     public bool DestroysEnemyProjectiles => destroyEnemyProjectiles;
 
+    public static bool TryGetRespawnPosition(Vector2 fromPosition, out Vector2 respawnPosition)
+    {
+        respawnPosition = Vector2.zero;
+        SafeZone2D nearestZone = null;
+        float nearestDistanceSquared = float.PositiveInfinity;
+
+        for (int i = activeZones.Count - 1; i >= 0; i--)
+        {
+            SafeZone2D zone = activeZones[i];
+            if (zone == null)
+            {
+                activeZones.RemoveAt(i);
+                continue;
+            }
+
+            if (!zone.isActiveAndEnabled || zone.zoneCollider == null)
+                continue;
+
+            Vector2 candidate = zone.zoneCollider.bounds.center;
+            float distanceSquared = (candidate - fromPosition).sqrMagnitude;
+            if (distanceSquared >= nearestDistanceSquared)
+                continue;
+
+            nearestZone = zone;
+            nearestDistanceSquared = distanceSquared;
+            respawnPosition = candidate;
+        }
+
+        return nearestZone != null;
+    }
+
     private void Reset()
     {
         EnsureStableId();

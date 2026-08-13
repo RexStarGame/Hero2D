@@ -199,6 +199,11 @@ public class PlayerHealth : MonoBehaviour
         if (playerXP != null)
             playerXP.ApplyDeathPenaltyAndSave();
 
+        if (SafeZone2D.TryGetRespawnPosition(transform.position, out Vector2 respawnPosition))
+            PlayerProgressSave.SetDeathRespawnPosition(respawnPosition);
+        else
+            Debug.LogError("[PlayerHealth] No active safe zone was found for player respawn.", this);
+
         if (gameOverManager != null)
             gameOverManager.TriggerGameOver();
         else

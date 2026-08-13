@@ -1,0 +1,1105 @@
+fileFormatVersion: 2
+guid: ddc465dc95051c64ea2ee1f4d89b9cfe
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 3014143914646941281
+    second: download (72)_0
+  - first:
+      213: 3778774144938393340
+    second: download (72)_1
+  - first:
+      213: -5184904094946530890
+    second: download (72)_2
+  - first:
+      213: -8936737357944669119
+    second: download (72)_3
+  - first:
+      213: 6945076629011379242
+    second: download (72)_4
+  - first:
+      213: 4722048564080764659
+    second: download (72)_5
+  - first:
+      213: -6548334306527180923
+    second: download (72)_6
+  - first:
+      213: -8888706453050344882
+    second: download (72)_7
+  - first:
+      213: 7533511982816024156
+    second: download (72)_8
+  - first:
+      213: -8687175050048497619
+    second: download (72)_9
+  - first:
+      213: -6944243772169146502
+    second: download (72)_10
+  - first:
+      213: -272391100021251244
+    second: download (72)_11
+  - first:
+      213: 6225411214351825195
+    second: download (72)_12
+  - first:
+      213: -5304132167612567162
+    second: download (72)_13
+  - first:
+      213: 3955805865365511426
+    second: download (72)_14
+  - first:
+      213: 2083290551890685537
+    second: download (72)_15
+  - first:
+      213: -3706474028242564460
+    second: download (72)_16
+  - first:
+      213: 6164407039367817306
+    second: download (72)_17
+  - first:
+      213: -8582147741144636548
+    second: download (72)_18
+  - first:
+      213: 9108240194799964855
+    second: download (72)_19
+  - first:
+      213: 7167237540382582645
+    second: download (72)_20
+  - first:
+      213: -3035174345788276099
+    second: download (72)_21
+  - first:
+      213: -3938206501281915070
+    second: download (72)_22
+  - first:
+      213: 6317875352314550556
+    second: download (72)_23
+  - first:
+      213: 4824872568555534523
+    second: download (72)_24
+  - first:
+      213: -1898682925919242769
+    second: download (72)_25
+  - first:
+      213: -3464238541603976222
+    second: download (72)_26
+  - first:
+      213: -5951373147023842778
+    second: download (72)_27
+  - first:
+      213: 1196905725337709095
+    second: download (72)_28
+  - first:
+      213: -4069434032819798678
+    second: download (72)_29
+  - first:
+      213: 9033252311272244822
+    second: download (72)_30
+  - first:
+      213: 7130806004290666873
+    second: download (72)_31
+  - first:
+      213: 2783744998639668203
+    second: download (72)_32
+  - first:
+      213: 5950632371221069158
+    second: download (72)_33
+  - first:
+      213: 7741181849001057385
+    second: download (72)_34
+  - first:
+      213: 4258858843567030297
+    second: download (72)_35
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: download (72)_0
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 350
+        width: 36
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 16eaf66bbe364d920800000000000000
+      internalID: 3014143914646941281
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_1
+      rect:
+        serializedVersion: 2
+        x: 68
+        y: 275
+        width: 61
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cfebb736017e07430800000000000000
+      internalID: 3778774144938393340
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_2
+      rect:
+        serializedVersion: 2
+        x: 134
+        y: 350
+        width: 101
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b96e3a42358b08b0800000000000000
+      internalID: -5184904094946530890
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_3
+      rect:
+        serializedVersion: 2
+        x: 323
+        y: 267
+        width: 69
+        height: 110
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 14cbeb8c8b45af380800000000000000
+      internalID: -8936737357944669119
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_4
+      rect:
+        serializedVersion: 2
+        x: 429
+        y: 282
+        width: 104
+        height: 101
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a243712c56ed16060800000000000000
+      internalID: 6945076629011379242
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_5
+      rect:
+        serializedVersion: 2
+        x: 548
+        y: 316
+        width: 40
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3f66d2a8626188140800000000000000
+      internalID: 4722048564080764659
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_6
+      rect:
+        serializedVersion: 2
+        x: 569
+        y: 265
+        width: 119
+        height: 119
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 58781fc84a4af15a0800000000000000
+      internalID: -6548334306527180923
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_7
+      rect:
+        serializedVersion: 2
+        x: 167
+        y: 248
+        width: 88
+        height: 69
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e4a36394398f4a480800000000000000
+      internalID: -8888706453050344882
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_8
+      rect:
+        serializedVersion: 2
+        x: 376
+        y: 175
+        width: 140
+        height: 126
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c56d5eeeb396c8860800000000000000
+      internalID: 7533511982816024156
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_9
+      rect:
+        serializedVersion: 2
+        x: 516
+        y: 241
+        width: 36
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d2819309154f07780800000000000000
+      internalID: -8687175050048497619
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_10
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 282
+        width: 34
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a7fa326d41711af90800000000000000
+      internalID: -6944243772169146502
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_11
+      rect:
+        serializedVersion: 2
+        x: 13
+        y: 111
+        width: 127
+        height: 152
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 453614bdcb5483cf0800000000000000
+      internalID: -272391100021251244
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_12
+      rect:
+        serializedVersion: 2
+        x: 170
+        y: 178
+        width: 38
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b297c2c048a156650800000000000000
+      internalID: 6225411214351825195
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_13
+      rect:
+        serializedVersion: 2
+        x: 176
+        y: 222
+        width: 28
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 681fab365efe366b0800000000000000
+      internalID: -5304132167612567162
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_14
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 212
+        width: 36
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 20d948dc978d5e630800000000000000
+      internalID: 3955805865365511426
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_15
+      rect:
+        serializedVersion: 2
+        x: 331
+        y: 181
+        width: 53
+        height: 99
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 16e2f5d18b559ec10800000000000000
+      internalID: 2083290551890685537
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_16
+      rect:
+        serializedVersion: 2
+        x: 480
+        y: 145
+        width: 106
+        height: 69
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 49a04615285ff8cc0800000000000000
+      internalID: -3706474028242564460
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_17
+      rect:
+        serializedVersion: 2
+        x: 618
+        y: 147
+        width: 69
+        height: 90
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a58af68ba8f5c8550800000000000000
+      internalID: 6164407039367817306
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_18
+      rect:
+        serializedVersion: 2
+        x: 102
+        y: 142
+        width: 106
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c73272f791616e880800000000000000
+      internalID: -8582147741144636548
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_19
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 106
+        width: 69
+        height: 69
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7b29cfb1338f66e70800000000000000
+      internalID: 9108240194799964855
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_20
+      rect:
+        serializedVersion: 2
+        x: 452
+        y: 152
+        width: 28
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 577295fb194277360800000000000000
+      internalID: 7167237540382582645
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_21
+      rect:
+        serializedVersion: 2
+        x: 584
+        y: 37
+        width: 93
+        height: 141
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d7249e77305e0e5d0800000000000000
+      internalID: -3035174345788276099
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_22
+      rect:
+        serializedVersion: 2
+        x: 155
+        y: 55
+        width: 60
+        height: 87
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 24f15f67d0ea859c0800000000000000
+      internalID: -3938206501281915070
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_23
+      rect:
+        serializedVersion: 2
+        x: 407
+        y: 61
+        width: 49
+        height: 72
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c1997edc82a9da750800000000000000
+      internalID: 6317875352314550556
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_24
+      rect:
+        serializedVersion: 2
+        x: 465
+        y: 110
+        width: 49
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bb8774fa90465f240800000000000000
+      internalID: 4824872568555534523
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_25
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 70
+        width: 36
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fe5fb7340f586a5e0800000000000000
+      internalID: -1898682925919242769
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_26
+      rect:
+        serializedVersion: 2
+        x: 242
+        y: 70
+        width: 36
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2eb4a76966d8cefc0800000000000000
+      internalID: -3464238541603976222
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_27
+      rect:
+        serializedVersion: 2
+        x: 312
+        y: 65
+        width: 67
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 62268dd87a9786da0800000000000000
+      internalID: -5951373147023842778
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_28
+      rect:
+        serializedVersion: 2
+        x: 480
+        y: 68
+        width: 55
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 72aa26c6a634c9010800000000000000
+      internalID: 1196905725337709095
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_29
+      rect:
+        serializedVersion: 2
+        x: 554
+        y: 86
+        width: 22
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a6df3e4de477687c0800000000000000
+      internalID: -4069434032819798678
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_30
+      rect:
+        serializedVersion: 2
+        x: 35
+        y: 7
+        width: 60
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 656cbdbed1f8c5d70800000000000000
+      internalID: 9033252311272244822
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_31
+      rect:
+        serializedVersion: 2
+        x: 242
+        y: 0
+        width: 34
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 971c7ffb746b5f260800000000000000
+      internalID: 7130806004290666873
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_32
+      rect:
+        serializedVersion: 2
+        x: 274
+        y: 34
+        width: 38
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: beb003dc359d1a620800000000000000
+      internalID: 2783744998639668203
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_33
+      rect:
+        serializedVersion: 2
+        x: 416
+        y: 0
+        width: 40
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 66d72932d94e49250800000000000000
+      internalID: 5950632371221069158
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_34
+      rect:
+        serializedVersion: 2
+        x: 446
+        y: 32
+        width: 70
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 96cd86b80e33e6b60800000000000000
+      internalID: 7741181849001057385
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: download (72)_35
+      rect:
+        serializedVersion: 2
+        x: 394
+        y: 4
+        width: 22
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9100857cd818a1b30800000000000000
+      internalID: 4258858843567030297
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      download (72)_0: 3014143914646941281
+      download (72)_1: 3778774144938393340
+      download (72)_10: -6944243772169146502
+      download (72)_11: -272391100021251244
+      download (72)_12: 6225411214351825195
+      download (72)_13: -5304132167612567162
+      download (72)_14: 3955805865365511426
+      download (72)_15: 2083290551890685537
+      download (72)_16: -3706474028242564460
+      download (72)_17: 6164407039367817306
+      download (72)_18: -8582147741144636548
+      download (72)_19: 9108240194799964855
+      download (72)_2: -5184904094946530890
+      download (72)_20: 7167237540382582645
+      download (72)_21: -3035174345788276099
+      download (72)_22: -3938206501281915070
+      download (72)_23: 6317875352314550556
+      download (72)_24: 4824872568555534523
+      download (72)_25: -1898682925919242769
+      download (72)_26: -3464238541603976222
+      download (72)_27: -5951373147023842778
+      download (72)_28: 1196905725337709095
+      download (72)_29: -4069434032819798678
+      download (72)_3: -8936737357944669119
+      download (72)_30: 9033252311272244822
+      download (72)_31: 7130806004290666873
+      download (72)_32: 2783744998639668203
+      download (72)_33: 5950632371221069158
+      download (72)_34: 7741181849001057385
+      download (72)_35: 4258858843567030297
+      download (72)_4: 6945076629011379242
+      download (72)_5: 4722048564080764659
+      download (72)_6: -6548334306527180923
+      download (72)_7: -8888706453050344882
+      download (72)_8: 7533511982816024156
+      download (72)_9: -8687175050048497619
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

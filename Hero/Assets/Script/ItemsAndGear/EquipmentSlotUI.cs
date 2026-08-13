@@ -130,6 +130,7 @@ public class EquipmentSlotUI : MonoBehaviour,
             equipment != null)
         {
             equipment.SwapRings();
+            inventory?.SaveEquipmentState();
             ItemDragContext.MarkDropHandled();
         }
     }
