@@ -1412,8 +1412,7 @@ MonoBehaviour:
     m_Scale: 1
   m_AtlasTextures:
   - {fileID: 28268798066460806}
-  - {fileID: 2177769313798466292}
-  m_AtlasTextureIndex: 1
+  m_AtlasTextureIndex: 0
   m_IsMultiAtlasTexturesEnabled: 1
   m_GetFontFeatures: 1
   m_ClearDynamicDataOnBuild: 1
@@ -11258,9 +11257,9 @@ Texture2D:
     Hash: 00000000000000000000000000000000
   m_IsAlphaChannelOptional: 0
   serializedVersion: 3
-  m_Width: 512
-  m_Height: 512
-  m_CompleteImageSize: 262144
+  m_Width: 1
+  m_Height: 1
+  m_CompleteImageSize: 1
   m_MipsStripped: 0
   m_TextureFormat: 1
   m_MipCount: 1

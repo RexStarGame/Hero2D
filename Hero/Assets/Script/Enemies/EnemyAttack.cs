@@ -11,6 +11,10 @@ public class EnemyAttack : MonoBehaviour
     [SerializeField] private float attackRange = 5f;
     [SerializeField] private float attackCooldown = 2f;
 
+    private bool useVariableCooldown;
+    private float minimumCooldownMultiplier = 1f;
+    private float maximumCooldownMultiplier = 1f;
+
     [Header("Telegraph (Warning before shot)")]
     [SerializeField] private float windupTime = 0.45f;                 // tid før skuddet
     [SerializeField] private GameObject telegraphPrefab;               // fx ! icon eller glow sprite (valgfri)
@@ -138,8 +142,25 @@ public class EnemyAttack : MonoBehaviour
             Shoot(direction);
 
         // start cooldown AFTER the shot
-        cooldownTimer = attackCooldown;
+        cooldownTimer = GetNextAttackCooldown();
         isWindingUp = false;
+    }
+
+    public void ConfigureCooldownVariation(float minimumMultiplier, float maximumMultiplier)
+    {
+        minimumCooldownMultiplier = Mathf.Max(0.1f, minimumMultiplier);
+        maximumCooldownMultiplier = Mathf.Max(minimumCooldownMultiplier, maximumMultiplier);
+        useVariableCooldown = true;
+    }
+
+    private float GetNextAttackCooldown()
+    {
+        if (!useVariableCooldown)
+            return attackCooldown;
+
+        return attackCooldown * Random.Range(
+            minimumCooldownMultiplier,
+            maximumCooldownMultiplier);
     }
 
     void Shoot(Vector2 direction)
