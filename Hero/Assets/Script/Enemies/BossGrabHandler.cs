@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class BossGrabHandler : MonoBehaviour
@@ -74,9 +75,17 @@ public class BossGrabHandler : MonoBehaviour
 
     private Transform player;
     private Rigidbody2D playerRb;
+    private Transform activeGrabbedPlayer;
+    private Rigidbody2D activeGrabbedRb;
+    private BossBehaviorController bossController;
 
     private bool playerInGrabZone;
     private bool grabbing;
+    private Coroutine grabRoutine;
+    private readonly Dictionary<MonoBehaviour, bool> disabledScriptStates =
+        new Dictionary<MonoBehaviour, bool>();
+
+    public bool IsRunning => grabbing || charging;
 
     // auto-cached scripts
     private MonoBehaviour cachedMovement;
@@ -107,6 +116,9 @@ public class BossGrabHandler : MonoBehaviour
     private void Awake()
     {
         difficultyProfile = GetComponentInParent<EnemyDifficultyProfile>();
+        bossController = GetComponentInParent<BossBehaviorController>();
+        if (bossController == null)
+            bossController = GetComponentInChildren<BossBehaviorController>(true);
 
         if (warningAnchor == null)
             warningAnchor = (grabPoint != null) ? grabPoint : transform;
@@ -122,6 +134,12 @@ public class BossGrabHandler : MonoBehaviour
     private void Update()
     {
         if (grabbing) return;
+
+        if (bossController != null && bossController.IsAttacking)
+        {
+            charging = false;
+            return;
+        }
 
         EnsurePlayer();
 
@@ -171,11 +189,28 @@ public class BossGrabHandler : MonoBehaviour
     // Called from GrabZone2D
     public void SetPlayerInGrabZone(Collider2D col, bool inZone)
     {
-        if (col != null && col.CompareTag(playerTag))
-        {
-            CachePlayer(col.transform);
-            playerInGrabZone = inZone;
-        }
+        if (col == null)
+            return;
+
+        Transform target = null;
+        PlayerHealth health = col.GetComponentInParent<PlayerHealth>();
+        if (health != null)
+            target = health.transform;
+        else if (col.CompareTag(playerTag))
+            target = col.transform;
+        else if (col.transform.root != null && col.transform.root.CompareTag(playerTag))
+            target = col.transform.root;
+
+        if (target == null)
+            return;
+
+        CachePlayer(target);
+        playerInGrabZone = inZone;
+    }
+
+    public void ClearGrabZone()
+    {
+        playerInGrabZone = false;
     }
 
     private void EnsurePlayer()
@@ -228,120 +263,238 @@ public class BossGrabHandler : MonoBehaviour
 
     private void BeginGrab()
     {
-        if (grabbing) return;
-        if (grabPoint == null || player == null) return;
+        if (grabbing || grabRoutine != null) return;
+        if (bossController != null && bossController.IsAttacking) return;
 
-        StartCoroutine(GrabRoutine());
+        TryBeginGrab();
     }
 
-    private IEnumerator GrabRoutine()
+    /// <summary>
+    /// Starts a grab immediately when the target and required references are valid.
+    /// Used by BossBehaviorController so both autonomous and controller-driven grabs
+    /// share one state and one cleanup path.
+    /// </summary>
+    public bool TryBeginGrab()
+    {
+        EnsurePlayer();
+
+        if (grabbing || grabRoutine != null || grabPoint == null || player == null)
+            return false;
+
+        if (!IsPlayerCloseRightNow())
+            return false;
+
+        grabRoutine = StartCoroutine(GrabRoutine(player));
+        return true;
+    }
+
+    private IEnumerator GrabRoutine(Transform grabbedPlayer)
     {
         grabbing = true;
+        charging = false;
+        Rigidbody2D grabbedRb = grabbedPlayer != null
+            ? grabbedPlayer.GetComponent<Rigidbody2D>()
+            : null;
+        activeGrabbedPlayer = grabbedPlayer;
+        activeGrabbedRb = grabbedRb;
+        bool completedThrow = false;
 
-        SetPlayerControlDisabled(true);
-
-        oldParent = player.parent;
-        savedWorldScale = player.lossyScale;
-
-        if (playerRb != null)
+        try
         {
-            oldBodyType = playerRb.bodyType;
-            oldGravity = playerRb.gravityScale;
-            oldSimulated = playerRb.simulated;
+            CaptureAndDisablePlayerControls(grabbedPlayer);
 
-#if UNITY_6000_0_OR_NEWER
-            playerRb.linearVelocity = Vector2.zero;
-#else
-            playerRb.velocity = Vector2.zero;
-#endif
-            playerRb.angularVelocity = 0f;
+            oldParent = grabbedPlayer.parent;
+            savedWorldScale = grabbedPlayer.lossyScale;
 
-            playerRb.simulated = true;
-            playerRb.bodyType = RigidbodyType2D.Kinematic;
-            playerRb.gravityScale = 0f;
-        }
-
-        player.SetParent(grabPoint, worldPositionStays: true);
-        player.position = grabPoint.position;
-        RestoreWorldScale(player, savedWorldScale);
-
-        yield return new WaitForSeconds(holdTime);
-
-        player.SetParent(oldParent, worldPositionStays: true);
-        RestoreWorldScale(player, savedWorldScale);
-
-        if (difficultyProfile == null)
-            difficultyProfile = GetComponentInParent<EnemyDifficultyProfile>();
-        float scaledDamage = difficultyProfile != null
-            ? difficultyProfile.ScaleDamage(damage)
-            : damage * EnemyDifficultyProfile.GetDefaultDamageMultiplier();
-        DifficultyDebugTelemetry.RecordEnemyDamage(
-            this, damage, scaledDamage);
-        player.gameObject.SendMessage(
-            "TakeDamage", scaledDamage, SendMessageOptions.DontRequireReceiver);
-
-        if (playerRb != null)
-        {
-            playerRb.simulated = oldSimulated;
-
-            if (forceDynamicForThrow) playerRb.bodyType = RigidbodyType2D.Dynamic;
-            else playerRb.bodyType = oldBodyType;
-
-            if (playerRb.bodyType == RigidbodyType2D.Dynamic)
-                playerRb.gravityScale = oldGravity;
-
-#if UNITY_6000_0_OR_NEWER
-            playerRb.linearVelocity = Vector2.zero;
-#else
-            playerRb.velocity = Vector2.zero;
-#endif
-
-            Vector2 dir = ((Vector2)(player.position - transform.position)).normalized;
-
-            if (randomAngleDegrees > 0f)
+            if (grabbedRb != null)
             {
-                float angle = Random.Range(-randomAngleDegrees, randomAngleDegrees);
-                dir = Quaternion.Euler(0f, 0f, angle) * dir;
+                oldBodyType = grabbedRb.bodyType;
+                oldGravity = grabbedRb.gravityScale;
+                oldSimulated = grabbedRb.simulated;
+
+                SetVelocity(grabbedRb, Vector2.zero);
+                grabbedRb.angularVelocity = 0f;
+                grabbedRb.simulated = true;
+                grabbedRb.bodyType = RigidbodyType2D.Kinematic;
+                grabbedRb.gravityScale = 0f;
             }
 
-            playerRb.AddForce(dir * throwForce, ForceMode2D.Impulse);
+            grabbedPlayer.SetParent(grabPoint, worldPositionStays: true);
+            grabbedPlayer.position = grabPoint.position;
+            RestoreWorldScale(grabbedPlayer, savedWorldScale);
+
+            yield return new WaitForSeconds(Mathf.Max(0f, holdTime));
+
+            if (grabbedPlayer == null)
+                yield break;
+
+            grabbedPlayer.SetParent(oldParent, worldPositionStays: true);
+            RestoreWorldScale(grabbedPlayer, savedWorldScale);
+
+            if (difficultyProfile == null)
+                difficultyProfile = GetComponentInParent<EnemyDifficultyProfile>();
+
+            float scaledDamage = difficultyProfile != null
+                ? difficultyProfile.ScaleDamage(damage)
+                : damage * EnemyDifficultyProfile.GetDefaultDamageMultiplier();
+
+            DifficultyDebugTelemetry.RecordEnemyDamage(this, damage, scaledDamage);
+
+            PlayerHealth health = grabbedPlayer.GetComponentInParent<PlayerHealth>();
+            if (health != null)
+                health.TakeDamage(scaledDamage);
+            else
+                grabbedPlayer.gameObject.SendMessage(
+                    "TakeDamage", scaledDamage, SendMessageOptions.DontRequireReceiver);
+
+            if (grabbedPlayer == null)
+                yield break;
+
+            if (grabbedRb != null)
+            {
+                grabbedRb.simulated = true;
+                grabbedRb.bodyType = forceDynamicForThrow
+                    ? RigidbodyType2D.Dynamic
+                    : oldBodyType;
+
+                if (grabbedRb.bodyType == RigidbodyType2D.Dynamic)
+                    grabbedRb.gravityScale = oldGravity;
+
+                SetVelocity(grabbedRb, Vector2.zero);
+
+                Vector2 direction =
+                    ((Vector2)grabbedPlayer.position - (Vector2)transform.position).normalized;
+                if (direction.sqrMagnitude < 0.001f)
+                    direction = transform.right;
+
+                if (randomAngleDegrees > 0f)
+                {
+                    float angle = Random.Range(-randomAngleDegrees, randomAngleDegrees);
+                    direction = Quaternion.Euler(0f, 0f, angle) * direction;
+                }
+
+                grabbedRb.AddForce(direction * Mathf.Max(0f, throwForce), ForceMode2D.Impulse);
+                completedThrow = true;
+
+                PlayerMovement movement = grabbedPlayer.GetComponent<PlayerMovement>();
+                if (movement != null)
+                    movement.PreserveExternalVelocity(Mathf.Max(0.1f, stunAfterThrow + 0.1f));
+            }
+
+            if (stunAfterThrow > 0f)
+                yield return new WaitForSeconds(stunAfterThrow);
         }
-
-        if (stunAfterThrow > 0f)
-            yield return new WaitForSeconds(stunAfterThrow);
-
-        SetPlayerControlDisabled(false);
-
-        grabbing = false;
+        finally
+        {
+            CleanupGrab(grabbedPlayer, grabbedRb, completedThrow);
+        }
     }
 
-    private void SetPlayerControlDisabled(bool disabled)
+    private void CaptureAndDisablePlayerControls(Transform grabbedPlayer)
     {
-        // manual list
+        disabledScriptStates.Clear();
+
         if (playerScriptsToDisable != null)
         {
             for (int i = 0; i < playerScriptsToDisable.Length; i++)
+                RememberAndDisable(playerScriptsToDisable[i]);
+        }
+
+        if (grabbedPlayer != null)
+        {
+            if (autoDisablePlayerMovement)
+                cachedMovement = grabbedPlayer.GetComponent<PlayerMovement>();
+            if (autoDisablePlayerAttack)
+                cachedAttack = grabbedPlayer.GetComponent<PlayerAttack>();
+        }
+
+        if (autoDisablePlayerMovement)
+            RememberAndDisable(cachedMovement);
+        if (autoDisablePlayerAttack)
+            RememberAndDisable(cachedAttack);
+    }
+
+    private void RememberAndDisable(MonoBehaviour behaviour)
+    {
+        if (behaviour == null || disabledScriptStates.ContainsKey(behaviour))
+            return;
+
+        disabledScriptStates.Add(behaviour, behaviour.enabled);
+        behaviour.enabled = false;
+
+        if (logDebug)
+            Debug.Log($"[Grab] DISABLED {behaviour.GetType().Name}");
+    }
+
+    private void RestorePlayerControls()
+    {
+        foreach (KeyValuePair<MonoBehaviour, bool> entry in disabledScriptStates)
+        {
+            if (entry.Key == null) continue;
+            entry.Key.enabled = entry.Value;
+
+            if (logDebug)
+                Debug.Log($"[Grab] RESTORED {entry.Key.GetType().Name} to {entry.Value}");
+        }
+
+        disabledScriptStates.Clear();
+    }
+
+    private void CleanupGrab(
+        Transform grabbedPlayer,
+        Rigidbody2D grabbedRb,
+        bool preserveThrowVelocity)
+    {
+        if (!grabbing && disabledScriptStates.Count == 0)
+            return;
+
+        if (grabbedPlayer != null)
+        {
+            if (grabbedPlayer.parent == grabPoint)
+                grabbedPlayer.SetParent(oldParent, worldPositionStays: true);
+
+            RestoreWorldScale(grabbedPlayer, savedWorldScale);
+        }
+
+        if (grabbedRb != null)
+        {
+            Vector2 velocity = GetVelocity(grabbedRb);
+            float angularVelocity = grabbedRb.angularVelocity;
+
+            grabbedRb.simulated = oldSimulated;
+            grabbedRb.bodyType = oldBodyType;
+            grabbedRb.gravityScale = oldGravity;
+
+            if (preserveThrowVelocity && oldSimulated)
             {
-                var s = playerScriptsToDisable[i];
-                if (s == null) continue;
-                s.enabled = !disabled;
-                if (logDebug) Debug.Log($"[Grab] {(disabled ? "DIS" : "EN")}ABLED {s.GetType().Name}");
+                SetVelocity(grabbedRb, velocity);
+                grabbedRb.angularVelocity = angularVelocity;
             }
         }
 
-        // auto movement
-        if (autoDisablePlayerMovement && cachedMovement != null)
-        {
-            cachedMovement.enabled = !disabled;
-            if (logDebug) Debug.Log($"[Grab] {(disabled ? "DIS" : "EN")}ABLED {cachedMovement.GetType().Name} (auto)");
-        }
+        RestorePlayerControls();
+        grabbing = false;
+        grabRoutine = null;
+        activeGrabbedPlayer = null;
+        activeGrabbedRb = null;
+    }
 
-        // auto attack
-        if (autoDisablePlayerAttack && cachedAttack != null)
-        {
-            cachedAttack.enabled = !disabled;
-            if (logDebug) Debug.Log($"[Grab] {(disabled ? "DIS" : "EN")}ABLED {cachedAttack.GetType().Name} (auto)");
-        }
+    private static Vector2 GetVelocity(Rigidbody2D body)
+    {
+#if UNITY_6000_0_OR_NEWER
+        return body.linearVelocity;
+#else
+        return body.velocity;
+#endif
+    }
+
+    private static void SetVelocity(Rigidbody2D body, Vector2 velocity)
+    {
+#if UNITY_6000_0_OR_NEWER
+        body.linearVelocity = velocity;
+#else
+        body.velocity = velocity;
+#endif
     }
 
     // ---------- Ring Visuals ----------
@@ -479,6 +632,28 @@ public class BossGrabHandler : MonoBehaviour
         DrawCircleOnLineRenderer(ringLR, grabRadius, segments);
         lastDrawnRadius = grabRadius;
         lastDrawnSegments = segments;
+    }
+
+    private void OnEnable()
+    {
+        if (ring != null)
+            ring.SetActive(true);
+    }
+
+    private void OnDisable()
+    {
+        charging = false;
+
+        if (grabRoutine != null)
+        {
+            StopCoroutine(grabRoutine);
+            grabRoutine = null;
+        }
+
+        CleanupGrab(activeGrabbedPlayer, activeGrabbedRb, false);
+
+        if (ring != null)
+            ring.SetActive(false);
     }
 
     private void OnDestroy()

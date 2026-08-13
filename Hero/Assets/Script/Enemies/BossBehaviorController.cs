@@ -217,7 +217,10 @@ public class BossBehaviorController : MonoBehaviour
     private Rigidbody2D rb;
     private BossHealth bossHealth;
     private BossStompAoeTelegraph2D stompAoeSequence;
+    private BossGrabHandler grabSequence;
     private bool isAttacking;
+
+    public bool IsAttacking => isAttacking;
     private bool isChasing;
     private float nextAttackTime;
     private readonly Dictionary<BossAttackType, float> cooldowns = new Dictionary<BossAttackType, float>();
@@ -244,6 +247,10 @@ public class BossBehaviorController : MonoBehaviour
         if (stompAoeSequence == null)
             stompAoeSequence = GetComponentInParent<BossStompAoeTelegraph2D>();
 
+        grabSequence = GetComponentInChildren<BossGrabHandler>(true);
+        if (grabSequence == null)
+            grabSequence = GetComponentInParent<BossGrabHandler>();
+
         aggro = GetComponent<EnemyAggro2D>();
         if (aggro == null) aggro = gameObject.AddComponent<EnemyAggro2D>();
         aggro.ConfigureRanges(detectionRange, giveUpRange);
@@ -255,6 +262,14 @@ public class BossBehaviorController : MonoBehaviour
         UpdateAggroTracking();
 
         player = aggro != null ? aggro.CurrentTarget : null;
+
+        // BossGrabHandler can run autonomously from its warning ring. Treat its
+        // charge, hold and throw as one authoritative boss attack.
+        if (grabSequence != null && grabSequence.IsRunning)
+        {
+            StopChasing();
+            return;
+        }
 
         if (player == null)
         {
@@ -297,7 +312,8 @@ public class BossBehaviorController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!isChasing || rb == null || player == null || aggro == null || !aggro.HasAuthority())
+        if ((grabSequence != null && grabSequence.IsRunning) ||
+            !isChasing || rb == null || player == null || aggro == null || !aggro.HasAuthority())
             return;
 
         Vector2 direction = ((Vector2)player.position - rb.position).normalized;
@@ -499,7 +515,22 @@ public class BossBehaviorController : MonoBehaviour
                     break;
                 case BossAttackType.Grab:
                     onGrab?.Invoke();
-                    yield return new WaitForSeconds(0.2f / attackSpeed);
+
+                    // Preserve existing event wiring, but use the actual grab
+                    // sequence as the completion signal when it is available.
+                    if (grabSequence != null && !grabSequence.IsRunning)
+                        grabSequence.TryBeginGrab();
+
+                    if (grabSequence != null && grabSequence.IsRunning)
+                    {
+                        while (grabSequence.IsRunning)
+                            yield return null;
+                    }
+                    else
+                    {
+                        // Legacy fallback for animation-only grab events.
+                        yield return new WaitForSeconds(0.2f / attackSpeed);
+                    }
                     break;
             }
 
