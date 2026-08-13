@@ -73,6 +73,7 @@ public class PlayerAttack : MonoBehaviour
     private Coroutine attackRoutine;
     private bool trailPlayedThisAttack;
     private PlayerDamageNumberWorld damageNumberWorld;
+    private SafeZoneFeedbackUI safeZoneFeedback;
 
     [SerializeField] private DamageUpgrade damageUpgrade;
     public DamageUpgrade DamageUpgrade => damageUpgrade;
@@ -102,6 +103,10 @@ public class PlayerAttack : MonoBehaviour
         if (damageNumberWorld == null)
             damageNumberWorld = gameObject.AddComponent<PlayerDamageNumberWorld>();
 
+        safeZoneFeedback = GetComponent<SafeZoneFeedbackUI>();
+        if (safeZoneFeedback == null)
+            safeZoneFeedback = gameObject.AddComponent<SafeZoneFeedbackUI>();
+
         // Start as ready
         AttackReadyTime = Time.time;
     }
@@ -114,7 +119,12 @@ public class PlayerAttack : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && canAttack && attackRoutine == null)
         {
             if (SafeZone2D.IsPlayerAttackBlocked(transform.position))
+            {
+                if (safeZoneFeedback != null)
+                    safeZoneFeedback.ShowAttackBlocked();
+
                 return;
+            }
 
             attackRoutine = StartCoroutine(PerformAttack());
         }
