@@ -4,6 +4,16 @@ public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private PlayerEquipment equipment;
+
+    [Header("Position Save")]
+    [Tooltip("How often the player's position is checked for an autosave.")]
+    [Min(0.5f)]
+    [SerializeField] private float positionAutosaveInterval = 3f;
+
+    [Tooltip("Minimum distance the player must move from the last saved point before a periodic autosave writes again.")]
+    [Min(0f)]
+    [SerializeField] private float positionSaveDistanceThreshold = 0.05f;
+
     public float EquipmentMovementSpeedBonus => equipment == null ? 0f : Mathf.Max(-0.9f, equipment.GetMovementSpeedBonus());
     public float EffectiveMoveSpeed => moveSpeed * (1f + EquipmentMovementSpeedBonus);
 
@@ -12,6 +22,9 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 movement;
     private SpriteRenderer sr;
     private float preserveExternalVelocityUntil;
+    private float positionAutosaveTimer;
+    private Vector2 lastSavedPosition;
+    private bool hasLastSavedPosition;
 
     /// <summary>
     /// Prevents player input from immediately overwriting an externally applied
@@ -27,12 +40,16 @@ public class PlayerMovement : MonoBehaviour
 
     private void Awake()
     {
+        rb = GetComponent<Rigidbody2D>();
         MinimapTarget2D.Ensure(gameObject, MinimapTargetKind.Player);
+        RestoreSavedPosition();
     }
 
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
+        if (rb == null)
+            rb = GetComponent<Rigidbody2D>();
+
         animator = GetComponent<Animator>();
         sr = GetComponent<SpriteRenderer>();
         if (equipment == null) equipment = GetComponent<PlayerEquipment>();
@@ -95,6 +112,19 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    private void LateUpdate()
+    {
+        if (rb == null)
+            return;
+
+        positionAutosaveTimer += Time.unscaledDeltaTime;
+        if (positionAutosaveTimer < Mathf.Max(0.5f, positionAutosaveInterval))
+            return;
+
+        positionAutosaveTimer = 0f;
+        SavePositionIfChanged();
+    }
+
 
     void FixedUpdate()
     {
@@ -108,5 +138,69 @@ public class PlayerMovement : MonoBehaviour
         }
 
         rb.linearVelocity = movement * EffectiveMoveSpeed;
+    }
+
+    private void RestoreSavedPosition()
+    {
+        if (rb == null)
+            return;
+
+        if (PlayerProgressSave.TryRestorePlayerPosition(out Vector2 savedPosition))
+        {
+            rb.position = savedPosition;
+            rb.linearVelocity = Vector2.zero;
+            movement = Vector2.zero;
+        }
+
+        lastSavedPosition = rb.position;
+        hasLastSavedPosition = true;
+    }
+
+    private void SavePositionIfChanged()
+    {
+        if (rb == null)
+            return;
+
+        Vector2 currentPosition = rb.position;
+        float threshold = Mathf.Max(0f, positionSaveDistanceThreshold);
+        float thresholdSquared = threshold * threshold;
+
+        if (hasLastSavedPosition &&
+            (currentPosition - lastSavedPosition).sqrMagnitude <= thresholdSquared)
+        {
+            return;
+        }
+
+        SavePosition(currentPosition);
+    }
+
+    private void SavePositionNow()
+    {
+        if (rb != null)
+            SavePosition(rb.position);
+    }
+
+    private void SavePosition(Vector2 position)
+    {
+        PlayerProgressSave.SavePlayerPosition(position);
+        lastSavedPosition = position;
+        hasLastSavedPosition = true;
+    }
+
+    private void OnApplicationPause(bool paused)
+    {
+        if (paused)
+            SavePositionNow();
+    }
+
+    private void OnApplicationQuit()
+    {
+        SavePositionNow();
+    }
+
+    private void OnValidate()
+    {
+        positionAutosaveInterval = Mathf.Max(0.5f, positionAutosaveInterval);
+        positionSaveDistanceThreshold = Mathf.Max(0f, positionSaveDistanceThreshold);
     }
 }

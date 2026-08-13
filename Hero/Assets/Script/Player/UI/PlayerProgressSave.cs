@@ -1,8 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// Owns persistent player progression. Inventory, position, health and enemy
-/// world state intentionally remain outside this first save-system stage.
+/// Owns persistent player progression and the player's last saved world position.
+/// Inventory, health and enemy world state remain outside this save system.
 /// </summary>
 public static class PlayerProgressSave
 {
@@ -13,6 +13,10 @@ public static class PlayerProgressSave
     private const string LevelKey = Prefix + "Level";
     private const string XpKey = Prefix + "XP";
     private const string AbilityPointsKey = Prefix + "AbilityPoints";
+
+    private const string PositionSavedKey = Prefix + "PositionSaved";
+    private const string PositionXKey = Prefix + "PositionX";
+    private const string PositionYKey = Prefix + "PositionY";
 
     private const string DamageLevelKey = Prefix + "DamageLevel";
     private const string MaxHealthLevelKey = Prefix + "MaxHealthLevel";
@@ -58,6 +62,40 @@ public static class PlayerProgressSave
         PlayerPrefs.SetInt(LevelKey, Mathf.Max(1, player.level));
         PlayerPrefs.SetInt(XpKey, Mathf.Max(0, player.xp));
         PlayerPrefs.SetInt(AbilityPointsKey, Mathf.Max(0, player.abilityPoints));
+        PlayerPrefs.Save();
+    }
+
+    public static bool TryRestorePlayerPosition(out Vector2 position)
+    {
+        position = Vector2.zero;
+
+        if (PlayerPrefs.GetInt(PositionSavedKey, 0) != 1)
+            return false;
+
+        float x = PlayerPrefs.GetFloat(PositionXKey, 0f);
+        float y = PlayerPrefs.GetFloat(PositionYKey, 0f);
+
+        if (float.IsNaN(x) || float.IsInfinity(x) ||
+            float.IsNaN(y) || float.IsInfinity(y))
+        {
+            return false;
+        }
+
+        position = new Vector2(x, y);
+        return true;
+    }
+
+    public static void SavePlayerPosition(Vector2 position)
+    {
+        if (float.IsNaN(position.x) || float.IsInfinity(position.x) ||
+            float.IsNaN(position.y) || float.IsInfinity(position.y))
+        {
+            return;
+        }
+
+        PlayerPrefs.SetInt(PositionSavedKey, 1);
+        PlayerPrefs.SetFloat(PositionXKey, position.x);
+        PlayerPrefs.SetFloat(PositionYKey, position.y);
         PlayerPrefs.Save();
     }
 
