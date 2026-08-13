@@ -61,7 +61,10 @@ public class BossStompAoeTelegraph2D : MonoBehaviour
     [SerializeField] private bool fireSimulationLocal = true;
 
     private bool running;
+    private Coroutine stompRoutine;
     private EnemyDifficultyProfile difficultyProfile;
+
+    public bool IsRunning => running;
 
     // For prediction fallback if player has no Rigidbody2D velocity:
     private Vector2 lastPlayerPos;
@@ -105,13 +108,22 @@ public class BossStompAoeTelegraph2D : MonoBehaviour
         lastPlayerPos = current;
     }
 
-    // Hook this to BossBehaviorController.onStompAoe
+    // Hook this to BossBehaviorController.onStompAoe.
     public void PlayStompAoe()
+    {
+        TryPlayStompAoe();
+    }
+
+    /// <summary>
+    /// Starts the complete telegraphed AOE sequence when its requirements are valid.
+    /// Returns false when another sequence is active or setup is incomplete.
+    /// </summary>
+    public bool TryPlayStompAoe()
     {
         if (running)
         {
             if (logDebug) Debug.Log("[AOE] PlayStompAoe ignored (already running)");
-            return;
+            return false;
         }
 
         EnsurePlayer();
@@ -119,27 +131,27 @@ public class BossStompAoeTelegraph2D : MonoBehaviour
         if (player == null)
         {
             Debug.LogWarning("[AOE] No player found (tag mismatch?)");
-            return;
+            return false;
         }
 
         if (telegraphPrimaryPrefab == null)
         {
             Debug.LogWarning("[AOE] telegraphPrimaryPrefab is NULL (assign in inspector)");
-            return;
+            return false;
         }
 
         if (strikeCount <= 0)
         {
             Debug.LogWarning("[AOE] strikeCount <= 0");
-            return;
+            return false;
         }
 
         if (logDebug) Debug.Log("[AOE] PlayStompAoe START");
 
-        // Trigger attack animation once for the whole combo
+        running = true;
         bossAnim?.PlayAttack();
-
-        StartCoroutine(StompRoutine());
+        stompRoutine = StartCoroutine(StompRoutine());
+        return true;
     }
 
 
@@ -159,8 +171,6 @@ public class BossStompAoeTelegraph2D : MonoBehaviour
 
     private IEnumerator StompRoutine()
     {
-        running = true;
-
         GameObject currentTele = null;
         GameObject nextTele = null;
 
@@ -235,6 +245,7 @@ public class BossStompAoeTelegraph2D : MonoBehaviour
         {
             // Always reset state + animation, even if something interrupts the coroutine
             running = false;
+            stompRoutine = null;
             bossAnim?.PlayIdle();
 
             // Safety: if coroutine ends early, clean leftovers
@@ -465,6 +476,8 @@ public class BossStompAoeTelegraph2D : MonoBehaviour
 
         if (logDebug) Debug.Log($"[AOE] Overlap hits={hits.Length}");
 
+        HashSet<PlayerHealth> damagedPlayers = new HashSet<PlayerHealth>();
+
         for (int i = 0; i < hits.Length; i++)
         {
             Collider2D other = hits[i];
@@ -472,9 +485,9 @@ public class BossStompAoeTelegraph2D : MonoBehaviour
 
             // ✅ Samme som i EnemyBullet (finder PlayerHealth på parent)
             var hp = other.GetComponentInParent<PlayerHealth>();
-            if (hp == null) continue;
+            if (hp == null || !damagedPlayers.Add(hp)) continue;
 
-            // Damage (kun én gang)
+            // Damage once per unique player, even when that player has several colliders.
             if (difficultyProfile == null)
                 difficultyProfile = GetComponentInParent<EnemyDifficultyProfile>();
             float scaledDamage = difficultyProfile != null
@@ -500,7 +513,18 @@ public class BossStompAoeTelegraph2D : MonoBehaviour
             }
 
             if (logDebug) Debug.Log($"[AOE] Damaged player for {damage}");
-            break; // stop så du ikke rammer flere gange pga flere colliders
         }
+    }
+
+    private void OnDisable()
+    {
+        if (stompRoutine != null)
+        {
+            StopCoroutine(stompRoutine);
+            stompRoutine = null;
+        }
+
+        running = false;
+        bossAnim?.PlayIdle();
     }
 }

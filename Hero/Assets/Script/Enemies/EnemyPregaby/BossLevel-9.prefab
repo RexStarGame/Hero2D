@@ -948,6 +948,7 @@ MonoBehaviour:
   routeValidationInterval: 0.2
   stuckTimeout: 1
   minimumProgressDistance: 0.05
+  regionalTargetSearchAttempts: 32
   showPatrolTarget: 1
 --- !u!95 &1378482468039930319
 Animator:
@@ -984,10 +985,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 1000
-  xpReward: 500
+  xpReward: 300
   onDeath:
     m_PersistentCalls:
       m_Calls: []
+  deathDestroyDelay: 0
 --- !u!114 &-3651679510663702152
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1247,7 +1249,7 @@ MonoBehaviour:
   maxHealth: 1000
   currentHealth: 1000
   destroyOnDeath: 1
-  xpReward: 100
+  xpReward: 300
   onHealthChanged:
     m_PersistentCalls:
       m_Calls: []
