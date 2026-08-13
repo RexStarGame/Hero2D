@@ -9,9 +9,15 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField] private float hitboxActiveTime = 0.2f;
     [SerializeField] private float hitboxDistance = 0.7f;
 
-    public float AttackCooldown => attackCooldown;      // attack speed value (seconds)
-    public float LifeStealPercent => lifeStealPercent;  // 0..1
-    public float CritChance => critChance;              // 0..1
+    public float BaseAttackCooldown => attackCooldown;
+    public float EquipmentAttackSpeedBonus => equipment == null ? 0f : Mathf.Max(0f, equipment.GetAttackSpeedBonus());
+    public float AttackCooldown => attackCooldown / (1f + EquipmentAttackSpeedBonus);
+    public float AbilityLifeStealPercent => lifeStealPercent;
+    public float EquipmentLifeStealPercent => equipment == null ? 0f : equipment.GetLifeStealBonus();
+    public float LifeStealPercent => Mathf.Max(0f, AbilityLifeStealPercent + EquipmentLifeStealPercent);
+    public float AbilityCritChance => critChance;
+    public float EquipmentCritChance => equipment == null ? 0f : equipment.GetCriticalChanceBonus();
+    public float CritChance => Mathf.Clamp01(AbilityCritChance + EquipmentCritChance);
     public float CritMultiplier => critMultiplier;      // e.g. 2.0
 
     // ---------- NEW: Cooldown/Ready info for UI ----------
@@ -21,7 +27,7 @@ public class PlayerAttack : MonoBehaviour
     public float AttackReadyTime { get; private set; }
 
     // Full cycle from pressing attack until you can attack again
-    public float AttackCycleDuration => hitboxStartDelay + hitboxActiveTime + attackCooldown;
+    public float AttackCycleDuration => hitboxStartDelay + hitboxActiveTime + AttackCooldown;
 
     public float CooldownRemaining => Mathf.Max(0f, AttackReadyTime - Time.time);
 
@@ -39,9 +45,11 @@ public class PlayerAttack : MonoBehaviour
     [Header("References")]
     [SerializeField] private Collider2D attackHitbox;
     [SerializeField] private Animator animator;
+    [SerializeField] private SwordSwingTrail2D swordSwingTrail;
 
     [Header("Health (for Life Steal)")]
     [SerializeField] private PlayerHealth playerHealth;
+    [SerializeField] private PlayerEquipment equipment;
 
     [Header("Attack Upgrades")]
     public int attackSpeedLevel = 0;
@@ -63,6 +71,7 @@ public class PlayerAttack : MonoBehaviour
     private bool canAttack = true;
     private Vector2 lastFacingDirection = Vector2.down;
     private Coroutine attackRoutine;
+    private bool trailPlayedThisAttack;
 
     [SerializeField] private DamageUpgrade damageUpgrade;
     public DamageUpgrade DamageUpgrade => damageUpgrade;
@@ -72,8 +81,18 @@ public class PlayerAttack : MonoBehaviour
         if (attackHitbox != null) attackHitbox.enabled = false;
         if (animator == null) animator = GetComponentInChildren<Animator>();
 
+        if (swordSwingTrail == null && attackHitbox != null)
+        {
+            swordSwingTrail = attackHitbox.GetComponent<SwordSwingTrail2D>();
+            if (swordSwingTrail == null)
+                swordSwingTrail = attackHitbox.gameObject.AddComponent<SwordSwingTrail2D>();
+        }
+
         if (playerHealth == null)
             playerHealth = GetComponent<PlayerHealth>();
+
+        if (equipment == null)
+            equipment = GetComponent<PlayerEquipment>();
 
         if (damageUpgrade == null)
             damageUpgrade = GetComponent<DamageUpgrade>();
@@ -89,6 +108,9 @@ public class PlayerAttack : MonoBehaviour
         // Only start attack if allowed
         if (Input.GetKeyDown(KeyCode.Space) && canAttack && attackRoutine == null)
         {
+            if (SafeZone2D.IsPlayerAttackBlocked(transform.position))
+                return;
+
             attackRoutine = StartCoroutine(PerformAttack());
         }
 
@@ -116,6 +138,7 @@ public class PlayerAttack : MonoBehaviour
     {
         canAttack = false;
         attackRoutine = null;
+        trailPlayedThisAttack = false;
 
         // NEW: set when we will be ready again (includes delays + cooldown)
         AttackReadyTime = Time.time + AttackCycleDuration;
@@ -127,7 +150,7 @@ public class PlayerAttack : MonoBehaviour
         }
 
         yield return new WaitForSeconds(hitboxStartDelay);
-        if (attackHitbox != null) attackHitbox.enabled = true;
+        ActivateHitboxAndTrail();
 
         yield return new WaitForSeconds(hitboxActiveTime);
         if (attackHitbox != null) attackHitbox.enabled = false;
@@ -135,7 +158,10 @@ public class PlayerAttack : MonoBehaviour
         if (animator != null)
             animator.SetBool(animationBoolName, false);
 
-        yield return new WaitForSeconds(attackCooldown);
+        if (swordSwingTrail != null)
+            swordSwingTrail.StopTrail();
+
+        yield return new WaitForSeconds(AttackCooldown);
         canAttack = true;
         attackRoutine = null;
 
@@ -151,13 +177,14 @@ public class PlayerAttack : MonoBehaviour
 
         canAttack = true;
         if (attackHitbox != null) attackHitbox.enabled = false;
+        if (swordSwingTrail != null) swordSwingTrail.StopTrail();
+        trailPlayedThisAttack = false;
     }
 
     public void EnableHitbox()
     {
         Debug.Log("Hitbox enabled");
-        if (attackHitbox != null)
-            attackHitbox.enabled = true;
+        ActivateHitboxAndTrail();
     }
 
     public void DisableHitbox()
@@ -167,13 +194,29 @@ public class PlayerAttack : MonoBehaviour
             attackHitbox.enabled = false;
     }
 
+    private void ActivateHitboxAndTrail()
+    {
+        if (attackHitbox != null)
+            attackHitbox.enabled = true;
+
+        if (trailPlayedThisAttack || swordSwingTrail == null)
+            return;
+
+        // The trail belongs to the visible attack animation, never idle state.
+        if (animator != null && !animator.GetBool(animationBoolName))
+            return;
+
+        trailPlayedThisAttack = true;
+        swordSwingTrail.PlaySwing();
+    }
+
 
     // ---------- Crit: compute damage for a hit ----------
     public int GetDamageForHit(int baseDamage)
     {
         if (baseDamage <= 0) return 0;
 
-        bool isCrit = Random.value < Mathf.Clamp01(critChance);
+        bool isCrit = Random.value < CritChance;
         if (!isCrit) return baseDamage;
 
         int critDamage = Mathf.RoundToInt(baseDamage * critMultiplier);
@@ -184,10 +227,10 @@ public class PlayerAttack : MonoBehaviour
     public void OnSuccessfulHit(float damageDealt)
     {
         if (playerHealth == null) return;
-        if (lifeStealPercent <= 0f) return;
+        if (LifeStealPercent <= 0f) return;
         if (damageDealt <= 0f) return;
 
-        float healAmount = damageDealt * lifeStealPercent;
+        float healAmount = damageDealt * LifeStealPercent;
         if (healAmount <= 0f) return;
 
         playerHealth.Heal(healAmount);

@@ -47,6 +47,8 @@ public class EnemySpiralShooter : MonoBehaviour
     private bool isShooting;
     private Coroutine shootRoutine;
     private AudioSource audioSource;
+    private EnemyAggro2D aggro;
+    private EnemyDifficultyProfile difficultyProfile;
 
     private void Start()
     {
@@ -59,11 +61,20 @@ public class EnemySpiralShooter : MonoBehaviour
         AttackReadyTime = Time.time;
 
         audioSource = GetComponent<AudioSource>(); // optional (add AudioSource if you want SFX)
+
+        aggro = GetComponent<EnemyAggro2D>();
+        if (aggro == null) aggro = gameObject.AddComponent<EnemyAggro2D>();
+
+        difficultyProfile = GetComponentInParent<EnemyDifficultyProfile>();
+        if (difficultyProfile == null)
+            difficultyProfile = GetComponentInChildren<EnemyDifficultyProfile>(true);
     }
 
     private void Update()
     {
+        if (aggro != null) player = aggro.CurrentTarget;
         if (player == null || bulletPrefab == null) return;
+        if (SafeZone2D.IsPlayerProtected(player.position)) return;
         if (isShooting || shootRoutine != null) return;
         if (Time.time < AttackReadyTime) return;
 
@@ -103,6 +114,14 @@ public class EnemySpiralShooter : MonoBehaviour
         if (telegraphInstance != null)
             Destroy(telegraphInstance);
 
+        // The player may enter safety during the telegraph.
+        if (player == null || SafeZone2D.IsPlayerProtected(player.position))
+        {
+            isShooting = false;
+            shootRoutine = null;
+            yield break;
+        }
+
         // Base direction for first bullet
         Vector2 baseDir = (targetPos - (Vector2)firePoint.position).normalized;
         if (baseDir.sqrMagnitude < 0.001f) baseDir = Vector2.right;
@@ -115,7 +134,10 @@ public class EnemySpiralShooter : MonoBehaviour
             float ang = (i == 0 && lockFirstAim) ? baseAngle : (baseAngle + (i * step));
             Quaternion rot = Quaternion.Euler(0f, 0f, ang);
 
-            Instantiate(bulletPrefab, firePoint.position, rot);
+            GameObject projectile = Instantiate(
+                bulletPrefab, firePoint.position, rot);
+            if (difficultyProfile != null)
+                difficultyProfile.ApplyToSpawnedDamage(projectile);
 
             if (shotDelay > 0f)
                 yield return new WaitForSeconds(shotDelay);

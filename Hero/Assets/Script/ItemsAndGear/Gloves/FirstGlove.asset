@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f2477849a84ab0458c29c68740e0b03, type: 3}
+  m_Name: FirstGlove
+  m_EditorClassIdentifier: 
+  itemID: '@4dcsk4r3dpgpfc450'
+  itemName: Fur Gloves
+  description: just some old gloves that might help you a little...
+  rarity: 0
+  requiredLevel: 1
+  goldValue: 50
+  icon: {fileID: -2838672241945654444, guid: f8b4fc6da272033439487e65009b3223, type: 3}
+  worldPrefab: {fileID: 81302450339565686, guid: f8264a80d0327014781588a08a6a0b32, type: 3}
+  equipmentSlot: 4
+  statModifiers:
+    maxHealth: 10
+    damage: 0
+    defense: 4
+    regeneration: 0.05
+    lifeSteal: 0
+    criticalChance: 0
+    attackSpeed: 0
+    movementSpeed: 0
+  armorRating: 0

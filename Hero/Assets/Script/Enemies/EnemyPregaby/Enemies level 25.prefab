@@ -50,6 +50,8 @@ GameObject:
   - component: {fileID: -3651679510663702152}
   - component: {fileID: -8708243518032412209}
   - component: {fileID: 878880681790245415}
+  - component: {fileID: 4932240404900250367}
+  - component: {fileID: 8625283916152591775}
   m_Layer: 3
   m_Name: Enemies level 25
   m_TagString: Enemy
@@ -215,6 +217,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 3
   waitTime: 2
+  detectionRange: 6
+  giveUpRange: 10
+  chaseStopDistance: 0.9
+  chaseSpeedMultiplier: 1.15
+  routeValidationInterval: 0.2
+  stuckTimeout: 1
+  minimumProgressDistance: 0.05
+  showPatrolTarget: 1
 --- !u!95 &1378482468039930319
 Animator:
   serializedVersion: 7
@@ -249,8 +259,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12ad796373a86fb46af69ae35cfd02b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 1800
-  xpReward: 9450
+  maxHealth: 235
+  xpReward: 500
+  onDeath:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &3745639338394277203
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -407,3 +420,47 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be42cee28163cab4bb3a26f007ac9409, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4932240404900250367
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8233854846743954295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f6649c0106740a8967350e37e6de719, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minCoins: 170
+  maxCoins: 278
+  wallet: {fileID: 0}
+--- !u!114 &8625283916152591775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8233854846743954295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1f5977c97154415b18d83abfa20cdf6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  easy:
+    bonusHealthPercent: 0
+    bonusDamagePercent: 0
+  normal:
+    bonusHealthPercent: 30
+    bonusDamagePercent: 15
+  hard:
+    bonusHealthPercent: 90
+    bonusDamagePercent: 60
+  calculateExtremeAsMidpoint: 1
+  profileVersion: 2
+  extreme:
+    bonusHealthPercent: 130
+    bonusDamagePercent: 100
+  nightmare:
+    bonusHealthPercent: 160
+    bonusDamagePercent: 125

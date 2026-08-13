@@ -52,6 +52,7 @@ public class BossGrabHandler : MonoBehaviour
     [Header("Grab Hold + Throw")]
     [SerializeField] private float holdTime = 0.5f;
     [SerializeField] private float damage = 20f;
+    private EnemyDifficultyProfile difficultyProfile;
     [SerializeField] private float throwForce = 12f;
 
     [Range(0f, 45f)]
@@ -102,6 +103,8 @@ public class BossGrabHandler : MonoBehaviour
 
     private void Awake()
     {
+        difficultyProfile = GetComponentInParent<EnemyDifficultyProfile>();
+
         if (warningAnchor == null)
             warningAnchor = (grabPoint != null) ? grabPoint : transform;
 
@@ -264,7 +267,15 @@ public class BossGrabHandler : MonoBehaviour
         player.SetParent(oldParent, worldPositionStays: true);
         RestoreWorldScale(player, savedWorldScale);
 
-        player.gameObject.SendMessage("TakeDamage", damage, SendMessageOptions.DontRequireReceiver);
+        if (difficultyProfile == null)
+            difficultyProfile = GetComponentInParent<EnemyDifficultyProfile>();
+        float scaledDamage = difficultyProfile != null
+            ? difficultyProfile.ScaleDamage(damage)
+            : damage * EnemyDifficultyProfile.GetDefaultDamageMultiplier();
+        DifficultyDebugTelemetry.RecordEnemyDamage(
+            this, damage, scaledDamage);
+        player.gameObject.SendMessage(
+            "TakeDamage", scaledDamage, SendMessageOptions.DontRequireReceiver);
 
         if (playerRb != null)
         {

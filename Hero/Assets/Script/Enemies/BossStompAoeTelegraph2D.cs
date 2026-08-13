@@ -61,6 +61,7 @@ public class BossStompAoeTelegraph2D : MonoBehaviour
     [SerializeField] private bool fireSimulationLocal = true;
 
     private bool running;
+    private EnemyDifficultyProfile difficultyProfile;
 
     // For prediction fallback if player has no Rigidbody2D velocity:
     private Vector2 lastPlayerPos;
@@ -68,6 +69,8 @@ public class BossStompAoeTelegraph2D : MonoBehaviour
 
     private void Awake()
     {
+        difficultyProfile = GetComponentInParent<EnemyDifficultyProfile>();
+
         // Cache animation component (optional if set in Inspector)
         if (bossAnim == null)
             bossAnim = GetComponentInChildren<BossAttackAnimation>(true);
@@ -472,7 +475,14 @@ public class BossStompAoeTelegraph2D : MonoBehaviour
             if (hp == null) continue;
 
             // Damage (kun én gang)
-            hp.TakeDamage(damage);
+            if (difficultyProfile == null)
+                difficultyProfile = GetComponentInParent<EnemyDifficultyProfile>();
+            float scaledDamage = difficultyProfile != null
+                ? difficultyProfile.ScaleDamage(damage)
+                : damage * EnemyDifficultyProfile.GetDefaultDamageMultiplier();
+            DifficultyDebugTelemetry.RecordEnemyDamage(
+                this, damage, scaledDamage);
+            hp.TakeDamage(scaledDamage);
 
             // Knockback (brug rb på parent hvis child collider ikke har rb)
             if (applyKnockback)

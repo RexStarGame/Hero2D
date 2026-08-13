@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 768067447680fd84fb4e1e40643a66d5, type: 3}
+  m_Name: Helmet - 1
+  m_EditorClassIdentifier: 
+  itemID: "@c56t324ctgklc\xE6csw434"
+  itemName: Hoodie
+  description: 'a hood from your own father to keep you safe... i''ll make a better
+    description later... '
+  rarity: 0
+  requiredLevel: 2
+  goldValue: 70
+  icon: {fileID: -6128539358149561950, guid: 5448e8d73b7e75049b0bca27e5001430, type: 3}
+  worldPrefab: {fileID: 7453752399748477125, guid: ce11c9f98c29c934f9d75ad51cff6c16, type: 3}
+  equipmentSlot: 2
+  statModifiers:
+    maxHealth: 10
+    damage: 0
+    defense: 6
+    regeneration: 0
+    lifeSteal: 0.04
+    criticalChance: 0
+    attackSpeed: 0
+    movementSpeed: 0
+  armorRating: 2

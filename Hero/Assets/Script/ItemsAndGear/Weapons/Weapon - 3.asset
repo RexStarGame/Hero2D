@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e58d3672d1ed2db498e592ec117e887e, type: 3}
+  m_Name: Weapon - 3
+  m_EditorClassIdentifier: 
+  itemID: '@f34m42cx34gsd24ru47232'
+  itemName: 
+  description: An old ronin reinforced this blade with bronze after its steel began
+    to fail. It is heavier than a common sword, but every strike carries the patience
+    of one who survived defeat
+  rarity: 2
+  requiredLevel: 10
+  goldValue: 3245
+  icon: {fileID: -254455751072573816, guid: 118ed08431674394bb988c1b45d422ac, type: 3}
+  worldPrefab: {fileID: 0}
+  equipmentSlot: 1
+  statModifiers:
+    maxHealth: 0
+    damage: 23
+    defense: 0
+    regeneration: 0
+    lifeSteal: 0.065
+    criticalChance: 0.06
+    attackSpeed: 0.03
+    movementSpeed: 0
+  weaponType: 0
+  baseDamage: 0
+  attackRange: 1

@@ -14,6 +14,7 @@ public class DamageUpgrade : MonoBehaviour
     [Header("Upgrade Cost")]
     [SerializeField] private int cost = 1;
     [SerializeField] private PlayerXP playerXP;
+    [SerializeField] private PlayerEquipment equipment;
 
     [Header("UI")]
     [SerializeField] private TMP_Text levelText;
@@ -22,11 +23,47 @@ public class DamageUpgrade : MonoBehaviour
     public UnityEvent<int> onDamageChanged; // sends new Damage value
 
     // ✅ This is the REAL damage used by the player
-    public int Damage => damage + (damageLevel * damagePerLevel);
+    public int BaseAndAbilityDamage => damage + (damageLevel * damagePerLevel);
+    public int EquipmentDamageBonus
+    {
+        get
+        {
+            // This component currently lives under an upgrade-menu UI object,
+            // which can be inactive at startup. Resolve gameplay references on
+            // demand so equipped-item damage never depends on opening that UI.
+            ResolveReferences();
+            return equipment == null ? 0 : Mathf.RoundToInt(equipment.GetDamageBonus());
+        }
+    }
+    public int Damage => BaseAndAbilityDamage + EquipmentDamageBonus;
 
     public int DamageLevel => damageLevel;
 
     private void Awake()
+    {
+        ResolveReferences();
+
+        UpdateLevelText();
+        onDamageChanged?.Invoke(Damage);
+    }
+
+    private void OnEnable()
+    {
+        ResolveReferences();
+        if (equipment != null)
+        {
+            equipment.EquipmentChanged -= HandleEquipmentChanged;
+            equipment.EquipmentChanged += HandleEquipmentChanged;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (equipment != null)
+            equipment.EquipmentChanged -= HandleEquipmentChanged;
+    }
+
+    private void ResolveReferences()
     {
         if (playerXP == null)
         {
@@ -37,6 +74,24 @@ public class DamageUpgrade : MonoBehaviour
 #endif
         }
 
+        if (equipment != null) return;
+
+        // DamageUpgrade currently lives on a UI object, while equipment lives
+        // on Player. PlayerXP is already a reliable reference to that Player.
+        if (playerXP != null)
+            equipment = playerXP.GetComponent<PlayerEquipment>();
+
+        if (equipment != null) return;
+
+#if UNITY_2023_1_OR_NEWER
+        equipment = FindAnyObjectByType<PlayerEquipment>();
+#else
+        equipment = FindObjectOfType<PlayerEquipment>();
+#endif
+    }
+
+    private void HandleEquipmentChanged()
+    {
         UpdateLevelText();
         onDamageChanged?.Invoke(Damage);
     }

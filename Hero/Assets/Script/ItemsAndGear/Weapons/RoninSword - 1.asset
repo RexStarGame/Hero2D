@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e58d3672d1ed2db498e592ec117e887e, type: 3}
+  m_Name: RoninSword - 1
+  m_EditorClassIdentifier: 
+  itemID: '@f34dcfcx34gsdaqru47232'
+  itemName: Wooden Romin Sword
+  description: 'just a decription for now i''ll edit it later :) '
+  rarity: 0
+  requiredLevel: 3
+  goldValue: 100
+  icon: {fileID: 5055297531225710034, guid: 3e0e80f4d3b84294ba305243adf537e7, type: 3}
+  worldPrefab: {fileID: 6478795621236157954, guid: a0acb62a23c3a9842993680f01212b4a, type: 3}
+  equipmentSlot: 1
+  statModifiers:
+    maxHealth: 0
+    damage: 7
+    defense: 0
+    regeneration: 0
+    lifeSteal: 0
+    criticalChance: 0
+    attackSpeed: 0
+    movementSpeed: 0.8
+  weaponType: 0
+  baseDamage: 0
+  attackRange: 1

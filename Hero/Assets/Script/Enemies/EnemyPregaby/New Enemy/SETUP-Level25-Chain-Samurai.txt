@@ -1,0 +1,60 @@
+LEVEL 25 ORC / CHAIN ENEMY SETUP
+
+AUTOMATIC SETUP (RECOMMENDED)
+
+1. Let Unity finish importing the project and the split Orc PNG files.
+2. In Unity's top menu choose:
+   Hero2D > Enemies > Setup Level 25 Orc
+3. The tool configures the existing "Chain Enemy" prefab. It does not add an
+   enemy to the open scene.
+4. Add "Chain Enemy" to EnemySpawn's Enemy Pool with Min Level 25.
+
+WHAT THE TOOL CONFIGURES
+
+- Builds normal standalone .anim files and Level25 Orc.controller from the
+  100x100 Orc PNG strips:
+  Idle (6), Walk (8), Attack01 (6), Attack02 (6), Hurt (4), Death (4).
+- Assigns that Animator Controller to Chain Enemy.prefab.
+- Uses horizontal sprite flipping because this art is side-facing, not a
+  four-direction sprite set.
+- Sets Rigidbody2D Gravity Scale to 0, interpolation on and rotation frozen.
+- Replaces the weapon-shaped PolygonCollider2D with one stable body-only
+  CapsuleCollider2D. The weapon drawn in the animation is visual only.
+- Connects Attack01 to the aimed slash and Attack02 to the larger circular AOE.
+- Keeps the enemy alive briefly after death so the Death animation can finish.
+- Ensures EnemyCoins and HitFeedback are present.
+
+IMPORTANT
+
+Do not also add MageRed or EnemyAttack. ChainSamuraiLevel25 owns movement and
+both attacks. Adding another movement/attack controller would make the scripts
+fight each other.
+
+COMBAT
+
+- Attack 1: short aimed chain slash. Yellow warning cone.
+- Attack 2: larger circular chain AOE. Red warning circle.
+- Damage occurs after the warning/windup and is scaled by the selected game
+  difficulty through EnemyDifficultyProfile.
+- SafeZone protection and EnemyAggro2D authority remain shared with the other
+  enemies and future co-op preparation.
+
+TUNING
+
+Select Chain Enemy.prefab and edit ChainSamuraiLevel25 in the Inspector:
+- detection/give-up range
+- movement speed
+- slash/AOE range and damage
+- cooldown and AOE chance
+- warning colours and widths
+
+EnemyHealth controls base health and XP. EnemyCoins controls the random minimum
+and maximum coin reward.
+
+WHY THE RAW ASEPRITE FILE IS OUTSIDE ASSETS
+
+The original Orc.aseprite source is preserved in Hero/SourceArt, outside Unity's
+Assets folder. Some Unity/Aseprite importer combinations cannot read its format.
+Keeping it outside Assets prevents import errors and stops Unity from rebuilding
+and erasing Animator transitions. The game uses ordinary PNG sprites, .anim
+clips and a standalone Animator Controller instead.

@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3611d678efbbef04a93edaec562a1f6f, type: 3}
+  m_Name: Chest - 2
+  m_EditorClassIdentifier: 
+  itemID: "@gk234fqs\xE6f44234421qdCV3"
+  itemName: Sanada Bronze-Fur Armour
+  description: Worn armour bearing the Sanada six-coin crest. Its thick fur and aged
+    bronze plates have protected many wandering warriors.
+  rarity: 2
+  requiredLevel: 12
+  goldValue: 1850
+  icon: {fileID: -4811841700611195683, guid: 0f0240f490f1ee540ad6ea72c1f31081, type: 3}
+  worldPrefab: {fileID: 8095208919230466080, guid: f0381b8a5ab83ac49b88af1aa03900cc, type: 3}
+  equipmentSlot: 3
+  statModifiers:
+    maxHealth: 30
+    damage: 0
+    defense: 16
+    regeneration: 0
+    lifeSteal: 0
+    criticalChance: 0
+    attackSpeed: 0
+    movementSpeed: 0.05
+    experienceGain: 0
+  armorRating: 0

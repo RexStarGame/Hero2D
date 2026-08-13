@@ -6,12 +6,16 @@ public class PlayerStats : MonoBehaviour
 {
     [Header("UI")]
     [SerializeField] private TMP_Text statsText;
+    [SerializeField] private TMP_Text defenseText;
+    [Tooltip("Separate, low-noise text field for XP gained from equipped gear.")]
+    [SerializeField] private TMP_Text experienceBonusText;
 
     [Header("References (auto-find if null)")]
     [SerializeField] private PlayerXP playerXP;
     [SerializeField] private PlayerHealth playerHealth;
     [SerializeField] private PlayerAttack playerAttack;
     [SerializeField] private DamageUpgrade damageUpgrade;
+    [SerializeField] private PlayerEquipment equipment;
 
     [Header("Refresh")]
     [SerializeField] private float refreshInterval = 0.15f;
@@ -91,6 +95,7 @@ public class PlayerStats : MonoBehaviour
         if (playerXP == null) playerXP = FindAny<PlayerXP>();
         if (playerHealth == null) playerHealth = FindAny<PlayerHealth>();
         if (playerAttack == null) playerAttack = FindAny<PlayerAttack>();
+        if (equipment == null) equipment = FindAny<PlayerEquipment>();
 
         if (damageUpgrade == null && playerAttack != null)
             damageUpgrade = playerAttack.DamageUpgrade;
@@ -101,6 +106,12 @@ public class PlayerStats : MonoBehaviour
         {
             var go = GameObject.Find("UpgradeMenu");
              if (go != null) upgradeMenu = go;
+        }
+
+        if (experienceBonusText == null)
+        {
+            GameObject go = GameObject.Find("ExperienceBonusText");
+            if (go != null) experienceBonusText = go.GetComponent<TMP_Text>();
         }
     }
     public void ResumeGame()
@@ -122,6 +133,9 @@ public class PlayerStats : MonoBehaviour
     }
     private void ForceUpdate()
     {
+        UpdateDefenseText();
+        UpdateExperienceBonusText();
+
         if (statsText == null) return;
 
         sb.Clear();
@@ -129,6 +143,7 @@ public class PlayerStats : MonoBehaviour
         // Title
         sb.AppendLine(Head("PLAYER STATS"));
         sb.AppendLine(Soft("──────────────"));
+        sb.AppendLine();
 
         // Ability Points
         if (playerXP != null)
@@ -141,45 +156,52 @@ public class PlayerStats : MonoBehaviour
             sb.AppendLine(Row("Ability Points", Soft("N/A")));
         }
 
-        sb.AppendLine(Soft(" "));
+        sb.AppendLine("<size=45%> </size>");
 
         // Health + Regen
         sb.AppendLine(Head("SURVIVABILITY"));
+        sb.AppendLine("<size=35%> </size>");
 
         if (playerHealth != null)
         {
-            float hpPct = (playerHealth.maxHealth > 0f) ? (playerHealth.health / playerHealth.maxHealth) : 0f;
+            float hpPct = playerHealth.MaxHealth > 0f ? playerHealth.health / playerHealth.MaxHealth : 0f;
             string hpCol = hpPct >= 0.60f ? goodColor : (hpPct >= 0.25f ? warnColor : badColor);
 
             sb.AppendLine(Row("HP",
-                $"{Color($"{playerHealth.health:0}", hpCol)}/{Color($"{playerHealth.maxHealth:0}", valueColor)}  {Soft($"(MaxHP Lv {playerHealth.maxHealthLevel})")}"));
+                $"{Color($"{playerHealth.health:0}", hpCol)}/{Color($"{playerHealth.MaxHealth:0}", valueColor)}{Bonus(playerHealth.EquipmentHealthBonus, "0")}  {Soft($"(MaxHP Lv {playerHealth.maxHealthLevel})")}"));
 
-            float regenPerSec = (playerHealth.baseRegen + playerHealth.regenLevel * playerHealth.regenPerLevel);
+            sb.AppendLine("<size=35%> </size>");
+
+            float regenPerSec = playerHealth.baseRegen + playerHealth.regenLevel * playerHealth.regenPerLevel;
             string regenCol = regenPerSec > 0f ? blueColor : mutedColor;
 
             sb.AppendLine(Row("Regen",
-                $"{Soft($"Lv {playerHealth.regenLevel}")}  {Color($"{regenPerSec:0.00}/s", regenCol)}"));
+                $"{Soft($"Lv {playerHealth.regenLevel}")}  {Color($"{regenPerSec:0.00}/s", regenCol)}{Bonus(playerHealth.EquipmentRegenBonus, "0.00", "/s")}"));
         }
         else
         {
             sb.AppendLine(Row("HP", Soft("N/A")));
+            sb.AppendLine("<size=35%> </size>");
             sb.AppendLine(Row("Regen", Soft("N/A")));
         }
 
-        sb.AppendLine(Soft(" "));
+        sb.AppendLine("<size=55%> </size>");
 
         // Damage
         sb.AppendLine(Head("OFFENSE"));
+        sb.AppendLine("<size=35%> </size>");
 
         if (damageUpgrade != null)
         {
             sb.AppendLine(Row("Damage",
-                $"{Color($"{damageUpgrade.Damage}", valueColor)}  {Soft($"(Lv {damageUpgrade.DamageLevel})")}"));
+                $"{Color($"{damageUpgrade.BaseAndAbilityDamage}", valueColor)}{Bonus(damageUpgrade.EquipmentDamageBonus, "0")}  {Soft($"(Lv {damageUpgrade.DamageLevel})")}"));
         }
         else
         {
             sb.AppendLine(Row("Damage", Soft("N/A")));
         }
+
+        sb.AppendLine("<size=35%> </size>");
 
         // Attack stats
         if (playerAttack != null)
@@ -188,17 +210,23 @@ public class PlayerStats : MonoBehaviour
             float aps = cd > 0.0001f ? (1f / cd) : 0f;
 
             sb.AppendLine(Row("Attack Speed",
-                $"{Soft($"Lv {playerAttack.attackSpeedLevel}")}  {Color($"{cd:0.00}s", valueColor)} {Soft($"(~{aps:0.00}/s)")}"));
+                $"{Soft($"Lv {playerAttack.attackSpeedLevel}")}  {Color($"{cd:0.00}s", valueColor)}{Bonus(playerAttack.EquipmentAttackSpeedBonus * 100f, "0.##", "% speed")} {Soft($"(~{aps:0.00}/s)")}"));
+
+            sb.AppendLine("<size=35%> </size>");
 
             float lsPct = playerAttack.LifeStealPercent * 100f;
             string lsCol = lsPct > 0f ? goodColor : mutedColor;
+
             sb.AppendLine(Row("Life Steal",
-                $"{Soft($"Lv {playerAttack.lifeStealLevel}")}  {Color($"{lsPct:0.000}%", lsCol)} {Soft("per hit")}"));
+                $"{Soft($"Lv {playerAttack.lifeStealLevel}")}  {Color($"{playerAttack.AbilityLifeStealPercent * 100f:0.###}%", lsCol)}{Bonus(playerAttack.EquipmentLifeStealPercent * 100f, "0.###", "%")} {Soft("per hit")}"));
+
+            sb.AppendLine("<size=35%> </size>");
 
             float critPct = playerAttack.CritChance * 100f;
             string critCol = critPct >= 10f ? goodColor : (critPct > 0f ? warnColor : mutedColor);
+
             sb.AppendLine(Row("Crit",
-                $"{Soft($"Lv {playerAttack.critLevel}")}  {Color($"{critPct:0.00}%", critCol)} {Soft("chance")}  {Color($"x{playerAttack.CritMultiplier:0.00}", valueColor)}"));
+                $"{Soft($"Lv {playerAttack.critLevel}")}  {Color($"{playerAttack.AbilityCritChance * 100f:0.##}%", critCol)}{Bonus(playerAttack.EquipmentCritChance * 100f, "0.##", "%")} {Soft("chance")}  {Color($"x{playerAttack.CritMultiplier:0.00}", valueColor)}"));
         }
         else
         {
@@ -208,11 +236,44 @@ public class PlayerStats : MonoBehaviour
         statsText.text = sb.ToString();
     }
 
+    private void UpdateDefenseText()
+    {
+        if (defenseText == null)
+            return;
+
+        if (playerHealth == null)
+        {
+            defenseText.text = Row("Defense", Soft("N/A"));
+            return;
+        }
+
+        float defense = playerHealth.Defense;
+        defenseText.text = defense > 0f
+            ? Row("Defense", BonusOnly(defense, "0"))
+            : Row("Defense", Soft("0"));
+    }
+
+    private void UpdateExperienceBonusText()
+    {
+        if (experienceBonusText == null)
+            return;
+
+        float bonusPercent = equipment != null
+            ? Mathf.Max(0f, equipment.GetExperienceGainBonus()) * 100f
+            : 0f;
+
+        experienceBonusText.text = bonusPercent > 0f
+            ? Row("Kill XP Bonus", $"{Color($"+{bonusPercent:0.##}%", goodColor)} {Soft("per kill")}")
+            : Row("Kill XP Bonus", $"{Soft("0% per kill")}");
+    }
+
     // ---------- Formatting helpers ----------
     private string Head(string t) => $"<b><color={headerColor}>{t}</color></b>";
     private string Soft(string t) => $"<color={mutedColor}>{t}</color>";
     private string Label(string t) => $"<color={labelColor}>{t}</color>";
     private string Color(string t, string hex) => $"<color={hex}>{t}</color>";
+    private string Bonus(float value, string format, string suffix = "") => value > 0f ? $"  {Color($"+{value.ToString(format)}{suffix}", goodColor)}" : string.Empty;
+    private string BonusOnly(float value, string format) => Color($"+{value.ToString(format)}", goodColor);
 
     private string Row(string label, string value)
     {

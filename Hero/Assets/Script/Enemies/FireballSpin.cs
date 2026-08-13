@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class FireballSpin : MonoBehaviour
+public class FireballSpin : MonoBehaviour, IDifficultyScaledEnemyDamage
 {
     [Header("Settings")]
     [SerializeField] private float speed = 7f;
@@ -14,14 +14,30 @@ public class FireballSpin : MonoBehaviour
     private Transform enemyTarget;
     private float angle;
     private bool attached;
+    private float difficultyDamageMultiplier = 1f;
+    private bool difficultyMultiplierConfigured;
+
+    public void SetDifficultyDamageMultiplier(float multiplier)
+    {
+        difficultyDamageMultiplier = Mathf.Max(0f, multiplier);
+        difficultyMultiplierConfigured = true;
+    }
 
     void Start()
     {
+        if (!difficultyMultiplierConfigured)
+            difficultyDamageMultiplier = EnemyDifficultyProfile.GetDefaultDamageMultiplier();
         Destroy(gameObject, lifeTime);
     }
 
     void Update()
     {
+        if (SafeZone2D.IsEnemyProjectileBlocked(transform.position))
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         // Always spin around itself
         transform.Rotate(0f, 0f, selfSpinSpeed * Time.deltaTime);
 
@@ -49,11 +65,23 @@ public class FireballSpin : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
+        SafeZone2D safeZone = other.GetComponent<SafeZone2D>();
+        if (safeZone != null && safeZone.DestroysEnemyProjectiles)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         // Fireball attaches to the enemy
         if (!attached && other.CompareTag("Enemy"))
         {
             enemyTarget = other.transform;
             attached = true;
+
+            EnemyDifficultyProfile sourceProfile =
+                other.GetComponentInParent<EnemyDifficultyProfile>();
+            if (sourceProfile != null)
+                SetDifficultyDamageMultiplier(sourceProfile.DamageMultiplier);
 
             angle = Random.Range(0f, Mathf.PI * 2f);
             return;
@@ -65,7 +93,10 @@ public class FireballSpin : MonoBehaviour
             PlayerHealth health = other.GetComponentInParent<PlayerHealth>();
             if (health != null)
             {
-                health.TakeDamage(damage);
+                float scaledDamage = damage * difficultyDamageMultiplier;
+                DifficultyDebugTelemetry.RecordEnemyDamage(
+                    this, damage, scaledDamage);
+                health.TakeDamage(scaledDamage);
                 Destroy(gameObject);
             }
         }

@@ -35,11 +35,11 @@ public class BossBehaviorController : MonoBehaviour
     public class TelegraphedChargeSettings
     {
         public bool enabled = true;
-        [Tooltip("Hvor lang tid bossen lader op før dash/slag.")]
+        [Tooltip("Hvor lang tid bossen lader op fÃ¸r dash/slag.")]
         public float windupTime = 0.75f;
-        [Tooltip("Hvor hurtigt bossen bevæger sig i chargedash.")]
+        [Tooltip("Hvor hurtigt bossen bevÃ¦ger sig i chargedash.")]
         public float dashSpeed = 8f;
-        [Tooltip("Cooldown før angrebet kan vælges igen.")]
+        [Tooltip("Cooldown fÃ¸r angrebet kan vÃ¦lges igen.")]
         public float cooldown = 4f;
     }
 
@@ -51,7 +51,7 @@ public class BossBehaviorController : MonoBehaviour
         public int comboHits = 3;
         [Tooltip("Tid mellem hvert slag.")]
         public float hitInterval = 0.35f;
-        [Tooltip("Ekstra rækkevidde/AOE på sidste hit.")]
+        [Tooltip("Ekstra rÃ¦kkevidde/AOE pÃ¥ sidste hit.")]
         public float finisherBonusRange = 1.5f;
         public float cooldown = 3f;
     }
@@ -60,9 +60,9 @@ public class BossBehaviorController : MonoBehaviour
     public class StompAoeSettings
     {
         public bool enabled = true;
-        [Tooltip("Hvor højt bossen hopper (visuelt/timing).")]
+        [Tooltip("Hvor hÃ¸jt bossen hopper (visuelt/timing).")]
         public float jumpTime = 0.5f;
-        [Tooltip("Radius på chokbølgen.")]
+        [Tooltip("Radius pÃ¥ chokbÃ¸lgen.")]
         public float shockwaveRadius = 4f;
         public float cooldown = 5f;
     }
@@ -71,7 +71,7 @@ public class BossBehaviorController : MonoBehaviour
     public class FeintSettings
     {
         public bool enabled = true;
-        [Tooltip("Hvor lang tid feint 'fakes' før skift til rigtigt angreb.")]
+        [Tooltip("Hvor lang tid feint 'fakes' fÃ¸r skift til rigtigt angreb.")]
         public float feintTime = 0.35f;
         [Tooltip("Mulighed for at feinten erstatter et andet angreb.")]
         public float replaceChance = 0.4f;
@@ -84,7 +84,7 @@ public class BossBehaviorController : MonoBehaviour
         public bool enabled = true;
         [Tooltip("Min. afstand for at bossen vil gribe.")]
         public float grabRange = 1.5f;
-        [Tooltip("Hvor længe spilleren skal være tæt på før grab vælges.")]
+        [Tooltip("Hvor lÃ¦nge spilleren skal vÃ¦re tÃ¦t pÃ¥ fÃ¸r grab vÃ¦lges.")]
         public float closeRangeTime = 1f;
         public float cooldown = 6f;
     }
@@ -93,11 +93,11 @@ public class BossBehaviorController : MonoBehaviour
     public class AggroShiftSettings
     {
         public bool enabled = true;
-        [Tooltip("Hvor mange dodges i vinduet før AOE prioriteres.")]
+        [Tooltip("Hvor mange dodges i vinduet fÃ¸r AOE prioriteres.")]
         public int dodgeThreshold = 3;
-        [Tooltip("Sekunder der måles dodges over.")]
+        [Tooltip("Sekunder der mÃ¥les dodges over.")]
         public float dodgeWindow = 4f;
-        [Tooltip("Hvor meget AOE vægtes ekstra ved mange dodges.")]
+        [Tooltip("Hvor meget AOE vÃ¦gtes ekstra ved mange dodges.")]
         public float aoeWeightBonus = 1.5f;
     }
 
@@ -105,7 +105,7 @@ public class BossBehaviorController : MonoBehaviour
     public class TerritoryControlSettings
     {
         public bool enabled = true;
-        [Tooltip("Mål-områder bossen forsøger at trække spilleren imod.")]
+        [Tooltip("MÃ¥l-omrÃ¥der bossen forsÃ¸ger at trÃ¦kke spilleren imod.")]
         public Transform[] controlPoints;
         [Tooltip("Afstand til control point, hvor bossen anses for at have flyttet kampen.")]
         public float controlRadius = 2f;
@@ -115,7 +115,7 @@ public class BossBehaviorController : MonoBehaviour
     public class ZoneSettings
     {
         public bool enabled = true;
-        [Tooltip("Start radius på den sikre zone.")]
+        [Tooltip("Start radius pÃ¥ den sikre zone.")]
         public float safeZoneRadius = 6f;
         [Tooltip("Hvor hurtigt safe zone skrumper pr. sekund.")]
         public float shrinkPerSecond = 0.15f;
@@ -126,7 +126,7 @@ public class BossBehaviorController : MonoBehaviour
     {
         public bool enabled = true;
         [Range(0f, 1f)]
-        [Tooltip("HP-procent hvor bossen går berserk.")]
+        [Tooltip("HP-procent hvor bossen gÃ¥r berserk.")]
         public float triggerHealthPercent = 0.3f;
         [Tooltip("Hvor meget tempo/angrebscooldowns skaleres.")]
         public float attackSpeedMultiplier = 1.3f;
@@ -136,9 +136,9 @@ public class BossBehaviorController : MonoBehaviour
     public class StaggerSensitivitySettings
     {
         public bool enabled = true;
-        [Tooltip("Antal blocks før ekstra stagger trigger.")]
+        [Tooltip("Antal blocks fÃ¸r ekstra stagger trigger.")]
         public int blocksBeforeStagger = 3;
-        [Tooltip("Hvor længe bossen er ekstra stagger-sårbar.")]
+        [Tooltip("Hvor lÃ¦nge bossen er ekstra stagger-sÃ¥rbar.")]
         public float staggerWindow = 2f;
     }
 
@@ -147,12 +147,12 @@ public class BossBehaviorController : MonoBehaviour
     {
         [Header("Eksponerede faser")]
         public bool exposedPhaseEnabled = true;
-        [Tooltip("Hvor længe svagt punkt er eksponeret.")]
+        [Tooltip("Hvor lÃ¦nge svagt punkt er eksponeret.")]
         public float exposedDuration = 2f;
 
         [Header("Overheat")]
         public bool overheatEnabled = true;
-        [Tooltip("Antal store angreb før overheat.")]
+        [Tooltip("Antal store angreb fÃ¸r overheat.")]
         public int bigAttacksBeforeOverheat = 3;
         public float overheatDuration = 2.5f;
 
@@ -163,9 +163,9 @@ public class BossBehaviorController : MonoBehaviour
 
         [Header("Del-bar")]
         public bool partBreakEnabled = true;
-        [Tooltip("Navn på kropsdel der kan knuses.")]
+        [Tooltip("Navn pÃ¥ kropsdel der kan knuses.")]
         public string breakablePartName = "Arm";
-        [Tooltip("Når del er knust, disables et angreb (fx Grab).")]
+        [Tooltip("NÃ¥r del er knust, disables et angreb (fx Grab).")]
         public BossAttackType disabledAttackOnBreak = BossAttackType.Grab;
 
         [Header("Status trigger")]
@@ -181,7 +181,7 @@ public class BossBehaviorController : MonoBehaviour
     [SerializeField] private FeintSettings feint = new FeintSettings();
     [SerializeField] private GrabSettings grab = new GrabSettings();
 
-    [Header("Adfærd")]
+    [Header("AdfÃ¦rd")]
     [SerializeField] private AggroShiftSettings aggroShift = new AggroShiftSettings();
     [SerializeField] private TerritoryControlSettings territoryControl = new TerritoryControlSettings();
     [SerializeField] private ZoneSettings zones = new ZoneSettings();
@@ -191,6 +191,12 @@ public class BossBehaviorController : MonoBehaviour
     [Header("Svagheder")]
     [SerializeField] private WeaknessSettings weaknesses = new WeaknessSettings();
 
+    [Header("Smart Chase")]
+    [Min(0.1f)] [SerializeField] private float detectionRange = 9f;
+    [Min(0.1f)] [SerializeField] private float giveUpRange = 15f;
+    [Min(0.1f)] [SerializeField] private float chaseSpeed = 2.5f;
+    [Min(0f)] [SerializeField] private float attackEngageRange = 3f;
+
     [Header("Events (hook til animation/FX)")]
     public UnityEvent onTelegraphedCharge;
     public UnityEvent onMultiPhaseCombo;
@@ -199,7 +205,10 @@ public class BossBehaviorController : MonoBehaviour
     public UnityEvent onGrab;
 
     private Transform player;
+    private EnemyAggro2D aggro;
+    private Rigidbody2D rb;
     private bool isAttacking;
+    private bool isChasing;
     private float nextAttackTime;
     private readonly Dictionary<BossAttackType, float> cooldowns = new Dictionary<BossAttackType, float>();
 
@@ -216,11 +225,10 @@ public class BossBehaviorController : MonoBehaviour
 
     private void Awake()
     {
-        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-        if (playerObj != null)
-        {
-            player = playerObj.transform;
-        }
+        rb = GetComponent<Rigidbody2D>();
+        aggro = GetComponent<EnemyAggro2D>();
+        if (aggro == null) aggro = gameObject.AddComponent<EnemyAggro2D>();
+        aggro.ConfigureRanges(detectionRange, giveUpRange);
     }
 
     private void Update()
@@ -228,8 +236,35 @@ public class BossBehaviorController : MonoBehaviour
         UpdateTimers();
         UpdateAggroTracking();
 
-        if (player == null || isAttacking)
+        player = aggro != null ? aggro.CurrentTarget : null;
+
+        if (player == null)
+        {
+            StopChasing();
             return;
+        }
+
+        if (isAttacking)
+        {
+            StopChasing();
+            return;
+        }
+
+        float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+        if (distanceToPlayer > attackEngageRange)
+        {
+            isChasing = true;
+            if (rb == null && aggro.HasAuthority())
+            {
+                transform.position = Vector2.MoveTowards(
+                    transform.position,
+                    player.position,
+                    chaseSpeed * Time.deltaTime);
+            }
+            return;
+        }
+
+        StopChasing();
 
         if (Time.time < nextAttackTime)
             return;
@@ -240,6 +275,24 @@ public class BossBehaviorController : MonoBehaviour
             isAttacking = true; // set BEFORE starting coroutine
             attackRoutine = StartCoroutine(ExecuteAttack(nextAttack.Value));
         }
+    }
+
+    private void FixedUpdate()
+    {
+        if (!isChasing || rb == null || player == null || aggro == null || !aggro.HasAuthority())
+            return;
+
+        Vector2 direction = ((Vector2)player.position - rb.position).normalized;
+        rb.linearVelocity = direction * chaseSpeed;
+    }
+
+    private void StopChasing()
+    {
+        if (!isChasing) return;
+
+        isChasing = false;
+        if (rb != null && aggro != null && aggro.HasAuthority())
+            rb.linearVelocity = Vector2.zero;
     }
 
     private void UpdateTimers()
@@ -506,6 +559,7 @@ public class BossBehaviorController : MonoBehaviour
             StopCoroutine(attackRoutine);
             attackRoutine = null;
         }
+        StopChasing();
         isAttacking = false;
     }
     public bool IsBlockDisabled()
@@ -514,5 +568,21 @@ public class BossBehaviorController : MonoBehaviour
             return false;
 
         return blockDisabled;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = new Color(1f, 0.75f, 0.1f, 0.9f);
+        Gizmos.DrawWireSphere(transform.position, detectionRange);
+
+        Gizmos.color = new Color(1f, 0.2f, 0.15f, 0.8f);
+        Gizmos.DrawWireSphere(transform.position, giveUpRange);
+
+#if UNITY_EDITOR
+        UnityEditor.Handles.color = new Color(1f, 0.75f, 0.1f, 1f);
+        UnityEditor.Handles.Label(transform.position + Vector3.right * detectionRange, "CHASE START");
+        UnityEditor.Handles.color = new Color(1f, 0.2f, 0.15f, 1f);
+        UnityEditor.Handles.Label(transform.position + Vector3.right * giveUpRange, "CHASE STOPS");
+#endif
     }
 }

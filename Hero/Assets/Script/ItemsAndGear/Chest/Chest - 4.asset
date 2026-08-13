@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3611d678efbbef04a93edaec562a1f6f, type: 3}
+  m_Name: Chest - 4
+  m_EditorClassIdentifier: 
+  itemID: "@CV254fqs\xE6f45234427qBCV9"
+  itemName: "Fud\u014Dshin Furplate"
+  description: "Dark fur and weathered metal inscribed with the silver words \u201CImmovable
+    Mind.\u201D Made for warriors who remain unshaken when death draws near."
+  rarity: 3
+  requiredLevel: 12
+  goldValue: 4950
+  icon: {fileID: 7910749381655152413, guid: a2914339d030cea4891fba264ca2378d, type: 3}
+  worldPrefab: {fileID: 8713158584076172559, guid: 65ea661f365f41c47b73ece37c7443c1, type: 3}
+  equipmentSlot: 3
+  statModifiers:
+    maxHealth: 60
+    damage: 0
+    defense: 24
+    regeneration: 0
+    lifeSteal: 0
+    criticalChance: 0
+    attackSpeed: 0
+    movementSpeed: 0.06
+    experienceGain: 0
+  armorRating: 0

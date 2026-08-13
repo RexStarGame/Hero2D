@@ -770,6 +770,9 @@ GameObject:
   - component: {fileID: 3815532356674230061}
   - component: {fileID: 1721934959143606376}
   - component: {fileID: 6192968572679862433}
+  - component: {fileID: 7505209832080599189}
+  - component: {fileID: -8291968235646512929}
+  - component: {fileID: 6693655435825030266}
   m_Layer: 3
   m_Name: BossLevel-9
   m_TagString: Enemy
@@ -938,6 +941,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 3
   waitTime: 2
+  detectionRange: 8.5
+  giveUpRange: 15
+  chaseStopDistance: 0.9
+  chaseSpeedMultiplier: 2.5
+  routeValidationInterval: 0.2
+  stuckTimeout: 1
+  minimumProgressDistance: 0.05
+  showPatrolTarget: 1
 --- !u!95 &1378482468039930319
 Animator:
   serializedVersion: 7
@@ -974,6 +985,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 1000
   xpReward: 500
+  onDeath:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &-3651679510663702152
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1149,6 +1163,10 @@ MonoBehaviour:
     statusTriggerEnabled: 0
     disablesBlockStatus: 1
     statusDisableDuration: 2
+  detectionRange: 8.5
+  giveUpRange: 15
+  chaseSpeed: 2.5
+  attackEngageRange: 7
   onTelegraphedCharge:
     m_PersistentCalls:
       m_Calls: []
@@ -1229,6 +1247,7 @@ MonoBehaviour:
   maxHealth: 1000
   currentHealth: 1000
   destroyOnDeath: 1
+  xpReward: 100
   onHealthChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1264,6 +1283,65 @@ MonoBehaviour:
   attackTrigger: Attack
   forceIdleAfterDelay: 0
   idleDelaySeconds: 0.6
+--- !u!114 &7505209832080599189
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8233854846743954295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f6649c0106740a8967350e37e6de719, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minCoins: 1
+  maxCoins: 3
+  wallet: {fileID: 0}
+--- !u!114 &-8291968235646512929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8233854846743954295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f6649c0106740a8967350e37e6de719, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minCoins: 500
+  maxCoins: 500
+  wallet: {fileID: 0}
+--- !u!114 &6693655435825030266
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8233854846743954295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1f5977c97154415b18d83abfa20cdf6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  easy:
+    bonusHealthPercent: 0
+    bonusDamagePercent: 0
+  normal:
+    bonusHealthPercent: 30
+    bonusDamagePercent: 15
+  hard:
+    bonusHealthPercent: 90
+    bonusDamagePercent: 60
+  calculateExtremeAsMidpoint: 1
+  profileVersion: 2
+  extreme:
+    bonusHealthPercent: 130
+    bonusDamagePercent: 100
+  nightmare:
+    bonusHealthPercent: 160
+    bonusDamagePercent: 125
 --- !u!1 &8620457369009950218
 GameObject:
   m_ObjectHideFlags: 0

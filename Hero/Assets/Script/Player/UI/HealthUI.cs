@@ -8,7 +8,9 @@ public class HealthTextUI : MonoBehaviour
 
     void Update()
     {
-        // Display current health rounded to integer
-        healthText.text = Mathf.RoundToInt(player.health) + " / " + Mathf.RoundToInt(player.maxHealth);
+        if (player == null || healthText == null) return;
+
+        // MaxHealth includes ability upgrades and all currently equipped gear.
+        healthText.text = Mathf.RoundToInt(player.health) + " / " + Mathf.RoundToInt(player.MaxHealth);
     }
 }

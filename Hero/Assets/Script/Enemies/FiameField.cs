@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Reflection;
 
 
-public class FlameField : MonoBehaviour
+public class FlameField : MonoBehaviour, IDifficultyScaledEnemyDamage
 {
     [Header("Movement (projectile)")]
     [SerializeField] private float speed = 10f;
@@ -37,9 +37,21 @@ public class FlameField : MonoBehaviour
     private Collider2D[] hits = new Collider2D[32];
     private GameObject burnVfxInstance;
     private ContactFilter2D damageFilter;
+    private float difficultyDamageMultiplier = 1f;
+
+    public void SetDifficultyDamageMultiplier(float multiplier)
+    {
+        difficultyDamageMultiplier = Mathf.Max(0f, multiplier);
+    }
 
     private void Awake()
     {
+        difficultyDamageMultiplier = EnemyDifficultyProfile.GetDefaultDamageMultiplier();
+        EnemyDifficultyProfile sourceProfile =
+            GetComponentInParent<EnemyDifficultyProfile>();
+        if (sourceProfile != null)
+            difficultyDamageMultiplier = sourceProfile.DamageMultiplier;
+
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
 
@@ -172,6 +184,8 @@ public class FlameField : MonoBehaviour
     {
         if (targetCol == null) return;
 
+        float scaledDamage = dmg * difficultyDamageMultiplier;
+
         // Find en MonoBehaviour p� target og pr�v at kalde TakeDamage(float)
         var behaviours = targetCol.GetComponents<MonoBehaviour>();
         for (int i = 0; i < behaviours.Length; i++)
@@ -185,7 +199,9 @@ public class FlameField : MonoBehaviour
             MethodInfo mFloat = t.GetMethod(damageMethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new[] { typeof(float) }, null);
             if (mFloat != null)
             {
-                mFloat.Invoke(b, new object[] { dmg });
+                DifficultyDebugTelemetry.RecordEnemyDamage(
+                    this, dmg, scaledDamage);
+                mFloat.Invoke(b, new object[] { scaledDamage });
                 return;
             }
         }

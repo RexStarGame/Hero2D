@@ -12,7 +12,7 @@ public class EnemyAttack : MonoBehaviour
     [SerializeField] private float attackCooldown = 2f;
 
     [Header("Telegraph (Warning before shot)")]
-    [SerializeField] private float windupTime = 0.45f;                 // tid før skuddet
+    [SerializeField] private float windupTime = 0.45f;                 // tid fÃ¸r skuddet
     [SerializeField] private GameObject telegraphPrefab;               // fx ! icon eller glow sprite (valgfri)
     [SerializeField] private Vector3 telegraphOffset = new Vector3(0, 0.6f, 0);
     [SerializeField] private AudioClip windupSfx;                      // valgfri pip/charge lyd
@@ -29,6 +29,8 @@ public class EnemyAttack : MonoBehaviour
 
     private bool isWindingUp;
     private GameObject telegraphInstance;
+    private EnemyAggro2D aggro;
+    private EnemyDifficultyProfile difficultyProfile;
 
     void Start()
     {
@@ -43,11 +45,20 @@ public class EnemyAttack : MonoBehaviour
 
         // fallback: auto-find sprite if not assigned
         if (enemySprite == null) enemySprite = GetComponentInChildren<SpriteRenderer>();
+
+        aggro = GetComponent<EnemyAggro2D>();
+        if (aggro == null) aggro = gameObject.AddComponent<EnemyAggro2D>();
+
+        difficultyProfile = GetComponentInParent<EnemyDifficultyProfile>();
+        if (difficultyProfile == null)
+            difficultyProfile = GetComponentInChildren<EnemyDifficultyProfile>(true);
     }
 
     void Update()
     {
+        if (aggro != null) player = aggro.CurrentTarget;
         if (player == null) return;
+        if (SafeZone2D.IsPlayerProtected(player.position)) return;
 
         cooldownTimer -= Time.deltaTime;
         if (isWindingUp) return;
@@ -123,7 +134,8 @@ public class EnemyAttack : MonoBehaviour
         if (telegraphInstance != null) Destroy(telegraphInstance);
 
         // shoot
-        Shoot(direction);
+        if (player != null && !SafeZone2D.IsPlayerProtected(player.position))
+            Shoot(direction);
 
         // start cooldown AFTER the shot
         cooldownTimer = attackCooldown;
@@ -140,7 +152,10 @@ public class EnemyAttack : MonoBehaviour
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         Quaternion rotation = Quaternion.Euler(0, 0, angle);
 
-        Instantiate(fireballPrefab, firePoint.position, rotation);
+        GameObject projectile = Instantiate(
+            fireballPrefab, firePoint.position, rotation);
+        if (difficultyProfile != null)
+            difficultyProfile.ApplyToSpawnedDamage(projectile);
     }
 
     private void UpdateFacing(Vector2 direction)

@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e58d3672d1ed2db498e592ec117e887e, type: 3}
+  m_Name: Weapon - 2
+  m_EditorClassIdentifier: 
+  itemID: '@f34dcfcx34gsd24ru47232'
+  itemName: Sansais Sword
+  description: 'just a decription for now i''ll edit it later :) '
+  rarity: 2
+  requiredLevel: 6
+  goldValue: 2200
+  icon: {fileID: -3382637633492864493, guid: e796f207d544dea459f4064a03049fa8, type: 3}
+  worldPrefab: {fileID: 8853070386427988161, guid: 5d2460c44acb5054d81b5a1d7c70154b, type: 3}
+  equipmentSlot: 1
+  statModifiers:
+    maxHealth: 0
+    damage: 15
+    defense: 0
+    regeneration: 0
+    lifeSteal: 0.06
+    criticalChance: 0.05
+    attackSpeed: 0.03
+    movementSpeed: 0
+  weaponType: 0
+  baseDamage: 0
+  attackRange: 1

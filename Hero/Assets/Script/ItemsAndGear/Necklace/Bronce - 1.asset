@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84ad063d2d0be7143b731bf233a811ac, type: 3}
+  m_Name: Bronce - 1
+  m_EditorClassIdentifier: 
+  itemID: "@4rdasxk3we\xE6cmasjd23128d9"
+  itemName: Necklace
+  description: 'i''ll fix this description soon sorry :) '
+  rarity: 0
+  requiredLevel: 7
+  goldValue: 350
+  icon: {fileID: -5776590601548206554, guid: 4f4813c9c3007e14c88ff2d97d873955, type: 3}
+  worldPrefab: {fileID: 2565297612257647697, guid: 6bd1ddbcab744cc44bbcd426ed67ffa5, type: 3}
+  equipmentSlot: 6
+  statModifiers:
+    maxHealth: 20
+    damage: 5
+    defense: 0
+    regeneration: 0
+    lifeSteal: 0
+    criticalChance: 0.05
+    attackSpeed: 0
+    movementSpeed: 0.04
+    experienceGain: 0.03

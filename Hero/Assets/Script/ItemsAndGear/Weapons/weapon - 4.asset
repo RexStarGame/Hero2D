@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e58d3672d1ed2db498e592ec117e887e, type: 3}
+  m_Name: weapon - 4
+  m_EditorClassIdentifier: 
+  itemID: '@f34m42cx86gsd24ru47233'
+  itemName: "Musashi\u2019s Iron Resolve"
+  description: "An epic steel blade engraved in gold with Miyamoto Musashi\u2019s
+    name. Forged for a ronin who chooses discipline over fear."
+  rarity: 3
+  requiredLevel: 22
+  goldValue: 6000
+  icon: {fileID: 6254593807821455677, guid: 6e39a921366f3f34086e95ec52bfd461, type: 3}
+  worldPrefab: {fileID: 2941225084639213600, guid: a3968640d19a90649a1c56dbc960caa3, type: 3}
+  equipmentSlot: 1
+  statModifiers:
+    maxHealth: 0
+    damage: 47.3
+    defense: 0
+    regeneration: 0
+    lifeSteal: 0.08
+    criticalChance: 0.09
+    attackSpeed: 0.12
+    movementSpeed: -0.02
+  weaponType: 0
+  baseDamage: 0
+  attackRange: 1

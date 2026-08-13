@@ -2,6 +2,7 @@ public enum MenuOwner
 {
     None,
     Upgrade,
+    Store,
     Pause
 }
 

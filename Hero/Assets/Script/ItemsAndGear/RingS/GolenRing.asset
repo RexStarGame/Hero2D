@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ed960394ba5edf47895c1598075fd4c, type: 3}
+  m_Name: GolenRing
+  m_EditorClassIdentifier: 
+  itemID: '@35FVDX3P120F'
+  itemName: Golem
+  description: an old ring barly worth anytihng at all but it might help you for
+    now....
+  rarity: 0
+  requiredLevel: 1
+  goldValue: 30
+  icon: {fileID: 3150272983019787682, guid: dad6ecc49e5374049bc08ac88e98d255, type: 3}
+  worldPrefab: {fileID: 7412342889807194695, guid: 56405f4c27bbe0744b63fbd2ee09823a, type: 3}
+  equipmentSlot: 7
+  statModifiers:
+    maxHealth: 10
+    damage: 0
+    defense: 0
+    regeneration: 0
+    lifeSteal: 0
+    criticalChance: 0
+    attackSpeed: 0.04
+    movementSpeed: 0

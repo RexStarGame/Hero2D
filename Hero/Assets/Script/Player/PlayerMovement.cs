@@ -3,6 +3,9 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private PlayerEquipment equipment;
+    public float EquipmentMovementSpeedBonus => equipment == null ? 0f : Mathf.Max(-0.9f, equipment.GetMovementSpeedBonus());
+    public float EffectiveMoveSpeed => moveSpeed * (1f + EquipmentMovementSpeedBonus);
 
     private Rigidbody2D rb;
     private Animator animator;
@@ -14,6 +17,7 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         sr = GetComponent<SpriteRenderer>();
+        if (equipment == null) equipment = GetComponent<PlayerEquipment>();
 
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
     }
@@ -68,6 +72,6 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        rb.linearVelocity = movement * moveSpeed;
+        rb.linearVelocity = movement * EffectiveMoveSpeed;
     }
 }

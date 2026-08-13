@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
-public class Fireball : MonoBehaviour
+public class Fireball : MonoBehaviour, IDifficultyScaledEnemyDamage
 {
     [Header("Movement")]
     [SerializeField] private float speed = 7f;
@@ -22,9 +22,16 @@ public class Fireball : MonoBehaviour
 
     private Rigidbody2D rb;
     private Collider2D col;
+    private float difficultyDamageMultiplier = 1f;
+
+    public void SetDifficultyDamageMultiplier(float multiplier)
+    {
+        difficultyDamageMultiplier = Mathf.Max(0f, multiplier);
+    }
 
     private void Awake()
     {
+        difficultyDamageMultiplier = EnemyDifficultyProfile.GetDefaultDamageMultiplier();
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
 
@@ -44,12 +51,25 @@ public class Fireball : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (SafeZone2D.IsEnemyProjectileBlocked(transform.position))
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         // Always move forward based on rotation
         rb.linearVelocity = (Vector2)transform.right * speed;
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        SafeZone2D safeZone = other.GetComponent<SafeZone2D>();
+        if (safeZone != null && safeZone.DestroysEnemyProjectiles)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         int otherLayer = other.gameObject.layer;
 
         Debug.Log($"Hit: {other.name} | Layer: {LayerMask.LayerToName(otherLayer)} | Tag: {other.tag}");
@@ -63,7 +83,12 @@ public class Fireball : MonoBehaviour
         {
             PlayerHealth health = other.GetComponentInParent<PlayerHealth>();
             if (health != null)
-                health.TakeDamage(damage);
+            {
+                float scaledDamage = damage * difficultyDamageMultiplier;
+                DifficultyDebugTelemetry.RecordEnemyDamage(
+                    this, damage, scaledDamage);
+                health.TakeDamage(scaledDamage);
+            }
 
             Destroy(gameObject);
             return;
