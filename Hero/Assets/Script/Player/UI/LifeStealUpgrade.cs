@@ -44,6 +44,7 @@ public class LifeStealUpgrade : MonoBehaviour
 
         playerXP.abilityPoints -= cost;
         playerAttack.UpgradeLifeSteal(lifeStealPerLevel);
+        PlayerProgressSave.SaveAttackUpgrades(playerAttack, playerXP);
 
         UpdateText();
     }

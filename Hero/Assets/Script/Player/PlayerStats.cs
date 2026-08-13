@@ -31,7 +31,6 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private string blueColor = "#60A5FA";
     [Header("Upgrade Menu")]
     [SerializeField] private GameObject upgradeMenu;     // Drag dit UpgradeMenu panel her
-    [SerializeField] private bool pauseWhenOpen = true;  // Pause spil når menu er åben
     private bool upgradeMenuOpen = false;
     private float timer;
     private readonly StringBuilder sb = new StringBuilder(768);
@@ -87,8 +86,6 @@ public class PlayerStats : MonoBehaviour
         else
             MenuLock.Clear(MenuOwner.Upgrade);
 
-        if (pauseWhenOpen)
-            UnityEngine.Time.timeScale = upgradeMenuOpen ? 0f : 1f;
     }
     private void AutoFind()
     {
@@ -121,14 +118,12 @@ public class PlayerStats : MonoBehaviour
         upgradeMenuOpen = false;
         upgradeMenu.SetActive(false);
         MenuLock.Clear(MenuOwner.Upgrade);
-        UnityEngine.Time.timeScale = 1f;
     }
     private void OnDisable()
     {
         if (upgradeMenuOpen)
         {
             MenuLock.Clear(MenuOwner.Upgrade);
-            UnityEngine.Time.timeScale = 1f;
         }
     }
     private void ForceUpdate()

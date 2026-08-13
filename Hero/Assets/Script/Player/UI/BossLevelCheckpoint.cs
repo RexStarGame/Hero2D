@@ -1,8 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// Persists only the highest level secured by defeating a milestone boss.
-/// Run XP and chosen ability upgrades are deliberately not saved here.
+/// Persists the highest level secured by a milestone boss and triggers the
+/// broader player progression autosave after every boss defeat.
 /// </summary>
 public static class BossLevelCheckpoint
 {
@@ -17,14 +17,22 @@ public static class BossLevelCheckpoint
     public static bool TryUnlock(int checkpointLevel)
     {
         checkpointLevel = Mathf.Max(1, checkpointLevel);
-        if (checkpointLevel <= Level)
-            return false;
+        bool unlockedNewCheckpoint = checkpointLevel > Level;
 
-        PlayerPrefs.SetInt(PlayerPrefsKey, checkpointLevel);
-        PlayerPrefs.Save();
+        if (unlockedNewCheckpoint)
+        {
+            PlayerPrefs.SetInt(PlayerPrefsKey, checkpointLevel);
+            PlayerPrefs.Save();
+            Debug.Log($"Boss checkpoint unlocked: Level {checkpointLevel}");
+        }
 
-        Debug.Log($"Boss checkpoint unlocked: Level {checkpointLevel}");
-        return true;
+        // A boss defeat is always an autosave trigger, even when replaying an
+        // already secured milestone.
+        PlayerXP playerXP = Object.FindAnyObjectByType<PlayerXP>();
+        if (playerXP != null)
+            playerXP.SaveProgress();
+
+        return unlockedNewCheckpoint;
     }
 
     /// <summary>

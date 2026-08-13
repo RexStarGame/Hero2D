@@ -32,6 +32,7 @@ public class RegenUpgrade : MonoBehaviour
 
         playerXP.abilityPoints -= cost;
         playerHealth.regenLevel++;
+        PlayerProgressSave.SaveHealthUpgrades(playerHealth, playerXP);
 
         Debug.Log("Bought Regen Level " + playerHealth.regenLevel);
 

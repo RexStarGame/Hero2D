@@ -45,6 +45,7 @@ public class AttackSpeedUpgrade : MonoBehaviour
 
         playerXP.abilityPoints -= cost;
         playerAttack.UpgradeAttackSpeed(cooldownReductionPerLevel, minAttackCooldown);
+        PlayerProgressSave.SaveAttackUpgrades(playerAttack, playerXP);
 
         UpdateText();
     }

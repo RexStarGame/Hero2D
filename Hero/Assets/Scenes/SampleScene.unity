@@ -10854,6 +10854,7 @@ MonoBehaviour:
   xp: 0
   xpToNextLevel: 100
   abilityPoints: 1
+  deathXpLossPercent: 20
   equipment: {fileID: 0}
 --- !u!114 &239307051
 MonoBehaviour:

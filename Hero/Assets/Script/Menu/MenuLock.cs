@@ -9,6 +9,7 @@ public enum MenuOwner
 public static class MenuLock
 {
     public static MenuOwner Owner = MenuOwner.None;
+    public static bool IsGameplayInputBlocked => Owner != MenuOwner.None;
 
     public static bool CanOpen(MenuOwner requester)
     {
