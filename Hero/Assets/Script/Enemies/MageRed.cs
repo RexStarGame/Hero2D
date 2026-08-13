@@ -17,6 +17,7 @@ public class MageRed : MonoBehaviour
     [Min(0.05f)] [SerializeField] private float routeValidationInterval = 0.2f;
     [Min(0.1f)] [SerializeField] private float stuckTimeout = 1f;
     [Min(0.001f)] [SerializeField] private float minimumProgressDistance = 0.05f;
+    [Min(1)] [SerializeField] private int regionalTargetSearchAttempts = 32;
 
     [Header("Scene Debug")]
     [SerializeField] private bool showPatrolTarget = true;
@@ -25,6 +26,7 @@ public class MageRed : MonoBehaviour
     private EnemyAggro2D aggro;
     private Rigidbody2D rb;
     private Animator animator;
+    private SpawnedEnemyRegionLink regionLink;
     private Vector2 currentTarget;
     private bool isMoving;
     private bool wasChasing;
@@ -34,6 +36,7 @@ public class MageRed : MonoBehaviour
     private float lastProgressTime;
     private Vector2 lastRejectedTarget;
     private float showRejectedTargetUntil;
+    private bool returningToRegion;
 
     public Vector2 CurrentPatrolTarget => currentTarget;
 
@@ -41,6 +44,7 @@ public class MageRed : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        regionLink = GetComponent<SpawnedEnemyRegionLink>();
         if (rb != null) rb.constraints = RigidbodyConstraints2D.FreezeRotation;
 
         aggro = GetComponent<EnemyAggro2D>();
@@ -72,6 +76,17 @@ public class MageRed : MonoBehaviour
         if (wasChasing)
         {
             wasChasing = false;
+            FindNewPosition();
+        }
+
+        if (IsOutsideAssignedRegion())
+        {
+            if (!returningToRegion)
+                BeginReturningToRegion();
+        }
+        else if (returningToRegion)
+        {
+            returningToRegion = false;
             FindNewPosition();
         }
 
@@ -123,11 +138,67 @@ public class MageRed : MonoBehaviour
     private void FindNewPosition()
     {
         if (myManager == null) return;
-        currentTarget = myManager.GetRandomPointInZone(transform.position);
+
+        Collider2D spawnArea = regionLink != null ? regionLink.SpawnArea : null;
+        if (spawnArea != null)
+        {
+            // A regional enemy must never fall back to the global patrol area.
+            // If no safe regional route is available this tick, staying still
+            // lets the normal stuck retry request another regional point.
+            currentTarget = TryGetRegionalPatrolTarget(out Vector2 regionalTarget)
+                ? regionalTarget
+                : (Vector2)transform.position;
+        }
+        else
+        {
+            currentTarget = myManager.GetRandomPointInZone(transform.position);
+        }
         nextRouteValidationTime = Time.time + routeValidationInterval;
         lastProgressPosition = transform.position;
         lastProgressTime = Time.time;
         isMoving = true;
+    }
+
+    private bool IsOutsideAssignedRegion()
+    {
+        Collider2D spawnArea = regionLink != null ? regionLink.SpawnArea : null;
+        return spawnArea != null && !spawnArea.OverlapPoint(transform.position);
+    }
+
+    private void BeginReturningToRegion()
+    {
+        if (waitRoutine != null)
+        {
+            StopCoroutine(waitRoutine);
+            waitRoutine = null;
+        }
+
+        returningToRegion = true;
+        FindNewPosition();
+    }
+
+    private bool TryGetRegionalPatrolTarget(out Vector2 target)
+    {
+        target = transform.position;
+        Collider2D spawnArea = regionLink != null ? regionLink.SpawnArea : null;
+        if (spawnArea == null || myManager == null) return false;
+
+        Bounds bounds = spawnArea.bounds;
+        int attempts = Mathf.Max(1, regionalTargetSearchAttempts);
+        for (int i = 0; i < attempts; i++)
+        {
+            Vector2 candidate = new Vector2(
+                Random.Range(bounds.min.x, bounds.max.x),
+                Random.Range(bounds.min.y, bounds.max.y));
+
+            if (!spawnArea.OverlapPoint(candidate)) continue;
+            if (!myManager.IsPatrolRouteValid(transform.position, candidate)) continue;
+
+            target = candidate;
+            return true;
+        }
+
+        return false;
     }
 
     private void CancelCurrentPatrolAndFindAnother()
@@ -165,6 +236,7 @@ public class MageRed : MonoBehaviour
         routeValidationInterval = Mathf.Max(0.05f, routeValidationInterval);
         stuckTimeout = Mathf.Max(0.1f, stuckTimeout);
         minimumProgressDistance = Mathf.Max(0.001f, minimumProgressDistance);
+        regionalTargetSearchAttempts = Mathf.Max(1, regionalTargetSearchAttempts);
     }
 
     private IEnumerator WaitAndMove()

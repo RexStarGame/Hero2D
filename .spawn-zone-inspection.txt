@@ -1,0 +1,993 @@
+TEMP UNITY SPAWN ZONE INSPECTION V2
+Scene: Hero/Assets/Scenes/SampleScene.unity
+
+=== Matching scene YAML blocks ===
+### classID=1 fileID=138475162
+--- !u!1 &138475162
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 138475163}
+  - component: {fileID: 138475165}
+  - component: {fileID: 138475164}
+  m_Layer: 0
+  m_Name: EnemyLevel-1Zone
+  m_TagString: Untagged
+  m_Icon: {fileID: 5132851093641282708, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+GUID 0000000000000000d000000000000000 -> None
+
+### classID=114 fileID=138475164
+--- !u!114 &138475164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 138475162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a29ad8ce999b4f2e9ddd114f7fd7e705, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  regionProfile: {fileID: 11400000, guid: b193aa4735e68d04c8a733ab2933e80e, type: 2}
+  director: {fileID: 781469748}
+  dynamicEnemiesRoot: {fileID: 2099999998}
+  localObserverCamera: {fileID: 519420031}
+  enemies:
+  - displayName: Level 1
+    enemyPrefab: {fileID: 8233854846743954295, guid: cc1175b0a56f8204d9a362b86c83c482, type: 3}
+    spawnArea: {fileID: 138475165}
+    desiredPopulation: 1
+    initialSpawnDelay: 0.5
+    minimumRespawnTime: 8
+    maximumRespawnTime: 14
+    failedPointRetryTime: 1.5
+    minimumDistanceFromPlayers: 7
+    maximumDistanceFromPlayers: 28
+    requireOffscreen: 1
+    offscreenPadding: 1.25
+    requireAllowedGround: 0
+    allowedGroundLayers:
+      serializedVersion: 2
+      m_Bits: 0
+    allowTriggerGround: 1
+    blockedEnvironmentLayers:
+      serializedVersion: 2
+      m_Bits: 128
+    blockedTags: []
+    enemyClearanceRadius: 0.5
+    blockedTriggersCount: 0
+    spawnPointSearchAttempts: 32
+  evaluationInterval: 0.25
+  drawSpawnAreas: 1
+  logConfigurationProblems: 1
+GUID a29ad8ce999b4f2e9ddd114f7fd7e705 -> Hero/Assets/Script/Enemies/RegionalSpawning/EnemySpawnZone2D.cs
+GUID b193aa4735e68d04c8a733ab2933e80e -> Hero/Assets/Script/Enemies/RegionalSpawning/Forst.asset
+GUID cc1175b0a56f8204d9a362b86c83c482 -> Hero/Assets/Script/Enemies/EnemyPregaby/Enemies-Level 1.prefab
+
+### classID=1 fileID=781469747
+--- !u!1 &781469747
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 781469749}
+  - component: {fileID: 781469748}
+  m_Layer: 0
+  m_Name: RegionalSpawnDirector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+
+### classID=114 fileID=781469748
+--- !u!114 &781469748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 781469747}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e054ba2f378401ba135e5b0e6edb8be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  authorityProvider: {fileID: 0}
+  easyMaximum: 12
+  normalMaximum: 15
+  hardMaximum: 18
+  extremeMaximum: 20
+  nightmareMaximum: 22
+  logRejectedAuthorityProvider: 1
+GUID 9e054ba2f378401ba135e5b0e6edb8be -> Hero/Assets/Script/Enemies/RegionalSpawning/RegionalSpawnDirector.cs
+
+### classID=114 fileID=1221292014
+--- !u!114 &1221292014
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1221292013}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 398cd0dd03a074f47a7d8b58777dea1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyManager: {fileID: 1572118937}
+  playerXP: {fileID: 239307050}
+  bossPool:
+  - prefab: {fileID: 8233854846743954295, guid: 5e2f1114b6b96c04aa40152f345bcca8, type: 3}
+    minLevel: 10
+  - prefab: {fileID: 8233854846743954295, guid: 450becd760f77e742af6649839c79b1f, type: 3}
+    minLevel: 20
+  bossTag: Boss
+  requireNoActiveBoss: 1
+  spawnZ: 0
+  spawnCamera: {fileID: 0}
+  spawnTarget: {fileID: 0}
+  warningDuration: 3
+  warningPrefab: {fileID: 0}
+  warningRadius: 1.25
+  warningColor: {r: 1, g: 0.25, b: 0.08, a: 0.9}
+  viewportPadding: 0.12
+  minimumDistanceFromPlayer: 3
+  spawnBlockingLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  spawnPointSearchAttempts: 32
+  failedSpawnRetryDelay: 1
+GUID 398cd0dd03a074f47a7d8b58777dea1f -> Hero/Assets/Script/Enemies/BossManager.cs
+GUID 450becd760f77e742af6649839c79b1f -> Hero/Assets/Script/Enemies/EnemyPregaby/BossLevel-21.prefab
+GUID 5e2f1114b6b96c04aa40152f345bcca8 -> Hero/Assets/Script/Enemies/EnemyPregaby/BossLevel-9.prefab
+
+### classID=114 fileID=1572118940
+--- !u!114 &1572118940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1572118935}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47b8d51a3be0b794a86d3a96bbc4824a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyPrefab: {fileID: 8233854846743954295, guid: cc1175b0a56f8204d9a362b86c83c482, type: 3}
+  enemyManager: {fileID: 1572118937}
+  playerXP: {fileID: 239307050}
+  enemyPool:
+  - prefab: {fileID: 8233854846743954295, guid: cc1175b0a56f8204d9a362b86c83c482, type: 3}
+    minLevel: 1
+  - prefab: {fileID: 8233854846743954295, guid: c431d5bfaee7cf242863ae6110025c32, type: 3}
+    minLevel: 5
+  - prefab: {fileID: 8233854846743954295, guid: 6242f085b186e894b83f42d36ba5f246, type: 3}
+    minLevel: 11
+  - prefab: {fileID: 8233854846743954295, guid: 5a7e9ed2e58b5f44798b11993a481c19, type: 3}
+    minLevel: 15
+  - prefab: {fileID: 8233854846743954295, guid: 2b3118a88f756cc4786e1ed4c60b687f, type: 3}
+    minLevel: 21
+  spawnInterval: 3
+  maxSpawn: 12
+  minSpawn: 3
+  normalMinSpawn: 4
+  normalMaxSpawn: 15
+  hardMinSpawn: 6
+  hardMaxSpawn: 18
+  calculateExtremeSpawnAsMidpoint: 1
+  difficultySpawnVersion: 2
+  extremeMinSpawn: 7
+  extremeMaxSpawn: 20
+  nightmareMinSpawn: 8
+  nightmareMaxSpawn: 22
+  spawnCamera: {fileID: 519420031}
+  spawnTarget: {fileID: 239307040}
+  minimumSpawnDistance: 18.6
+  maximumSpawnDistance: 31.5
+  offscreenPadding: 1.25
+  spawnClearanceRadius: 0.5
+  spawnBlockingLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  spawnPointSearchAttempts: 32
+GUID 2b3118a88f756cc4786e1ed4c60b687f -> Hero/Assets/Script/Enemies/EnemyPregaby/Enemies level 20.prefab
+GUID 47b8d51a3be0b794a86d3a96bbc4824a -> Hero/Assets/Script/Enemies/EnemySpawn.cs
+GUID 5a7e9ed2e58b5f44798b11993a481c19 -> Hero/Assets/Script/Enemies/EnemyPregaby/Enemies level 15.prefab
+GUID 6242f085b186e894b83f42d36ba5f246 -> Hero/Assets/Script/Enemies/EnemyPregaby/Enemies level 10.prefab
+GUID c431d5bfaee7cf242863ae6110025c32 -> Hero/Assets/Script/Enemies/EnemyPregaby/Enemies level 5.prefab
+GUID cc1175b0a56f8204d9a362b86c83c482 -> Hero/Assets/Script/Enemies/EnemyPregaby/Enemies-Level 1.prefab
+
+### classID=1 fileID=1615476166
+--- !u!1 &1615476166
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1615476168}
+  - component: {fileID: 1615476167}
+  m_Layer: 0
+  m_Name: RegionalSpawnDirector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+
+### classID=114 fileID=1615476167
+--- !u!114 &1615476167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1615476166}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e054ba2f378401ba135e5b0e6edb8be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  authorityProvider: {fileID: 0}
+  easyMaximum: 12
+  normalMaximum: 15
+  hardMaximum: 18
+  extremeMaximum: 20
+  nightmareMaximum: 22
+  logRejectedAuthorityProvider: 1
+GUID 9e054ba2f378401ba135e5b0e6edb8be -> Hero/Assets/Script/Enemies/RegionalSpawning/RegionalSpawnDirector.cs
+
+### classID=114 fileID=2200000000
+--- !u!114 &2200000000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1759172894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a29ad8ce999b4f2e9ddd114f7fd7e705, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  regionProfile: {fileID: 11400000, guid: ec5db68b9ed73ea4082f12a8d0a92ffa, type: 2}
+  director: {fileID: 1615476167}
+  dynamicEnemiesRoot: {fileID: 2200000002}
+  localObserverCamera: {fileID: 519420031}
+  enemies:
+  - displayName: Level 1 Enemy
+    enemyPrefab: {fileID: 0}
+    spawnArea: {fileID: 1759172896}
+    desiredPopulation: 3
+    initialSpawnDelay: 0.5
+    minimumRespawnTime: 8
+    maximumRespawnTime: 14
+    failedPointRetryTime: 1.5
+    minimumDistanceFromPlayers: 7
+    maximumDistanceFromPlayers: 28
+    requireOffscreen: 1
+    offscreenPadding: 1.25
+    requireAllowedGround: 0
+    allowedGroundLayers:
+      serializedVersion: 2
+      m_Bits: 0
+    allowTriggerGround: 1
+    blockedEnvironmentLayers:
+      serializedVersion: 2
+      m_Bits: 128
+    blockedTags: []
+    enemyClearanceRadius: 0.5
+    blockedTriggersCount: 0
+    spawnPointSearchAttempts: 32
+  evaluationInterval: 0.25
+  drawSpawnAreas: 1
+  logConfigurationProblems: 1
+GUID a29ad8ce999b4f2e9ddd114f7fd7e705 -> Hero/Assets/Script/Enemies/RegionalSpawning/EnemySpawnZone2D.cs
+GUID ec5db68b9ed73ea4082f12a8d0a92ffa -> Hero/Assets/Script/Enemies/RegionalSpawning/Level 1 Enemie Region.asset
+
+Matching block count: 9
+
+=== Direct occurrence contexts ===
+## EnemyLevel-1Zone: 1 occurrence(s)
+-- lines 6038-6058 --
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 138475163}
+  - component: {fileID: 138475165}
+  - component: {fileID: 138475164}
+  m_Layer: 0
+  m_Name: EnemyLevel-1Zone
+  m_TagString: Untagged
+  m_Icon: {fileID: 5132851093641282708, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &138475163
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+
+## ArmyEnemyZones: 0 occurrence(s)
+
+## RegionalSpawnDirector: 2 occurrence(s)
+-- lines 29790-29810 --
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 781469749}
+  - component: {fileID: 781469748}
+  m_Layer: 0
+  m_Name: RegionalSpawnDirector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &781469748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+-- lines 57521-57541 --
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1615476168}
+  - component: {fileID: 1615476167}
+  m_Layer: 0
+  m_Name: RegionalSpawnDirector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1615476167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+
+## dynamicEnemiesRoot: 2 occurrence(s)
+-- lines 6074-6094 --
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 138475162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a29ad8ce999b4f2e9ddd114f7fd7e705, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  regionProfile: {fileID: 11400000, guid: b193aa4735e68d04c8a733ab2933e80e, type: 2}
+  director: {fileID: 781469748}
+  dynamicEnemiesRoot: {fileID: 2099999998}
+  localObserverCamera: {fileID: 519420031}
+  enemies:
+  - displayName: Level 1
+    enemyPrefab: {fileID: 8233854846743954295, guid: cc1175b0a56f8204d9a362b86c83c482, type: 3}
+    spawnArea: {fileID: 138475165}
+    desiredPopulation: 1
+    initialSpawnDelay: 0.5
+    minimumRespawnTime: 8
+    maximumRespawnTime: 14
+    failedPointRetryTime: 1.5
+-- lines 63586-63606 --
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1759172894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a29ad8ce999b4f2e9ddd114f7fd7e705, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  regionProfile: {fileID: 11400000, guid: ec5db68b9ed73ea4082f12a8d0a92ffa, type: 2}
+  director: {fileID: 1615476167}
+  dynamicEnemiesRoot: {fileID: 2200000002}
+  localObserverCamera: {fileID: 519420031}
+  enemies:
+  - displayName: Level 1 Enemy
+    enemyPrefab: {fileID: 0}
+    spawnArea: {fileID: 1759172896}
+    desiredPopulation: 3
+    initialSpawnDelay: 0.5
+    minimumRespawnTime: 8
+    maximumRespawnTime: 14
+    failedPointRetryTime: 1.5
+
+## localObserverCamera: 2 occurrence(s)
+-- lines 6075-6095 --
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 138475162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a29ad8ce999b4f2e9ddd114f7fd7e705, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  regionProfile: {fileID: 11400000, guid: b193aa4735e68d04c8a733ab2933e80e, type: 2}
+  director: {fileID: 781469748}
+  dynamicEnemiesRoot: {fileID: 2099999998}
+  localObserverCamera: {fileID: 519420031}
+  enemies:
+  - displayName: Level 1
+    enemyPrefab: {fileID: 8233854846743954295, guid: cc1175b0a56f8204d9a362b86c83c482, type: 3}
+    spawnArea: {fileID: 138475165}
+    desiredPopulation: 1
+    initialSpawnDelay: 0.5
+    minimumRespawnTime: 8
+    maximumRespawnTime: 14
+    failedPointRetryTime: 1.5
+    minimumDistanceFromPlayers: 7
+-- lines 63587-63607 --
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1759172894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a29ad8ce999b4f2e9ddd114f7fd7e705, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  regionProfile: {fileID: 11400000, guid: ec5db68b9ed73ea4082f12a8d0a92ffa, type: 2}
+  director: {fileID: 1615476167}
+  dynamicEnemiesRoot: {fileID: 2200000002}
+  localObserverCamera: {fileID: 519420031}
+  enemies:
+  - displayName: Level 1 Enemy
+    enemyPrefab: {fileID: 0}
+    spawnArea: {fileID: 1759172896}
+    desiredPopulation: 3
+    initialSpawnDelay: 0.5
+    minimumRespawnTime: 8
+    maximumRespawnTime: 14
+    failedPointRetryTime: 1.5
+    minimumDistanceFromPlayers: 7
+
+## regionProfile: 2 occurrence(s)
+-- lines 6072-6092 --
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 138475162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a29ad8ce999b4f2e9ddd114f7fd7e705, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  regionProfile: {fileID: 11400000, guid: b193aa4735e68d04c8a733ab2933e80e, type: 2}
+  director: {fileID: 781469748}
+  dynamicEnemiesRoot: {fileID: 2099999998}
+  localObserverCamera: {fileID: 519420031}
+  enemies:
+  - displayName: Level 1
+    enemyPrefab: {fileID: 8233854846743954295, guid: cc1175b0a56f8204d9a362b86c83c482, type: 3}
+    spawnArea: {fileID: 138475165}
+    desiredPopulation: 1
+    initialSpawnDelay: 0.5
+    minimumRespawnTime: 8
+-- lines 63584-63604 --
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1759172894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a29ad8ce999b4f2e9ddd114f7fd7e705, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  regionProfile: {fileID: 11400000, guid: ec5db68b9ed73ea4082f12a8d0a92ffa, type: 2}
+  director: {fileID: 1615476167}
+  dynamicEnemiesRoot: {fileID: 2200000002}
+  localObserverCamera: {fileID: 519420031}
+  enemies:
+  - displayName: Level 1 Enemy
+    enemyPrefab: {fileID: 0}
+    spawnArea: {fileID: 1759172896}
+    desiredPopulation: 3
+    initialSpawnDelay: 0.5
+    minimumRespawnTime: 8
+
+## desiredPopulation: 2 occurrence(s)
+-- lines 6080-6100 --
+  m_Name: 
+  m_EditorClassIdentifier: 
+  regionProfile: {fileID: 11400000, guid: b193aa4735e68d04c8a733ab2933e80e, type: 2}
+  director: {fileID: 781469748}
+  dynamicEnemiesRoot: {fileID: 2099999998}
+  localObserverCamera: {fileID: 519420031}
+  enemies:
+  - displayName: Level 1
+    enemyPrefab: {fileID: 8233854846743954295, guid: cc1175b0a56f8204d9a362b86c83c482, type: 3}
+    spawnArea: {fileID: 138475165}
+    desiredPopulation: 1
+    initialSpawnDelay: 0.5
+    minimumRespawnTime: 8
+    maximumRespawnTime: 14
+    failedPointRetryTime: 1.5
+    minimumDistanceFromPlayers: 7
+    maximumDistanceFromPlayers: 28
+    requireOffscreen: 1
+    offscreenPadding: 1.25
+    requireAllowedGround: 0
+    allowedGroundLayers:
+-- lines 63592-63612 --
+  m_Name:
+  m_EditorClassIdentifier:
+  regionProfile: {fileID: 11400000, guid: ec5db68b9ed73ea4082f12a8d0a92ffa, type: 2}
+  director: {fileID: 1615476167}
+  dynamicEnemiesRoot: {fileID: 2200000002}
+  localObserverCamera: {fileID: 519420031}
+  enemies:
+  - displayName: Level 1 Enemy
+    enemyPrefab: {fileID: 0}
+    spawnArea: {fileID: 1759172896}
+    desiredPopulation: 3
+    initialSpawnDelay: 0.5
+    minimumRespawnTime: 8
+    maximumRespawnTime: 14
+    failedPointRetryTime: 1.5
+    minimumDistanceFromPlayers: 7
+    maximumDistanceFromPlayers: 28
+    requireOffscreen: 1
+    offscreenPadding: 1.25
+    requireAllowedGround: 0
+    allowedGroundLayers:
+
+## minimumDistanceFromPlayers: 2 occurrence(s)
+-- lines 6085-6105 --
+  localObserverCamera: {fileID: 519420031}
+  enemies:
+  - displayName: Level 1
+    enemyPrefab: {fileID: 8233854846743954295, guid: cc1175b0a56f8204d9a362b86c83c482, type: 3}
+    spawnArea: {fileID: 138475165}
+    desiredPopulation: 1
+    initialSpawnDelay: 0.5
+    minimumRespawnTime: 8
+    maximumRespawnTime: 14
+    failedPointRetryTime: 1.5
+    minimumDistanceFromPlayers: 7
+    maximumDistanceFromPlayers: 28
+    requireOffscreen: 1
+    offscreenPadding: 1.25
+    requireAllowedGround: 0
+    allowedGroundLayers:
+      serializedVersion: 2
+      m_Bits: 0
+    allowTriggerGround: 1
+    blockedEnvironmentLayers:
+      serializedVersion: 2
+-- lines 63597-63617 --
+  localObserverCamera: {fileID: 519420031}
+  enemies:
+  - displayName: Level 1 Enemy
+    enemyPrefab: {fileID: 0}
+    spawnArea: {fileID: 1759172896}
+    desiredPopulation: 3
+    initialSpawnDelay: 0.5
+    minimumRespawnTime: 8
+    maximumRespawnTime: 14
+    failedPointRetryTime: 1.5
+    minimumDistanceFromPlayers: 7
+    maximumDistanceFromPlayers: 28
+    requireOffscreen: 1
+    offscreenPadding: 1.25
+    requireAllowedGround: 0
+    allowedGroundLayers:
+      serializedVersion: 2
+      m_Bits: 0
+    allowTriggerGround: 1
+    blockedEnvironmentLayers:
+      serializedVersion: 2
+
+## maximumDistanceFromPlayers: 2 occurrence(s)
+-- lines 6086-6106 --
+  enemies:
+  - displayName: Level 1
+    enemyPrefab: {fileID: 8233854846743954295, guid: cc1175b0a56f8204d9a362b86c83c482, type: 3}
+    spawnArea: {fileID: 138475165}
+    desiredPopulation: 1
+    initialSpawnDelay: 0.5
+    minimumRespawnTime: 8
+    maximumRespawnTime: 14
+    failedPointRetryTime: 1.5
+    minimumDistanceFromPlayers: 7
+    maximumDistanceFromPlayers: 28
+    requireOffscreen: 1
+    offscreenPadding: 1.25
+    requireAllowedGround: 0
+    allowedGroundLayers:
+      serializedVersion: 2
+      m_Bits: 0
+    allowTriggerGround: 1
+    blockedEnvironmentLayers:
+      serializedVersion: 2
+      m_Bits: 128
+-- lines 63598-63618 --
+  enemies:
+  - displayName: Level 1 Enemy
+    enemyPrefab: {fileID: 0}
+    spawnArea: {fileID: 1759172896}
+    desiredPopulation: 3
+    initialSpawnDelay: 0.5
+    minimumRespawnTime: 8
+    maximumRespawnTime: 14
+    failedPointRetryTime: 1.5
+    minimumDistanceFromPlayers: 7
+    maximumDistanceFromPlayers: 28
+    requireOffscreen: 1
+    offscreenPadding: 1.25
+    requireAllowedGround: 0
+    allowedGroundLayers:
+      serializedVersion: 2
+      m_Bits: 0
+    allowTriggerGround: 1
+    blockedEnvironmentLayers:
+      serializedVersion: 2
+      m_Bits: 128
+
+## requireAllowedGround: 2 occurrence(s)
+-- lines 6089-6109 --
+    spawnArea: {fileID: 138475165}
+    desiredPopulation: 1
+    initialSpawnDelay: 0.5
+    minimumRespawnTime: 8
+    maximumRespawnTime: 14
+    failedPointRetryTime: 1.5
+    minimumDistanceFromPlayers: 7
+    maximumDistanceFromPlayers: 28
+    requireOffscreen: 1
+    offscreenPadding: 1.25
+    requireAllowedGround: 0
+    allowedGroundLayers:
+      serializedVersion: 2
+      m_Bits: 0
+    allowTriggerGround: 1
+    blockedEnvironmentLayers:
+      serializedVersion: 2
+      m_Bits: 128
+    blockedTags: []
+    enemyClearanceRadius: 0.5
+    blockedTriggersCount: 0
+-- lines 63601-63621 --
+    spawnArea: {fileID: 1759172896}
+    desiredPopulation: 3
+    initialSpawnDelay: 0.5
+    minimumRespawnTime: 8
+    maximumRespawnTime: 14
+    failedPointRetryTime: 1.5
+    minimumDistanceFromPlayers: 7
+    maximumDistanceFromPlayers: 28
+    requireOffscreen: 1
+    offscreenPadding: 1.25
+    requireAllowedGround: 0
+    allowedGroundLayers:
+      serializedVersion: 2
+      m_Bits: 0
+    allowTriggerGround: 1
+    blockedEnvironmentLayers:
+      serializedVersion: 2
+      m_Bits: 128
+    blockedTags: []
+    enemyClearanceRadius: 0.5
+    blockedTriggersCount: 0
+
+## allowedGroundLayers: 2 occurrence(s)
+-- lines 6090-6110 --
+    desiredPopulation: 1
+    initialSpawnDelay: 0.5
+    minimumRespawnTime: 8
+    maximumRespawnTime: 14
+    failedPointRetryTime: 1.5
+    minimumDistanceFromPlayers: 7
+    maximumDistanceFromPlayers: 28
+    requireOffscreen: 1
+    offscreenPadding: 1.25
+    requireAllowedGround: 0
+    allowedGroundLayers:
+      serializedVersion: 2
+      m_Bits: 0
+    allowTriggerGround: 1
+    blockedEnvironmentLayers:
+      serializedVersion: 2
+      m_Bits: 128
+    blockedTags: []
+    enemyClearanceRadius: 0.5
+    blockedTriggersCount: 0
+    spawnPointSearchAttempts: 32
+-- lines 63602-63622 --
+    desiredPopulation: 3
+    initialSpawnDelay: 0.5
+    minimumRespawnTime: 8
+    maximumRespawnTime: 14
+    failedPointRetryTime: 1.5
+    minimumDistanceFromPlayers: 7
+    maximumDistanceFromPlayers: 28
+    requireOffscreen: 1
+    offscreenPadding: 1.25
+    requireAllowedGround: 0
+    allowedGroundLayers:
+      serializedVersion: 2
+      m_Bits: 0
+    allowTriggerGround: 1
+    blockedEnvironmentLayers:
+      serializedVersion: 2
+      m_Bits: 128
+    blockedTags: []
+    enemyClearanceRadius: 0.5
+    blockedTriggersCount: 0
+    spawnPointSearchAttempts: 32
+
+## blockedEnvironmentLayers: 2 occurrence(s)
+-- lines 6094-6114 --
+    failedPointRetryTime: 1.5
+    minimumDistanceFromPlayers: 7
+    maximumDistanceFromPlayers: 28
+    requireOffscreen: 1
+    offscreenPadding: 1.25
+    requireAllowedGround: 0
+    allowedGroundLayers:
+      serializedVersion: 2
+      m_Bits: 0
+    allowTriggerGround: 1
+    blockedEnvironmentLayers:
+      serializedVersion: 2
+      m_Bits: 128
+    blockedTags: []
+    enemyClearanceRadius: 0.5
+    blockedTriggersCount: 0
+    spawnPointSearchAttempts: 32
+  evaluationInterval: 0.25
+  drawSpawnAreas: 1
+  logConfigurationProblems: 1
+--- !u!61 &138475165
+-- lines 63606-63626 --
+    failedPointRetryTime: 1.5
+    minimumDistanceFromPlayers: 7
+    maximumDistanceFromPlayers: 28
+    requireOffscreen: 1
+    offscreenPadding: 1.25
+    requireAllowedGround: 0
+    allowedGroundLayers:
+      serializedVersion: 2
+      m_Bits: 0
+    allowTriggerGround: 1
+    blockedEnvironmentLayers:
+      serializedVersion: 2
+      m_Bits: 128
+    blockedTags: []
+    enemyClearanceRadius: 0.5
+    blockedTriggersCount: 0
+    spawnPointSearchAttempts: 32
+  evaluationInterval: 0.25
+  drawSpawnAreas: 1
+  logConfigurationProblems: 1
+--- !u!1 &2200000001
+
+## spawnPointSearchAttempts: 4 occurrence(s)
+-- lines 6100-6120 --
+    allowedGroundLayers:
+      serializedVersion: 2
+      m_Bits: 0
+    allowTriggerGround: 1
+    blockedEnvironmentLayers:
+      serializedVersion: 2
+      m_Bits: 128
+    blockedTags: []
+    enemyClearanceRadius: 0.5
+    blockedTriggersCount: 0
+    spawnPointSearchAttempts: 32
+  evaluationInterval: 0.25
+  drawSpawnAreas: 1
+  logConfigurationProblems: 1
+--- !u!61 &138475165
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 138475162}
+-- lines 43837-43857 --
+  spawnTarget: {fileID: 0}
+  warningDuration: 3
+  warningPrefab: {fileID: 0}
+  warningRadius: 1.25
+  warningColor: {r: 1, g: 0.25, b: 0.08, a: 0.9}
+  viewportPadding: 0.12
+  minimumDistanceFromPlayer: 3
+  spawnBlockingLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  spawnPointSearchAttempts: 32
+  failedSpawnRetryDelay: 1
+--- !u!4 &1221292015
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1221292013}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+-- lines 56735-56755 --
+  nightmareMaxSpawn: 22
+  spawnCamera: {fileID: 519420031}
+  spawnTarget: {fileID: 239307040}
+  minimumSpawnDistance: 18.6
+  maximumSpawnDistance: 31.5
+  offscreenPadding: 1.25
+  spawnClearanceRadius: 0.5
+  spawnBlockingLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  spawnPointSearchAttempts: 32
+--- !u!1 &1572568510
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1572568511}
+  - component: {fileID: 1572568512}
+-- lines 63612-63632 --
+    allowedGroundLayers:
+      serializedVersion: 2
+      m_Bits: 0
+    allowTriggerGround: 1
+    blockedEnvironmentLayers:
+      serializedVersion: 2
+      m_Bits: 128
+    blockedTags: []
+    enemyClearanceRadius: 0.5
+    blockedTriggersCount: 0
+    spawnPointSearchAttempts: 32
+  evaluationInterval: 0.25
+  drawSpawnAreas: 1
+  logConfigurationProblems: 1
+--- !u!1 &2200000001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+
+## a29ad8ce999b4f2e9ddd114f7fd7e705: 2 occurrence(s)
+-- lines 6069-6089 --
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &138475164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 138475162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a29ad8ce999b4f2e9ddd114f7fd7e705, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  regionProfile: {fileID: 11400000, guid: b193aa4735e68d04c8a733ab2933e80e, type: 2}
+  director: {fileID: 781469748}
+  dynamicEnemiesRoot: {fileID: 2099999998}
+  localObserverCamera: {fileID: 519420031}
+  enemies:
+  - displayName: Level 1
+    enemyPrefab: {fileID: 8233854846743954295, guid: cc1175b0a56f8204d9a362b86c83c482, type: 3}
+    spawnArea: {fileID: 138475165}
+-- lines 63581-63601 --
+  m_EdgeRadius: 0
+--- !u!114 &2200000000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1759172894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a29ad8ce999b4f2e9ddd114f7fd7e705, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  regionProfile: {fileID: 11400000, guid: ec5db68b9ed73ea4082f12a8d0a92ffa, type: 2}
+  director: {fileID: 1615476167}
+  dynamicEnemiesRoot: {fileID: 2200000002}
+  localObserverCamera: {fileID: 519420031}
+  enemies:
+  - displayName: Level 1 Enemy
+    enemyPrefab: {fileID: 0}
+    spawnArea: {fileID: 1759172896}
+
+## 9e054ba2f378401ba135e5b0e6edb8be: 2 occurrence(s)
+-- lines 29805-29825 --
+  m_IsActive: 1
+--- !u!114 &781469748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 781469747}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e054ba2f378401ba135e5b0e6edb8be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  authorityProvider: {fileID: 0}
+  easyMaximum: 12
+  normalMaximum: 15
+  hardMaximum: 18
+  extremeMaximum: 20
+  nightmareMaximum: 22
+  logRejectedAuthorityProvider: 1
+--- !u!4 &781469749
+-- lines 57536-57556 --
+  m_IsActive: 1
+--- !u!114 &1615476167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1615476166}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e054ba2f378401ba135e5b0e6edb8be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  authorityProvider: {fileID: 0}
+  easyMaximum: 12
+  normalMaximum: 15
+  hardMaximum: 18
+  extremeMaximum: 20
+  nightmareMaximum: 22
+  logRejectedAuthorityProvider: 1
+--- !u!4 &1615476168
+
+=== Relevant GUID mappings ===
+cc1175b0a56f8204d9a362b86c83c482 -> Hero/Assets/Script/Enemies/EnemyPregaby/Enemies-Level 1.prefab
+47b8d51a3be0b794a86d3a96bbc4824a -> Hero/Assets/Script/Enemies/EnemySpawn.cs
+a2f931d6dfe64e10ace9d52383feda96 -> Hero/Assets/Script/Enemies/RegionalSpawning
+63f30f73b83544928f641dc40ec866a2 -> Hero/Assets/Script/Enemies/RegionalSpawning/Editor
+2c28d7b940a64f78883d48a15cb1f624 -> Hero/Assets/Script/Enemies/RegionalSpawning/Editor/RegionalSpawnSetupEditor.cs
+3215bdce295d4616a0ab0da903545fa8 -> Hero/Assets/Script/Enemies/RegionalSpawning/EnemyRegionProfile.cs
+a29ad8ce999b4f2e9ddd114f7fd7e705 -> Hero/Assets/Script/Enemies/RegionalSpawning/EnemySpawnZone2D.cs
+b193aa4735e68d04c8a733ab2933e80e -> Hero/Assets/Script/Enemies/RegionalSpawning/Forst.asset
+afcbd3d94c78456881e80a6508a61093 -> Hero/Assets/Script/Enemies/RegionalSpawning/IRegionalSpawnAuthority.cs
+ec5db68b9ed73ea4082f12a8d0a92ffa -> Hero/Assets/Script/Enemies/RegionalSpawning/Level 1 Enemie Region.asset
+bff55ee31cbb4d5aae70d5de001503e6 -> Hero/Assets/Script/Enemies/RegionalSpawning/REGIONAL_SPAWNING_SETUP.md
+9e054ba2f378401ba135e5b0e6edb8be -> Hero/Assets/Script/Enemies/RegionalSpawning/RegionalSpawnDirector.cs
+3dbae8e55af34f798ffedf9bd12ba6bc -> Hero/Assets/Script/Enemies/RegionalSpawning/SpawnedEnemyRegionLink.cs
+6534396e58c446c88ad4049e0a59b7cf -> Hero/Assets/Script/WorldStreaming/WorldStreamingTarget.cs
+
+=== WorldStreamingTarget sources ===
+Hero/Assets/Script/WorldStreaming/WorldChunkStreamer.cs guid=90d559cfc36e47f8896ee87cc77297e2
+Hero/Assets/Script/WorldStreaming/WorldStreamingTarget.cs guid=6534396e58c446c88ad4049e0a59b7cf
+Hero/Assets/Script/WorldStreaming/Editor/WorldStreamingSetupEditor.cs guid=083a4fab8cb84f1fa648e64675fd173c
+Hero/Assets/Script/Enemies/RegionalSpawning/EnemySpawnZone2D.cs guid=a29ad8ce999b4f2e9ddd114f7fd7e705

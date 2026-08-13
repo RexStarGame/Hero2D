@@ -10,21 +10,30 @@ public sealed class SpawnedEnemyRegionLink : MonoBehaviour
     private EnemySpawnZone2D owner;
     private RegionalSpawnDirector director;
     private EnemyHealth enemyHealth;
+    private Collider2D spawnArea;
     private int entryIndex = -1;
     private bool initialized;
     private bool released;
     private bool subscribed;
 
+    /// <summary>
+    /// The exact entry area that created this enemy. Event enemies do not have
+    /// a region link, so their movement controllers keep their normal behavior.
+    /// </summary>
+    public Collider2D SpawnArea => spawnArea;
+
     internal void Initialize(
         EnemySpawnZone2D spawnOwner,
         int spawnEntryIndex,
-        RegionalSpawnDirector spawnDirector)
+        RegionalSpawnDirector spawnDirector,
+        Collider2D assignedSpawnArea)
     {
         Release();
 
         owner = spawnOwner;
         entryIndex = spawnEntryIndex;
         director = spawnDirector;
+        spawnArea = assignedSpawnArea;
         initialized = true;
         released = false;
 
