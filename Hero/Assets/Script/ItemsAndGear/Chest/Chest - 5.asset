@@ -33,4 +33,7 @@ MonoBehaviour:
     attackSpeed: 0
     movementSpeed: 0.03
     experienceGain: 0
+    goldGain: 0
+    guardChance: 0.05
+    guardReduction: 0.01
   armorRating: 0
