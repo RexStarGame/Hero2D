@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77628aadd0e33ab41882f4f5537db51c, type: 3}
+  m_Name: Boots - level 10 Epic
+  m_EditorClassIdentifier: 
+  itemID: '@344k23kfcd6932euicvmvb19QssdfgF4'
+  itemName: "Musashi\u2019s Iron Path"
+  description: Epic iron-and-leather greaves engraved with silver markings inspired
+    by the path of Miyamoto Musashi. Built for warriors who have survived countless
+    battles, their reinforced plating offers dependable protection while the legendary
+    inscriptions honor the discipline of the two-sword path.
+  rarity: 3
+  requiredLevel: 10
+  goldValue: 1840
+  icon: {fileID: -8572389895113277757, guid: 05eb2f275540f98488c06edaed726a45, type: 3}
+  worldPrefab: {fileID: 2824062948663507103, guid: 1832f99ef1b4e764188bbb4896c7fc16, type: 3}
+  equipmentSlot: 5
+  statModifiers:
+    maxHealth: 54
+    minimumDamage: 0
+    maximumDamage: 0
+    defense: 21.9
+    regeneration: 0
+    lifeSteal: 0
+    criticalChance: 0
+    attackSpeed: 0
+    movementSpeed: 0.24
+    experienceGain: 0
+  armorRating: 0

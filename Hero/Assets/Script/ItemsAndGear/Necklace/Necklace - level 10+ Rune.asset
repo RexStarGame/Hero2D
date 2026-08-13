@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84ad063d2d0be7143b731bf233a811ac, type: 3}
+  m_Name: Necklace - level 10+ Rune
+  m_EditorClassIdentifier: 
+  itemID: '#gf3496klfq85ve3tikqlbpoP54CV12'
+  itemName: "Rume\u2019s Oath"
+  description: "A bronze-and-silver honor pendant gifted by Rume\u2019s ruler to
+    the ronin who saved his heir."
+  rarity: 1
+  requiredLevel: 14
+  goldValue: 830
+  icon: {fileID: -8192053610591046255, guid: 0fadd26eaa21f474d8f05bea7b67dbdb, type: 3}
+  worldPrefab: {fileID: 4452784338159096076, guid: 58450fef15526164bbc54970868b0d5b, type: 3}
+  equipmentSlot: 6
+  statModifiers:
+    maxHealth: 35
+    minimumDamage: 7
+    maximumDamage: 12
+    defense: 0
+    regeneration: 0
+    lifeSteal: 0
+    criticalChance: 0.07
+    attackSpeed: 0
+    movementSpeed: 0.05
+    experienceGain: 0.12
