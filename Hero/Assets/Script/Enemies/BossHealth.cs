@@ -30,6 +30,8 @@ public class BossHealth : MonoBehaviour
 
     private void Awake()
     {
+        MinimapTarget2D.Ensure(gameObject, MinimapTargetKind.Enemy);
+
         baseMaxHealth = Mathf.Max(1f, maxHealth);
         difficultyProfile = GetComponentInParent<EnemyDifficultyProfile>();
         if (difficultyProfile == null)

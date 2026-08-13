@@ -34,6 +34,8 @@ public class EnemyHealth : MonoBehaviour
 
     private void Awake()
     {
+        MinimapTarget2D.Ensure(gameObject, MinimapTargetKind.Enemy);
+
         difficultyProfile = GetComponentInParent<EnemyDifficultyProfile>();
         if (difficultyProfile == null)
             difficultyProfile = gameObject.AddComponent<EnemyDifficultyProfile>();
