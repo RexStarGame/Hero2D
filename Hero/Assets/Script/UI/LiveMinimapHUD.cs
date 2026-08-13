@@ -5,7 +5,11 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 [DisallowMultipleComponent]
-public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
+public sealed class LiveMinimapHUD : MonoBehaviour,
+    IPointerClickHandler,
+    IBeginDragHandler,
+    IDragHandler,
+    IEndDragHandler
 {
     [Header("Layout")]
     [Min(120f)] [SerializeField] private float mapSize = 220f;
@@ -95,6 +99,10 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
     private Texture2D arrowTexture;
     private bool showWaypointOnMap;
     private bool showHudDirectionArrow;
+    private Vector2 expandedViewCenter;
+    private Vector2 lastDragLocalPoint;
+    private bool hasExpandedViewCenter;
+    private bool isDraggingMap;
 
     private const string ShowWaypointOnMapKey = "Navigation.ShowWaypointOnMap";
     private const string ShowHudDirectionArrowKey = "Navigation.ShowHudDirectionArrow";
@@ -155,6 +163,7 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
             return;
 
         ResolveLocalPlayer();
+        EnsureExpandedViewCenter();
         UpdateWaypoint();
         RefreshMarkers();
     }
@@ -164,8 +173,8 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
         if (minimapCamera == null || localPlayer == null || !minimapCamera.enabled)
             return;
 
-        Vector3 playerPosition = localPlayer.position;
-        minimapCamera.transform.position = new Vector3(playerPosition.x, playerPosition.y, minimapCameraZ);
+        Vector2 viewCenter = CurrentViewCenter;
+        minimapCamera.transform.position = new Vector3(viewCenter.x, viewCenter.y, minimapCameraZ);
         minimapCamera.orthographicSize = CurrentWorldRadius;
     }
 
@@ -203,6 +212,7 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
             float currentWorldRadius = CurrentWorldRadius;
             float pixelsPerWorldUnit = (currentMapSize * 0.5f - 10f) / Mathf.Max(1f, currentWorldRadius);
             float radiusSquared = currentWorldRadius * currentWorldRadius;
+            Vector2 viewCenter = CurrentViewCenter;
 
             for (int i = 0; i < targets.Count; i++)
             {
@@ -210,16 +220,14 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
                 if (target == null || !target.isActiveAndEnabled)
                     continue;
 
-                Vector2 offset = (Vector2)(target.TrackedTransform.position - localPlayer.position);
+                Vector2 offset = (Vector2)target.TrackedTransform.position - viewCenter;
                 bool isLocalPlayer = target.TrackedTransform == localPlayer;
                 if (!isLocalPlayer && offset.sqrMagnitude > radiusSquared)
                     continue;
 
                 Image marker = GetMarker(used++);
                 ConfigureMarker(marker, target.Kind, isLocalPlayer);
-                marker.rectTransform.anchoredPosition = isLocalPlayer
-                    ? Vector2.zero
-                    : offset * pixelsPerWorldUnit;
+                marker.rectTransform.anchoredPosition = offset * pixelsPerWorldUnit;
             }
         }
 
@@ -410,7 +418,7 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
             Mathf.Max(1f, waypointDistanceTextSize.y));
 
         waypointHelpText = CreateText("Waypoint Help", transform, 18, TextAnchor.MiddleCenter);
-        waypointHelpText.text = "Left click: Set waypoint   Right click / Delete: Remove";
+        waypointHelpText.text = "Click: Set waypoint   Drag: Move map   Right click / Delete: Remove";
         waypointHelpText.rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
         waypointHelpText.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
         waypointHelpText.rectTransform.pivot = new Vector2(0.5f, 1f);
@@ -442,18 +450,16 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
         if (localPlayer == null || mapArea == null)
             return;
 
-        Vector2 localPoint;
-        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                mapArea, eventData.position, eventData.pressEventCamera, out localPoint))
+        if (!TryGetMapLocalPoint(eventData, out Vector2 localPoint))
             return;
 
-        float halfSize = Mathf.Min(mapArea.rect.width, mapArea.rect.height) * 0.5f;
-        if (halfSize <= 0f || localPoint.sqrMagnitude > halfSize * halfSize)
+        float halfSize = MapHalfSize;
+        if (halfSize <= 0f || !IsInsideMap(localPoint, halfSize))
             return;
 
         if (hasWaypoint)
         {
-            Vector2 existingPoint = WorldOffsetToMapPoint(waypointPosition - (Vector2)localPlayer.position);
+            Vector2 existingPoint = WorldOffsetToMapPoint(waypointPosition - CurrentViewCenter);
             if ((localPoint - existingPoint).sqrMagnitude <= waypointMarkerSize * waypointMarkerSize)
             {
                 ClearWaypoint();
@@ -461,10 +467,78 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
             }
         }
 
-        waypointPosition = (Vector2)localPlayer.position + localPoint * (CurrentWorldRadius / halfSize);
+        waypointPosition = CurrentViewCenter + localPoint * (CurrentWorldRadius / halfSize);
         hasWaypoint = true;
         UpdateWaypoint();
         RefreshWaypointMarker();
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        if (!isExpanded ||
+            eventData.button != PointerEventData.InputButton.Left ||
+            !TryGetMapLocalPoint(
+                eventData.pressPosition,
+                eventData.pressEventCamera,
+                out Vector2 pressLocalPoint))
+        {
+            return;
+        }
+
+        float halfSize = MapHalfSize;
+        if (halfSize <= 0f || !IsInsideMap(pressLocalPoint, halfSize))
+            return;
+
+        EnsureExpandedViewCenter();
+        if (!hasExpandedViewCenter || !TryGetMapLocalPoint(eventData, out Vector2 currentLocalPoint))
+            return;
+
+        isDraggingMap = true;
+        lastDragLocalPoint = currentLocalPoint;
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (!isDraggingMap ||
+            eventData.button != PointerEventData.InputButton.Left ||
+            !TryGetMapLocalPoint(eventData, out Vector2 localPoint))
+        {
+            return;
+        }
+
+        float halfSize = MapHalfSize;
+        if (halfSize <= 0f)
+            return;
+
+        Vector2 localDelta = localPoint - lastDragLocalPoint;
+        expandedViewCenter -= localDelta * (CurrentWorldRadius / halfSize);
+        lastDragLocalPoint = localPoint;
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Left)
+            isDraggingMap = false;
+    }
+
+    private bool TryGetMapLocalPoint(PointerEventData eventData, out Vector2 localPoint)
+    {
+        return TryGetMapLocalPoint(eventData.position, eventData.pressEventCamera, out localPoint);
+    }
+
+    private bool TryGetMapLocalPoint(Vector2 screenPoint, Camera eventCamera, out Vector2 localPoint)
+    {
+        localPoint = default;
+        return mapArea != null && RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            mapArea,
+            screenPoint,
+            eventCamera,
+            out localPoint);
+    }
+
+    private static bool IsInsideMap(Vector2 localPoint, float halfSize)
+    {
+        return localPoint.sqrMagnitude <= halfSize * halfSize;
     }
 
     private Sprite GetDirectionArrowSprite()
@@ -587,7 +661,7 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
             return;
         }
 
-        Vector2 offset = waypointPosition - (Vector2)localPlayer.position;
+        Vector2 offset = waypointPosition - CurrentViewCenter;
         float visibleRadius = CurrentWorldRadius;
         bool waypointIsVisible = offset.sqrMagnitude <= visibleRadius * visibleRadius;
         waypointMarker.gameObject.SetActive(waypointIsVisible);
@@ -631,11 +705,41 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
 
     private float CurrentMapSize => isExpanded ? Mathf.Max(mapSize, expandedMapSize) : mapSize;
     private float CurrentWorldRadius => isExpanded ? Mathf.Max(worldRadius, expandedWorldRadius) : worldRadius;
+    private float MapHalfSize => mapArea == null
+        ? 0f
+        : Mathf.Min(mapArea.rect.width, mapArea.rect.height) * 0.5f;
+    private Vector2 CurrentViewCenter => isExpanded && hasExpandedViewCenter
+        ? expandedViewCenter
+        : localPlayer != null
+            ? (Vector2)localPlayer.position
+            : Vector2.zero;
 
     private void ToggleExpanded()
     {
         isExpanded = !isExpanded;
+        isDraggingMap = false;
+
+        if (isExpanded)
+        {
+            ResolveLocalPlayer();
+            hasExpandedViewCenter = false;
+            EnsureExpandedViewCenter();
+        }
+        else
+        {
+            hasExpandedViewCenter = false;
+        }
+
         ApplyMapState();
+    }
+
+    private void EnsureExpandedViewCenter()
+    {
+        if (!isExpanded || hasExpandedViewCenter || localPlayer == null)
+            return;
+
+        expandedViewCenter = localPlayer.position;
+        hasExpandedViewCenter = true;
     }
 
     private void ApplyMapState()

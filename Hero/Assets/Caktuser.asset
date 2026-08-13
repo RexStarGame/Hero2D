@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0d95ab5f45f40ebadcf63d87a3ad842, type: 3}
+  m_Name: Caktuser
+  m_EditorClassIdentifier: 
+  cellSize: {x: 0.32, y: 0.32}
+  colorTolerance: 0.03
+  terrains:
+  - displayName: 
+    mapColor: {r: 0.26364803, g: 1, b: 0, a: 0}
+    targetLayer: 0
+    paintTiles:
+    - tile: {fileID: 11400000, guid: f732f7f91d0fa554dbeb66e120a43a98, type: 2}
+      weight: 0
+    decorationChance: 0.001
+    decorationTiles:
+    - tile: {fileID: 11400000, guid: 71745016e5494bb41a14fbede6384669, type: 2}
+      weight: 1.22
+    - tile: {fileID: 11400000, guid: 4d344ff75424b8b41b1346eee5c1a652, type: 2}
+      weight: 1.09
+    paintCollision: 0
+    collisionTile: {fileID: 0}
