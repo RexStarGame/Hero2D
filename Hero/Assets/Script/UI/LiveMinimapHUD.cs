@@ -35,6 +35,8 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
     [Min(6f)] [SerializeField] private float waypointMarkerSize = 18f;
     [SerializeField] private Color waypointColor = new Color(0.1f, 0.9f, 1f, 1f);
     [SerializeField] private KeyCode removeWaypointKey = KeyCode.Delete;
+    [SerializeField] private bool showWaypointOnMapByDefault = true;
+    [SerializeField] private bool showHudDirectionArrowByDefault = true;
 
     [Header("HUD Direction Arrow (Outside Map)")]
     [Tooltip("Leave empty to keep using the current generated triangle.")]
@@ -82,6 +84,7 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
     private Camera minimapCamera;
     private RenderTexture worldTexture;
     private Image waypointMarker;
+    private Image mapDirectionArrow;
     private RectTransform directionIndicator;
     private Image directionArrow;
     private TextMeshProUGUI distanceText;
@@ -90,6 +93,11 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
     private Vector2 waypointPosition;
     private Sprite arrowSprite;
     private Texture2D arrowTexture;
+    private bool showWaypointOnMap;
+    private bool showHudDirectionArrow;
+
+    private const string ShowWaypointOnMapKey = "Navigation.ShowWaypointOnMap";
+    private const string ShowHudDirectionArrowKey = "Navigation.ShowHudDirectionArrow";
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStatics()
@@ -126,6 +134,8 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
 
         instance = this;
         DontDestroyOnLoad(gameObject);
+        showWaypointOnMap = PlayerPrefs.GetInt(ShowWaypointOnMapKey, showWaypointOnMapByDefault ? 1 : 0) != 0;
+        showHudDirectionArrow = PlayerPrefs.GetInt(ShowHudDirectionArrowKey, showHudDirectionArrowByDefault ? 1 : 0) != 0;
         BuildUI();
     }
 
@@ -369,6 +379,11 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
         waypointMarker.raycastTarget = false;
         waypointMarker.gameObject.SetActive(false);
 
+        mapDirectionArrow = CreateImage("Waypoint Map Direction Arrow", mapArea, waypointColor, GetDirectionArrowSprite());
+        mapDirectionArrow.rectTransform.sizeDelta = new Vector2(waypointMarkerSize * 1.25f, waypointMarkerSize * 1.25f);
+        mapDirectionArrow.raycastTarget = false;
+        mapDirectionArrow.gameObject.SetActive(false);
+
         GameObject indicatorObject = new GameObject("Waypoint Direction", typeof(RectTransform));
         indicatorObject.transform.SetParent(transform, false);
         directionIndicator = indicatorObject.GetComponent<RectTransform>();
@@ -498,6 +513,36 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
     }
 #endif
 
+    public static bool ShowWaypointOnMap => instance != null
+        ? instance.showWaypointOnMap
+        : PlayerPrefs.GetInt(ShowWaypointOnMapKey, 1) != 0;
+
+    public static bool ShowHudDirectionArrow => instance != null
+        ? instance.showHudDirectionArrow
+        : PlayerPrefs.GetInt(ShowHudDirectionArrowKey, 1) != 0;
+
+    public static void SetShowWaypointOnMap(bool value)
+    {
+        PlayerPrefs.SetInt(ShowWaypointOnMapKey, value ? 1 : 0);
+        PlayerPrefs.Save();
+        if (instance == null)
+            return;
+
+        instance.showWaypointOnMap = value;
+        instance.RefreshWaypointMarker();
+    }
+
+    public static void SetShowHudDirectionArrow(bool value)
+    {
+        PlayerPrefs.SetInt(ShowHudDirectionArrowKey, value ? 1 : 0);
+        PlayerPrefs.Save();
+        if (instance == null)
+            return;
+
+        instance.showHudDirectionArrow = value;
+        instance.UpdateWaypoint();
+    }
+
     private void UpdateWaypoint()
     {
         if (!hasWaypoint || localPlayer == null)
@@ -515,7 +560,10 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
             return;
         }
 
-        directionIndicator.gameObject.SetActive(true);
+        directionIndicator.gameObject.SetActive(showHudDirectionArrow);
+        if (!showHudDirectionArrow)
+            return;
+
         int roundedDistance = Mathf.CeilToInt(distance);
         distanceText.text = string.IsNullOrEmpty(waypointDistanceFormat)
             ? roundedDistance.ToString()
@@ -529,26 +577,39 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
 
     private void RefreshWaypointMarker()
     {
-        if (waypointMarker == null)
+        if (waypointMarker == null || mapDirectionArrow == null)
             return;
 
-        if (!hasWaypoint || localPlayer == null)
+        if (!showWaypointOnMap || !hasWaypoint || localPlayer == null)
         {
             waypointMarker.gameObject.SetActive(false);
+            mapDirectionArrow.gameObject.SetActive(false);
             return;
         }
 
         Vector2 offset = waypointPosition - (Vector2)localPlayer.position;
-        if (offset.sqrMagnitude > CurrentWorldRadius * CurrentWorldRadius)
+        float visibleRadius = CurrentWorldRadius;
+        bool waypointIsVisible = offset.sqrMagnitude <= visibleRadius * visibleRadius;
+        waypointMarker.gameObject.SetActive(waypointIsVisible);
+        mapDirectionArrow.gameObject.SetActive(!waypointIsVisible);
+
+        if (waypointIsVisible)
         {
-            waypointMarker.gameObject.SetActive(false);
+            waypointMarker.rectTransform.sizeDelta = new Vector2(waypointMarkerSize, waypointMarkerSize);
+            waypointMarker.rectTransform.anchoredPosition = WorldOffsetToMapPoint(offset);
+            waypointMarker.transform.SetAsLastSibling();
             return;
         }
 
-        waypointMarker.gameObject.SetActive(true);
-        waypointMarker.rectTransform.sizeDelta = new Vector2(waypointMarkerSize, waypointMarkerSize);
-        waypointMarker.rectTransform.anchoredPosition = WorldOffsetToMapPoint(offset);
-        waypointMarker.transform.SetAsLastSibling();
+        Vector2 mapDirection = offset.normalized;
+        float edgeRadius = CurrentMapSize * 0.5f - waypointMarkerSize * 1.5f;
+        mapDirectionArrow.rectTransform.sizeDelta = new Vector2(waypointMarkerSize * 1.25f, waypointMarkerSize * 1.25f);
+        mapDirectionArrow.rectTransform.anchoredPosition = mapDirection * Mathf.Max(1f, edgeRadius);
+        mapDirectionArrow.rectTransform.localRotation = Quaternion.Euler(
+            0f,
+            0f,
+            Mathf.Atan2(mapDirection.y, mapDirection.x) * Mathf.Rad2Deg + 90f);
+        mapDirectionArrow.transform.SetAsLastSibling();
     }
 
     private Vector2 WorldOffsetToMapPoint(Vector2 worldOffset)
@@ -562,6 +623,8 @@ public sealed class LiveMinimapHUD : MonoBehaviour, IPointerClickHandler
         hasWaypoint = false;
         if (waypointMarker != null)
             waypointMarker.gameObject.SetActive(false);
+        if (mapDirectionArrow != null)
+            mapDirectionArrow.gameObject.SetActive(false);
         if (directionIndicator != null)
             directionIndicator.gameObject.SetActive(false);
     }

@@ -3,33 +3,33 @@ using UnityEngine.UI; // Vigtigt: Giver adgang til UI elementer som Slider
 
 public class MusicManager : MonoBehaviour
 {
-    [Header("UI Opsætning")]
-    public GameObject pauseMenuUI; // Træk dit Pause Panel herind
-    public Slider volumeSlider;    // Træk din Volume Slider herind
+    [Header("UI OpsÃ¦tning")]
+    public GameObject pauseMenuUI; // TrÃ¦k dit Pause Panel herind
+    public Slider volumeSlider;    // TrÃ¦k din Volume Slider herind
 
-    [Header("Audio Opsætning")]
-    public AudioSource musicSource; // Træk din AudioSource (musikken) herind
+    [Header("Audio OpsÃ¦tning")]
+    public AudioSource musicSource; // TrÃ¦k din AudioSource (musikken) herind
 
     private bool isGamePaused = false;
 
-    // Start køres før første frame
+    // Start kÃ¸res fÃ¸r fÃ¸rste frame
     void Start()
     {
-        // Sørg for at pausemenuen er skjult fra start
+        // SÃ¸rg for at pausemenuen er skjult fra start
         if (pauseMenuUI != null)
             pauseMenuUI.SetActive(false);
 
-        // Sæt sliderens værdi til at matche den nuværende musik-volumen
+        // SÃ¦t sliderens vÃ¦rdi til at matche den nuvÃ¦rende musik-volumen
         if (musicSource != null && volumeSlider != null)
         {
             volumeSlider.value = musicSource.volume;
 
-            // Dette sikrer, at funktionen kaldes, når man rykker på slideren
+            // Dette sikrer, at funktionen kaldes, nÃ¥r man rykker pÃ¥ slideren
             volumeSlider.onValueChanged.AddListener(SetLevel);
         }
     }
 
-    // Update køres hver frame
+    // Update kÃ¸res hver frame
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.P))
@@ -48,6 +48,7 @@ public class MusicManager : MonoBehaviour
             }
         }
     }
+
     void PauseGame()
     {
         if (pauseMenuUI != null)
@@ -71,6 +72,7 @@ public class MusicManager : MonoBehaviour
             MenuLock.Clear(MenuOwner.Pause);
         }
     }
+
     private void OnDisable()
     {
         if (isGamePaused)
@@ -79,6 +81,7 @@ public class MusicManager : MonoBehaviour
             Time.timeScale = 1f;
         }
     }
+
     // Denne funktion kaldes af Slideren
     public void SetLevel(float sliderValue)
     {
