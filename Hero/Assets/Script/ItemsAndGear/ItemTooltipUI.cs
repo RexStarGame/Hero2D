@@ -43,12 +43,12 @@ public class ItemTooltipUI : MonoBehaviour
                 if (current != null && current != gear)
                 {
                     text.Append("\n\n<color=#C7D2FE>COMPARED WITH ").Append(current.ItemName.ToUpperInvariant()).Append("</color>");
-                    AppendComparison(gear.StatModifiers, current.StatModifiers);
+                    AppendComparison(gear, current);
                 }
             }
         }
         if (item is WeaponDefinition weapon)
-            text.Append("\nBase damage: ").Append(weapon.BaseDamage.ToString("0.##"));
+            AppendDamageRange("Base damage", weapon.MinimumBaseDamage, weapon.MaximumBaseDamage, false);
         if (item is ArmorDefinition armor && armor.ArmorRating > 0f)
             text.Append("\nArmor: <color=#22C55E>+").Append(armor.ArmorRating.ToString("0.##")).Append("</color>");
         if (item is UniqueEquipmentDefinition unique && !string.IsNullOrWhiteSpace(unique.SpecialEffectDescription))
@@ -93,7 +93,7 @@ public class ItemTooltipUI : MonoBehaviour
     private void AppendStats(ItemStatModifiers s)
     {
         Line("Max Health", s.MaxHealth);
-        Line("Damage", s.Damage);
+        AppendDamageRange("Damage", s.MinimumDamage, s.MaximumDamage, true);
         Line("Defense", s.Defense);
         Line("Regeneration", s.Regeneration, "/s");
         Line("Life Steal", s.LifeSteal * 100f, "%");
@@ -112,10 +112,13 @@ public class ItemTooltipUI : MonoBehaviour
             .Append(sign).Append(value.ToString("0.##")).Append(suffix).Append("</color>");
     }
 
-    private void AppendComparison(ItemStatModifiers next, ItemStatModifiers old)
+    private void AppendComparison(EquippableItemDefinition nextItem, EquippableItemDefinition oldItem)
     {
+        ItemStatModifiers next = nextItem.StatModifiers;
+        ItemStatModifiers old = oldItem.StatModifiers;
         Compare("Max Health", next.MaxHealth - old.MaxHealth);
-        Compare("Damage", next.Damage - old.Damage);
+        CompareRange("Damage", next.MinimumDamage - old.MinimumDamage,
+            next.MaximumDamage - old.MaximumDamage);
         Compare("Defense", next.Defense - old.Defense);
         Compare("Regeneration", next.Regeneration - old.Regeneration, "/s");
         Compare("Life Steal", (next.LifeSteal - old.LifeSteal) * 100f, "%");
@@ -123,7 +126,40 @@ public class ItemTooltipUI : MonoBehaviour
         Compare("Attack Speed", (next.AttackSpeed - old.AttackSpeed) * 100f, "%");
         Compare("Movement Speed", (next.MovementSpeed - old.MovementSpeed) * 100f, "%");
         Compare("Kill XP", (next.ExperienceGain - old.ExperienceGain) * 100f, "%");
+
+        float nextMinBase = nextItem is WeaponDefinition nextWeapon ? nextWeapon.MinimumBaseDamage : 0f;
+        float nextMaxBase = nextItem is WeaponDefinition nextWeaponMax ? nextWeaponMax.MaximumBaseDamage : 0f;
+        float oldMinBase = oldItem is WeaponDefinition oldWeapon ? oldWeapon.MinimumBaseDamage : 0f;
+        float oldMaxBase = oldItem is WeaponDefinition oldWeaponMax ? oldWeaponMax.MaximumBaseDamage : 0f;
+        CompareRange("Base damage", nextMinBase - oldMinBase, nextMaxBase - oldMaxBase);
     }
+
+    private void AppendDamageRange(string label, float minimum, float maximum, bool signed)
+    {
+        maximum = Mathf.Max(minimum, maximum);
+        if (Mathf.Approximately(minimum, 0f) && Mathf.Approximately(maximum, 0f)) return;
+        string color = maximum > 0f ? "#22C55E" : "#EF4444";
+        string minSign = signed && minimum > 0f ? "+" : string.Empty;
+        string maxSign = signed && maximum > 0f ? "+" : string.Empty;
+        text.Append("\n").Append(label).Append(": <color=").Append(color).Append(">")
+            .Append(minSign).Append(minimum.ToString("0.##")).Append("–")
+            .Append(maxSign).Append(maximum.ToString("0.##")).Append("</color>");
+    }
+
+    private void CompareRange(string label, float minimumDifference, float maximumDifference)
+    {
+        if (Mathf.Approximately(minimumDifference, 0f) && Mathf.Approximately(maximumDifference, 0f)) return;
+        bool better = minimumDifference >= 0f && maximumDifference >= 0f;
+        bool worse = minimumDifference <= 0f && maximumDifference <= 0f;
+        string color = better ? "#22C55E" : worse ? "#EF4444" : "#F59E0B";
+        string marker = better ? " ▲" : worse ? " ▼" : " ◆";
+        text.Append("\n").Append(label).Append(": <color=").Append(color).Append(">")
+            .Append(FormatSigned(minimumDifference)).Append("–")
+            .Append(FormatSigned(maximumDifference)).Append(marker).Append("</color>");
+    }
+
+    private static string FormatSigned(float value)
+        => (value > 0f ? "+" : string.Empty) + value.ToString("0.##");
 
     private void Compare(string label, float difference, string suffix = "")
     {

@@ -24,7 +24,8 @@ MonoBehaviour:
   equipmentSlot: 2
   statModifiers:
     maxHealth: 10
-    damage: 0
+    minimumDamage: 0
+    maximumDamage: 0
     defense: 6
     regeneration: 0
     lifeSteal: 0.04

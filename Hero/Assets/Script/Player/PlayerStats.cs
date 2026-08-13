@@ -194,7 +194,7 @@ public class PlayerStats : MonoBehaviour
         if (damageUpgrade != null)
         {
             sb.AppendLine(Row("Damage",
-                $"{Color($"{damageUpgrade.BaseAndAbilityDamage}", valueColor)}{Bonus(damageUpgrade.EquipmentDamageBonus, "0")}  {Soft($"(Lv {damageUpgrade.DamageLevel})")}"));
+                $"{Color($"{damageUpgrade.MinimumDamage}–{damageUpgrade.MaximumDamage}", valueColor)}  {Soft($"(Lv {damageUpgrade.DamageLevel})")}"));
         }
         else
         {

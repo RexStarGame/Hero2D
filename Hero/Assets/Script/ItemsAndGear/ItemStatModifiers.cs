@@ -1,11 +1,14 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [Serializable]
-public class ItemStatModifiers
+public class ItemStatModifiers : ISerializationCallbackReceiver
 {
     [SerializeField] private float maxHealth;
-    [SerializeField] private float damage;
+    [FormerlySerializedAs("damage")]
+    [Min(0f)] [SerializeField] private float minimumDamage;
+    [Min(0f)] [SerializeField] private float maximumDamage;
     [SerializeField] private float defense;
     [SerializeField] private float regeneration;
     [Tooltip("Decimal: 0.04 means +4%.")] [SerializeField] private float lifeSteal;
@@ -16,7 +19,9 @@ public class ItemStatModifiers
     [Min(0f)] [SerializeField] private float experienceGain;
 
     public float MaxHealth => maxHealth;
-    public float Damage => damage;
+    public float MinimumDamage => minimumDamage;
+    public float MaximumDamage => Mathf.Max(minimumDamage, maximumDamage);
+    public float Damage => MaximumDamage;
     public float Defense => defense;
     public float Regeneration => regeneration;
     public float LifeSteal => lifeSteal;
@@ -30,7 +35,8 @@ public class ItemStatModifiers
         return new ItemStatModifiers
         {
             maxHealth = a.maxHealth + b.maxHealth,
-            damage = a.damage + b.damage,
+            minimumDamage = a.MinimumDamage + b.MinimumDamage,
+            maximumDamage = a.MaximumDamage + b.MaximumDamage,
             defense = a.defense + b.defense,
             regeneration = a.regeneration + b.regeneration,
             lifeSteal = a.lifeSteal + b.lifeSteal,
@@ -39,5 +45,15 @@ public class ItemStatModifiers
             movementSpeed = a.movementSpeed + b.movementSpeed,
             experienceGain = a.experienceGain + b.experienceGain
         };
+    }
+
+    public void OnBeforeSerialize()
+    {
+        if (maximumDamage < minimumDamage) maximumDamage = minimumDamage;
+    }
+
+    public void OnAfterDeserialize()
+    {
+        if (maximumDamage < minimumDamage) maximumDamage = minimumDamage;
     }
 }
