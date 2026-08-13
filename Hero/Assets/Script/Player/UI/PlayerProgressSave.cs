@@ -128,6 +128,42 @@ public static class PlayerProgressSave
         SavePlayer(player);
     }
 
+    public static int ResetAbilityUpgrades(
+        PlayerXP player,
+        DamageUpgrade damage,
+        PlayerHealth health,
+        PlayerAttack attack)
+    {
+        if (player == null || damage == null || health == null || attack == null)
+            return -1;
+
+        int refundedPoints =
+            Mathf.Max(0, damage.DamageLevel) +
+            Mathf.Max(0, health.maxHealthLevel) +
+            Mathf.Max(0, health.regenLevel) +
+            Mathf.Max(0, attack.attackSpeedLevel) +
+            Mathf.Max(0, attack.lifeStealLevel) +
+            Mathf.Max(0, attack.critLevel);
+
+        damage.RestoreDamageLevel(0);
+        health.ResetAbilityUpgradeProgress();
+        attack.ResetAbilityUpgradeProgress();
+        player.abilityPoints += refundedPoints;
+
+        PlayerPrefs.SetInt(DamageLevelKey, 0);
+        PlayerPrefs.SetInt(MaxHealthLevelKey, 0);
+        PlayerPrefs.SetFloat(MaxHealthKey, health.maxHealth);
+        PlayerPrefs.SetInt(RegenLevelKey, 0);
+        PlayerPrefs.SetInt(AttackSpeedLevelKey, 0);
+        PlayerPrefs.SetFloat(AttackCooldownKey, attack.BaseAttackCooldown);
+        PlayerPrefs.SetInt(LifeStealLevelKey, 0);
+        PlayerPrefs.SetFloat(LifeStealPercentKey, 0f);
+        PlayerPrefs.SetInt(CritLevelKey, 0);
+        PlayerPrefs.SetFloat(CritChanceKey, 0f);
+        SavePlayer(player);
+        return refundedPoints;
+    }
+
     public static int XpRequiredForLevel(int level)
     {
         return 100 + ((Mathf.Max(1, level) - 1) * 50);

@@ -4126,7 +4126,7 @@ MonoBehaviour:
   playerXP: {fileID: 239307050}
   playerHealth: {fileID: 239307047}
   levelText: {fileID: 1792090564}
-  maxLevel: 10
+  maxLevel: 50
   cost: 1
 --- !u!114 &93892296
 MonoBehaviour:
@@ -10803,11 +10803,11 @@ MonoBehaviour:
   healthSlider: {fileID: 507525551}
   gameOverManager: {fileID: 1702388449}
   baseRegen: 0
-  regenPerLevel: 1.5
+  regenPerLevel: 0.75
   regenLevel: 0
   maxHealthLevel: 0
   maxHealthUpgradeAmount: 50
-  maxHealthUpgradeMaxLevel: 30
+  maxHealthUpgradeMaxLevel: 50
 --- !u!114 &239307048
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10855,7 +10855,7 @@ MonoBehaviour:
   xpToNextLevel: 100
   abilityPoints: 1
   deathXpLossPercent: 20
-  equipment: {fileID: 0}
+  equipment: {fileID: 239307054}
 --- !u!114 &239307051
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22191,6 +22191,130 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &580098221
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 580098222}
+  - component: {fileID: 580098224}
+  - component: {fileID: 580098223}
+  m_Layer: 0
+  m_Name: EnemySpawn-25
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &580098222
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 580098221}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -37.8, y: 26.9, z: -0.0152331665}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 838774841}
+  m_Father: {fileID: 785165943}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &580098223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 580098221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a29ad8ce999b4f2e9ddd114f7fd7e705, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  regionProfile: {fileID: 11400000, guid: ec5db68b9ed73ea4082f12a8d0a92ffa, type: 2}
+  director: {fileID: 1615476167}
+  dynamicEnemiesRoot: {fileID: 838774841}
+  localObserverCamera: {fileID: 519420031}
+  enemies:
+  - displayName: Level 1 Enemy
+    enemyPrefab: {fileID: 8233854846743954295, guid: 4717450b1940da5478471a7f1d8f7c00, type: 3}
+    spawnArea: {fileID: 580098224}
+    desiredPopulation: 3
+    initialSpawnDelay: 0.5
+    minimumRespawnTime: 2
+    maximumRespawnTime: 14
+    failedPointRetryTime: 1.5
+    minimumDistanceFromPlayers: 7
+    maximumDistanceFromPlayers: 28
+    requireOffscreen: 1
+    offscreenPadding: 1.25
+    requireAllowedGround: 0
+    allowedGroundLayers:
+      serializedVersion: 2
+      m_Bits: 0
+    allowTriggerGround: 1
+    blockedEnvironmentLayers:
+      serializedVersion: 2
+      m_Bits: 128
+    blockedTags: []
+    enemyClearanceRadius: 0.5
+    blockedTriggersCount: 0
+    spawnPointSearchAttempts: 32
+  evaluationInterval: 0.25
+  drawSpawnAreas: 1
+  logConfigurationProblems: 1
+--- !u!61 &580098224
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 580098221}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 4.430475, y: -5.3874655}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 50.03686, y: 16.202986}
+  m_EdgeRadius: 0
 --- !u!1 &580817603 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2439885446973800532, guid: 10d5554c12c3e17468df62aef15420a4, type: 3}
@@ -24302,7 +24426,6 @@ MonoBehaviour:
   categoryButtonMinWidth: 58
   categoryButtonMinHeight: 24
   openKey: 98
-  pauseWhenOpen: 1
 --- !u!225 &619029389
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -26411,7 +26534,6 @@ MonoBehaviour:
   badColor: '#EF4444'
   blueColor: '#60A5FA'
   upgradeMenu: {fileID: 1568357024}
-  pauseWhenOpen: 1
 --- !u!114 &661886741
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27754,9 +27876,9 @@ MonoBehaviour:
   playerXP: {fileID: 239307050}
   playerAttack: {fileID: 239307042}
   levelText: {fileID: 1158941143}
-  maxLevel: 10
+  maxLevel: 50
   cost: 1
-  cooldownReductionPerLevel: 0.07
+  cooldownReductionPerLevel: 0.01
   minAttackCooldown: 0.1
 --- !u!114 &707229996
 MonoBehaviour:
@@ -31141,6 +31263,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1759172895}
+  - {fileID: 1828600848}
+  - {fileID: 580098222}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &790946059
@@ -32906,6 +33030,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 836563855}
   m_CullTransparentMesh: 1
+--- !u!1 &838774840
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 838774841}
+  m_Layer: 0
+  m_Name: DynamicEnemies
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &838774841
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 838774840}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 580098222}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &840477492 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5969234097357796667, guid: 5e2f1114b6b96c04aa40152f345bcca8, type: 3}
@@ -39172,7 +39327,7 @@ MonoBehaviour:
   minimumDamage: 15
   maximumDamage: 15
   damageLevel: 0
-  maxDamageLevel: 15
+  maxDamageLevel: 50
   damagePerLevel: 5
   cost: 1
   playerXP: {fileID: 239307050}
@@ -52286,9 +52441,9 @@ MonoBehaviour:
   playerXP: {fileID: 239307050}
   playerAttack: {fileID: 239307042}
   levelText: {fileID: 1670826967}
-  maxLevel: 15
+  maxLevel: 50
   cost: 1
-  critChancePerLevel: 0.025
+  critChancePerLevel: 0.005
 --- !u!1 &1403580734
 GameObject:
   m_ObjectHideFlags: 0
@@ -54576,7 +54731,7 @@ MonoBehaviour:
   playerXP: {fileID: 239307050}
   playerHealth: {fileID: 239307047}
   levelText: {fileID: 179001645}
-  maxLevel: 30
+  maxLevel: 50
   cost: 1
 --- !u!114 &1466374365
 MonoBehaviour:
@@ -63548,9 +63703,9 @@ MonoBehaviour:
   playerHealth: {fileID: 239307047}
   playerAttack: {fileID: 239307042}
   levelText: {fileID: 234584384}
-  maxLevel: 10
+  maxLevel: 50
   cost: 1
-  lifeStealPerLevel: 0.18
+  lifeStealPerLevel: 0.0085
 --- !u!114 &1712722284
 MonoBehaviour:
   m_ObjectHideFlags: 0

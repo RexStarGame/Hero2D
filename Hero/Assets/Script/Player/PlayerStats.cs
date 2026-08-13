@@ -40,7 +40,11 @@ public class PlayerStats : MonoBehaviour
         AutoFind();
         ForceUpdate();
         if (upgradeMenu != null)
+        {
             upgradeMenu.SetActive(false);
+            AbilityResetUI.Ensure(
+                upgradeMenu, playerXP, playerHealth, playerAttack, damageUpgrade);
+        }
     }
 
     private void OnEnable()
