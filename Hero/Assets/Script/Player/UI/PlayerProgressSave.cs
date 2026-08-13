@@ -35,7 +35,7 @@ public static class PlayerProgressSave
             int checkpointLevel = Mathf.Max(Mathf.Max(1, inspectorLevel), BossLevelCheckpoint.Level);
             player.level = checkpointLevel;
             player.xp = 0;
-            player.xpToNextLevel = XpRequiredForLevel(checkpointLevel);
+            player.xpToNextLevel = player.GetXpRequiredForLevel(checkpointLevel);
             player.abilityPoints = Mathf.Max(0, inspectorAbilityPoints) +
                                    (checkpointLevel - Mathf.Max(1, inspectorLevel));
             SavePlayer(player);
@@ -43,7 +43,7 @@ public static class PlayerProgressSave
         }
 
         player.level = Mathf.Max(1, PlayerPrefs.GetInt(LevelKey, inspectorLevel));
-        player.xpToNextLevel = XpRequiredForLevel(player.level);
+        player.xpToNextLevel = player.GetXpRequiredForLevel(player.level);
         player.xp = Mathf.Clamp(PlayerPrefs.GetInt(XpKey, 0), 0, player.xpToNextLevel - 1);
         player.abilityPoints = Mathf.Max(0, PlayerPrefs.GetInt(
             AbilityPointsKey, inspectorAbilityPoints));
@@ -164,8 +164,4 @@ public static class PlayerProgressSave
         return refundedPoints;
     }
 
-    public static int XpRequiredForLevel(int level)
-    {
-        return 100 + ((Mathf.Max(1, level) - 1) * 50);
-    }
 }
